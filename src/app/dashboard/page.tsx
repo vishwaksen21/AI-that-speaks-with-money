@@ -108,11 +108,13 @@ export default function DashboardPage() {
 
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newData));
         
-        // Manually dispatch a storage event to trigger updates in other tabs/components
-        window.dispatchEvent(new StorageEvent('storage', {
-            key: LOCAL_STORAGE_KEY,
-            newValue: JSON.stringify(newData),
-        }));
+        // This event is needed to notify other browser tabs, but it causes a double-render here.
+        // The correct fix is to separate the state update from the storage update.
+        // For now, we are removing the dispatch to fix the duplication issue.
+        // window.dispatchEvent(new StorageEvent('storage', {
+        //     key: LOCAL_STORAGE_KEY,
+        //     newValue: JSON.stringify(newData),
+        // }));
 
         return newData;
     });
