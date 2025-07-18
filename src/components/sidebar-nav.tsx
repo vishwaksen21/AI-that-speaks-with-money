@@ -15,12 +15,14 @@ import {
   Bot,
   Download,
   User,
-  LogIn
+  LogIn,
+  Mic,
 } from 'lucide-react';
 
 const mainNavItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/chat', label: 'Chat with AI', icon: MessageCircle },
+  { href: '/voice-assistant', label: 'Voice Assistant', icon: Mic },
   { href: '/scenario-simulator', label: 'Scenario Simulator', icon: Bot },
   { href: '/export', label: 'Export Data', icon: Download },
 ];

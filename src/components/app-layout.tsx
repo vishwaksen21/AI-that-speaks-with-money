@@ -25,8 +25,8 @@ export function AppLayout({
       <Sidebar variant="sidebar" collapsible="icon">
         <SidebarHeader>
           <div className="flex items-center gap-2 p-2">
-            <Logo className="w-8 h-8 text-primary" />
-            <span className="text-lg font-semibold font-headline text-foreground group-data-[collapsible=icon]:hidden">
+            <Logo className="w-8 h-8 text-sidebar-primary" />
+            <span className="text-lg font-semibold font-headline text-sidebar-foreground group-data-[collapsible=icon]:hidden">
               Fi Money
             </span>
           </div>
@@ -44,7 +44,7 @@ export function AppLayout({
             <SidebarTrigger className="md:hidden" />
             <div>
               <p className="text-sm text-muted-foreground">Pages / {pageTitle}</p>
-              <h1 className="text-lg font-bold font-headline">
+              <h1 className="text-lg font-bold font-headline text-primary">
                 {pageTitle}
               </h1>
             </div>

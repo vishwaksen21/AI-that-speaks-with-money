@@ -1,123 +1,114 @@
 import { AppLayout } from '@/components/app-layout';
-import { userFinancialData } from '@/lib/mock-data';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import {
-  ArrowUp,
-  Landmark,
-  PiggyBank,
-  TrendingUp,
-  Wallet,
-} from 'lucide-react';
-import { AssetAllocationChart } from '@/components/asset-allocation-chart';
-import { NetWorthChart } from '@/components/net-worth-chart';
-import { RecentTransactions } from '@/components/recent-transactions';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { CheckCircle, ArrowRight, TrendingUp, BarChart, Sliders, ShieldCheck, FileText, Bot, Users, Globe, BookOpen, BrainCircuit } from 'lucide-react';
 
-function formatCurrency(amount: number) {
-  return new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
+const FeatureCard = ({ icon: Icon, title, description }: { icon: React.ElementType, title: string, description: string }) => (
+  <div className="flex items-start gap-4">
+    <div className="bg-primary/10 text-primary p-2 rounded-lg">
+      <Icon className="w-6 h-6" />
+    </div>
+    <div>
+      <h3 className="text-lg font-semibold font-headline">{title}</h3>
+      <p className="text-muted-foreground">{description}</p>
+    </div>
+  </div>
+);
 
-function StatCard({
-  title,
-  value,
-  icon: Icon,
-  change,
-}: {
-  title: string;
-  value: string;
-  icon: React.ElementType;
-  change: string;
-}) {
-  return (
+const InfoCard = ({ icon: Icon, title, description }: { icon: React.ElementType, title: string, description: string }) => (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        <Icon className="h-4 w-4 text-muted-foreground" />
+      <CardHeader className="flex flex-row items-center gap-4 space-y-0 pb-2">
+        <div className="bg-primary/10 text-primary p-2 rounded-lg">
+            <Icon className="w-5 h-5" />
+        </div>
+        <CardTitle className="text-lg font-headline">{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{value}</div>
-        <p className="text-xs text-muted-foreground">{change}</p>
+        <p className="text-muted-foreground">{description}</p>
       </CardContent>
     </Card>
   );
-}
 
-export default function DashboardPage() {
-  const { assets, liabilities, netWorth, monthlyIncome, monthlyExpenses } =
-    userFinancialData;
-
+export default function HomePage() {
   return (
-    <AppLayout pageTitle="Dashboard">
-      <div className="space-y-6">
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <StatCard
-            title="Net Worth"
-            value={formatCurrency(netWorth)}
-            icon={Wallet}
-            change="+20.1% from last month"
-          />
-          <StatCard
-            title="Total Assets"
-            value={formatCurrency(assets.totalAssets)}
-            icon={PiggyBank}
-            change="+18.1% from last month"
-          />
-          <StatCard
-            title="Total Liabilities"
-            value={formatCurrency(liabilities.totalLiabilities)}
-            icon={Landmark}
-            change="+5.2% from last month"
-          />
-          <StatCard
-            title="Monthly Cash Flow"
-            value={formatCurrency(monthlyIncome - monthlyExpenses)}
-            icon={TrendingUp}
-            change="Net income after expenses"
-          />
-        </div>
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <CardTitle>Net Worth Over Time</CardTitle>
-              <CardDescription>
-                Your financial growth over the last 6 months.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <NetWorthChart />
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Asset Allocation</CardTitle>
-              <CardDescription>How your assets are diversified.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <AssetAllocationChart />
-            </CardContent>
-          </Card>
-        </div>
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Transactions</CardTitle>
-            <CardDescription>
-              Your latest financial activities.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <RecentTransactions />
-          </CardContent>
-        </Card>
+    <AppLayout pageTitle="Welcome">
+      <div className="space-y-12">
+        {/* Hero Section */}
+        <section className="text-center">
+          <h1 className="text-4xl md:text-6xl font-bold font-headline tracking-tight text-primary">
+            Navigate Your Financial Future
+          </h1>
+          <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">
+            An AI-powered platform to unify your financial data, generate powerful insights, and simulate future scenarios with confidence.
+          </p>
+          <div className="mt-6 flex gap-4 justify-center">
+            <Button size="lg" asChild>
+              <a href="/chat">Chat with AI <ArrowRight className="ml-2" /></a>
+            </Button>
+            <Button size="lg" variant="outline" asChild>
+              <a href="/scenario-simulator">Simulate Scenarios</a>
+            </Button>
+          </div>
+        </section>
+
+        {/* Use Cases Section */}
+        <section className="space-y-8">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold font-headline">Actionable Insights, Real-World Impact</h2>
+            <p className="mt-2 text-muted-foreground">From planning retirement to optimizing loans, our AI agents are here to help.</p>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <FeatureCard icon={TrendingUp} title="Wealth Growth Tracker" description="Track and forecast your net worth over time, suggesting adjustments to improve your financial trajectory." />
+            <FeatureCard icon={Bot} title="Smart Goal Planner" description="Ask questions like 'Can I retire at 55?' or 'How much do I need to save for a car in 3 years?'" />
+            <FeatureCard icon={BarChart} title="Loan Comparison Assistant" description="Evaluate EMI, interest outgo, and tax benefits for various loan options to make the smartest choice." />
+            <FeatureCard icon={FileText} title="Tax Optimization Advisor" description="Suggests tax-saving strategies based on your salary and investments before the financial year ends." />
+            <FeatureCard icon={Sliders} title="SIP Rebalancer" description="Recommends changes in your mutual fund allocation based on risk, returns, and market trends." />
+            <FeatureCard icon={BrainCircuit} title="Anomaly Detector" description="Flags unusual spikes in spending, investment withdrawals, or sudden changes in loan interest." />
+          </div>
+        </section>
+
+        {/* Security and Data Section */}
+        <section className="grid lg:grid-cols-2 gap-8 items-start">
+            <div className="space-y-6">
+                <div className="text-left">
+                    <h2 className="text-3xl font-bold font-headline">Your Data, Your Control</h2>
+                    <p className="mt-2 text-muted-foreground">Security and privacy are at the core of our platform. You decide what to share and with whom.</p>
+                </div>
+                <InfoCard icon={ShieldCheck} title="Secure Consent Model" description="We use an OAuth-based secure consent model for linking your financial accounts. Your credentials are never stored."/>
+                <InfoCard icon={BookOpen} title="Granular Permissions" description="You can choose which data (e.g., only credit score, or only EPF) to share with which agent or tool."/>
+            </div>
+            <div className="space-y-6">
+                <div className="text-left">
+                    <h2 className="text-3xl font-bold font-headline">Comprehensive Data Support</h2>
+                    <p className="mt-2 text-muted-foreground">Connect a wide range of financial accounts to get a true 360-degree view of your finances.</p>
+                </div>
+                <ul className="grid grid-cols-2 gap-x-6 gap-y-2 text-muted-foreground">
+                    {['Income & Salary', 'Real Estate', 'Gold Holdings', 'Insurance', 'UPI Spends', 'Recurring Expenses', 'Equity & Crypto', 'Tax History'].map(item => (
+                        <li key={item} className="flex items-center gap-2">
+                            <CheckCircle className="w-4 h-4 text-primary" /> {item}
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        </section>
+
+        {/* Integration and Personas Section */}
+        <section className="grid lg:grid-cols-2 gap-8 items-start">
+             <div className="space-y-6">
+                <div className="text-left">
+                    <h2 className="text-3xl font-bold font-headline">Powerful Integrations</h2>
+                    <p className="mt-2 text-muted-foreground">Connect your financial life to the tools you already use.</p>
+                </div>
+                <InfoCard icon={Globe} title="Connect Your Ecosystem" description="Export summaries to Google Sheets, get alerts on WhatsApp/Telegram, sync reminders with your Calendar, and get real-time insights in Google Pay."/>
+            </div>
+             <div className="space-y-6">
+                <div className="text-left">
+                    <h2 className="text-3xl font-bold font-headline">For Everyone on a Financial Journey</h2>
+                    <p className="mt-2 text-muted-foreground">Tailored advice for every stage of life.</p>
+                </div>
+                <InfoCard icon={Users} title="Built for Diverse Needs" description="Perfect for young professionals starting to invest, families managing complex budgets, freelancers with variable income, and retirees protecting their capital."/>
+            </div>
+        </section>
       </div>
     </AppLayout>
   );
