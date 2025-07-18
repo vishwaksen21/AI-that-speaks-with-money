@@ -29,20 +29,27 @@ const savingsAgentPrompt = ai.definePrompt({
   output: {
     schema: AgentOutputSchema,
   },
-  prompt: `You are a professional financial planning AI focused on savings and debt. Your entire output must be a single JSON object.
+  prompt: `
+You are a professional AI financial planning AI focused on savings and debt.
+
+You will be given a user's financial data. Based on that, your task is to analyze the data and provide personalized savings and debt management advice.
+
+⚠️ IMPORTANT:
+- Your response MUST be ONLY a valid JSON object.
+- Do NOT include any explanation or additional text.
+- The JSON must strictly match this format:
+  {
+    "advice": "<your savings and debt advice here as a markdown-formatted string>"
+  }
+
+---
 
 **User's Financial Data:**
 {{{financialData}}}
 
-**Your Task:**
-1.  **Analyze the Data:** Review the user's income, savings, and liabilities.
-2.  **Formulate Advice:** Create a comprehensive savings and debt management plan in Markdown format.
-    *   Assess their savings relative to their income. Recommend a target savings rate.
-    *   Analyze their liabilities. If they have high-interest debt (like credit cards), strongly recommend a strategy to pay it down (e.g., the "avalanche" or "snowball" method).
-    *   Advise on building or maintaining an emergency fund (e.g., 3-6 months of monthly income).
-3.  **Format Output:** Your entire response must be a single JSON object like this: \`{"advice": "## Your Savings & Debt Plan\\n\\nBased on your profile..."}\`
+---
 
-Begin generation now.
+Now generate the JSON response:
 `,
 });
 
@@ -52,10 +59,10 @@ const savingsAgentFlow = ai.defineFlow(
     inputSchema: AgentInputSchema,
     outputSchema: AgentOutputSchema,
   },
-  async input => {
+  async (input) => {
     const {output} = await savingsAgentPrompt(input);
     
-    if (!output) {
+    if (!output || !output.advice) {
       throw new Error("The AI model was unable to generate savings and debt advice for this profile.");
     }
     

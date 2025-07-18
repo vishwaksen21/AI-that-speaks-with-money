@@ -30,21 +30,27 @@ const expenseAgentPrompt = ai.definePrompt({
   output: {
     schema: AgentOutputSchema,
   },
-  prompt: `You are a professional financial coach AI specializing in expense management. Your entire output must be a single JSON object.
+  prompt: `
+You are a professional AI financial coach specializing in expense management.
 
-Your task is to provide personalized, actionable advice on optimizing spending. Analyze the user's income and known regular investments (SIPs). The final advice must be formatted as a Markdown string inside the 'advice' field of the JSON object.
+You will be given a user's financial data. Based on that, your task is to analyze the data and provide personalized advice on optimizing spending.
+
+⚠️ IMPORTANT:
+- Your response MUST be ONLY a valid JSON object.
+- Do NOT include any explanation or additional text.
+- The JSON must strictly match this format:
+  {
+    "advice": "<your expense optimization advice here as a markdown-formatted string>"
+  }
+
+---
 
 **User's Financial Data:**
 {{{financialData}}}
 
-**Your Task:**
-1.  **Analyze the Data:** Review the user's monthly income versus their SIPs and other known regular expenses if available.
-2.  **Formulate Advice:** Create a comprehensive expense optimization plan in Markdown format.
-    *   Provide general advice on tracking expenses and identifying areas for potential cutbacks to increase their savings rate. For example, suggest reviewing discretionary spending categories.
-    *   Suggest practical tips for budgeting and mindful spending.
-3.  **Format Output:** Your entire response must be a single JSON object like this: \`{"advice": "## Your Expense Optimization Plan\\n\\nBased on your profile..."}\`
+---
 
-Begin generation now.
+Now generate the JSON response:
 `,
 });
 
@@ -54,10 +60,10 @@ const expenseAgentFlow = ai.defineFlow(
     inputSchema: AgentInputSchema,
     outputSchema: AgentOutputSchema,
   },
-  async input => {
+  async (input) => {
     const {output} = await expenseAgentPrompt(input);
 
-    if (!output) {
+    if (!output || !output.advice) {
       throw new Error("The AI model was unable to generate expense advice for this profile.");
     }
 

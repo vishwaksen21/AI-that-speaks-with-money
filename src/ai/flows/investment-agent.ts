@@ -24,25 +24,32 @@ export async function generateInvestmentAdvice(input: z.infer<typeof AgentInputS
 const investmentAgentPrompt = ai.definePrompt({
   name: 'investmentAgentPrompt',
   input: {
-    schema: AgentInputSchema,
+    schema: AgentInputSchema, // { financialData: string }
   },
   output: {
-    schema: AgentOutputSchema,
+    schema: AgentOutputSchema, // { advice: string }
   },
-  prompt: `You are a professional investment advisor AI. Your entire output must be a single JSON object.
+  prompt: `
+You are a professional AI financial advisor.
+
+You will be given a user's financial data. Based on that, your task is to analyze the data and provide personalized investment advice. The advice should be educational and not suggest specific stocks or funds by name.
+
+⚠️ IMPORTANT:
+- Your response MUST be ONLY a valid JSON object.
+- Do NOT include any explanation or additional text.
+- The JSON must strictly match this format:
+  {
+    "advice": "<your investment advice here as a markdown-formatted string>"
+  }
+
+---
 
 **User's Financial Data:**
 {{{financialData}}}
 
-**Your Task:**
-1.  **Analyze the Data:** Review the user's age, income, and existing assets.
-2.  **Formulate Advice:** Create a comprehensive investment recommendation document in Markdown format.
-    *   Recommend a suitable asset allocation (e.g., 70% equity, 30% debt).
-    *   Suggest specific *types* of investments for each category (e.g., for equity, suggest a mix of index funds and blue-chip stocks; for debt, suggest government bonds or high-quality corporate bonds).
-    *   Provide clear reasoning for your recommendations. Keep the advice educational and do not suggest specific stocks or funds by name.
-3.  **Format Output:** Your entire response must be a single JSON object like this: \`{"advice": "## Your Investment Strategy\\n\\nBased on your profile..."}\`
+---
 
-Begin generation now.
+Now generate the JSON response:
 `,
 });
 
@@ -52,10 +59,10 @@ const investmentAgentFlow = ai.defineFlow(
     inputSchema: AgentInputSchema,
     outputSchema: AgentOutputSchema,
   },
-  async input => {
+  async (input) => {
     const {output} = await investmentAgentPrompt(input);
 
-    if (!output) {
+    if (!output || !output.advice) {
       throw new Error("The AI model was unable to generate investment advice for this profile.");
     }
 
