@@ -38,23 +38,29 @@ export default function ImportDataPage() {
     const reader = new FileReader();
     reader.onload = async (e) => {
       try {
-        const fileContent = e.target?.result as string;
-        // Send the raw file content to the server action with AI
-        const result = await uploadFinancialData(fileContent);
+        const fileContent = e.target?.result as ArrayBuffer;
+        if (!fileContent) {
+          throw new Error('Could not read file content.');
+        }
+
+        const result = await uploadFinancialData(
+          // Convert ArrayBuffer to a plain object for the server action
+          {
+            buffer: Array.from(new Uint8Array(fileContent)),
+            type: selectedFile.type,
+          }
+        );
 
         if (result.success && result.data) {
-            // Save the AI-structured data to localStorage
             localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(result.data));
-
             setUploadSuccess(true);
             toast({
                 title: 'Analysis Complete!',
                 description: 'Your financial data has been extracted and processed.',
             });
-            // Redirect after a short delay to ensure localStorage has updated
             setTimeout(() => router.push('/dashboard'), 1500); 
         } else {
-            throw new Error(result.error || 'The AI could not process your file. Please try a different format or check the content.');
+            throw new Error(result.error || 'The AI could not process your file. Please check the content.');
         }
 
       } catch (err: any) {
@@ -78,7 +84,7 @@ export default function ImportDataPage() {
             variant: 'destructive'
         });
     };
-    reader.readAsText(selectedFile);
+    reader.readAsArrayBuffer(selectedFile);
   };
 
   return (
@@ -87,7 +93,7 @@ export default function ImportDataPage() {
         <Card>
           <CardHeader>
             <CardTitle className="font-headline">Import Your Financial Data with AI</CardTitle>
-            <CardDescription>Upload a file (txt, csv, json, etc.) with your financial info. Our AI will analyze and structure it for you.</CardDescription>
+            <CardDescription>Upload a file (txt, csv, json, xlsx) with your financial info. Our AI will analyze and structure it for you.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
@@ -95,7 +101,7 @@ export default function ImportDataPage() {
                 Data File
               </label>
               <div className="flex items-center gap-4">
-                <Input id="file-upload" type="file" onChange={handleFileChange} className="flex-1" disabled={isUploading} />
+                <Input id="file-upload" type="file" onChange={handleFileChange} className="flex-1" disabled={isUploading} accept=".txt,.csv,.json,.xlsx" />
               </div>
             </div>
 
