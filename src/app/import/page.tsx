@@ -7,10 +7,11 @@ import { AppLayout } from '@/components/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Upload, FileText, CheckCircle, Loader2, AlertTriangle, Wand2 } from 'lucide-react';
+import { Upload, FileText, CheckCircle, Loader2, AlertTriangle, Wand2, HelpCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { uploadFinancialData } from './actions';
 import { LOCAL_STORAGE_KEY } from '@/lib/mock-data';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 export default function ImportDataPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -77,7 +78,7 @@ export default function ImportDataPage() {
         const friendlyError = err.message || 'An unexpected error occurred. Please try again.';
         setError(friendlyError);
         toast({
-          title: 'Upload Failed',
+          title: 'Analysis Failed',
           description: friendlyError,
           variant: 'destructive',
         });
@@ -105,7 +106,7 @@ export default function ImportDataPage() {
 
   return (
     <AppLayout pageTitle="Import Data">
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-2xl mx-auto space-y-6">
         <Card>
           <CardHeader>
             <CardTitle className="font-headline">Import Your Financial Data with AI</CardTitle>
@@ -152,13 +153,44 @@ export default function ImportDataPage() {
                 </div>
             )}
             {error && (
-                 <div className="flex items-start gap-3 p-4 rounded-md border text-destructive bg-destructive/10 border-destructive/20 dark:text-destructive-foreground dark:bg-destructive/20 dark:border-destructive/40">
-                    <AlertTriangle className="h-5 w-5 text-destructive dark:text-destructive-foreground mt-1" />
-                    <p className="font-medium text-sm flex-1">{error}</p>
-                </div>
+                 <Alert variant="destructive">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertTitle>Analysis Failed</AlertTitle>
+                    <AlertDescription>{error}</AlertDescription>
+                </Alert>
             )}
           </CardContent>
         </Card>
+
+        {error && (
+            <Card>
+                 <CardHeader>
+                    <div className="flex items-center gap-2">
+                         <HelpCircle className="h-5 w-5 text-muted-foreground" />
+                        <CardTitle className="font-headline text-xl">Having Trouble?</CardTitle>
+                    </div>
+                    <CardDescription>If the AI is unable to process your file, try these steps.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4 text-sm text-muted-foreground">
+                   <div>
+                        <h4 className="font-semibold text-foreground mb-1">1. Check the File Format</h4>
+                        <p>Make sure your document is in a supported format like TXT, CSV, XLSX, PNG, or JPG. If not, try converting it first.</p>
+                   </div>
+                   <div>
+                        <h4 className="font-semibold text-foreground mb-1">2. For Images or Scanned PDFs</h4>
+                        <p>Ensure the text is clear and readable. High-quality scans or photos work best for OCR (Optical Character Recognition).</p>
+                   </div>
+                    <div>
+                        <h4 className="font-semibold text-foreground mb-1">3. Split Large Files</h4>
+                        <p>If your file is very large (e.g., many pages or high resolution), the AI might time out. Try splitting it into smaller chunks.</p>
+                   </div>
+                    <div>
+                        <h4 className="font-semibold text-foreground mb-1">4. Check for Corruption</h4>
+                        <p>Try opening the file on your device. If it doesn't open, it might be corrupted. Try re-saving or re-exporting it.</p>
+                   </div>
+                </CardContent>
+            </Card>
+        )}
       </div>
     </AppLayout>
   );
