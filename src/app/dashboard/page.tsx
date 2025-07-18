@@ -421,3 +421,5 @@ function AddTransactionDialog({ onAddTransaction, currency }: { onAddTransaction
         </Dialog>
     );
 }
+
+    
