@@ -16,7 +16,7 @@ const FinancialDataSchema = z.object({
   profile: z.object({
     name: z.string().describe("The user's full name."),
     age: z.number().describe("The user's age."),
-    employment_status: z.string().describe("The user's employment status (e.g., Salaried, Self-employed)."),
+    employment_status: z.string().describe("The user's employment status (e.g., Salaried, Self-employed, Freelancer)."),
     monthly_income: z.number().describe("The user's monthly income in Indian Rupees (₹)."),
   }),
   assets: z.object({
@@ -29,18 +29,18 @@ const FinancialDataSchema = z.object({
         current_value: z.number().describe("Current market value of the holding in Indian Rupees (₹)."),
     })).describe("List of user's mutual fund investments."),
     stocks: z.array(z.object({
-        ticker: z.string().describe("The stock ticker symbol (e.g., TCS, INFY)."),
+        ticker: z.string().describe("The stock ticker symbol or company name (e.g., TCS, Reliance Industries)."),
         shares: z.number().describe("Number of shares held."),
         current_price: z.number().describe("Current price per share in Indian Rupees (₹)."),
     })).describe("List of user's stock holdings."),
     real_estate: z.array(z.object({
-        property_type: z.string().describe("Type of property (e.g., Apartment, Land)."),
+        property_type: z.string().describe("Type of property (e.g., Apartment, Land, Digital Gold)."),
         market_value: z.number().describe("Current market value of the property in Indian Rupees (₹)."),
     })).describe("List of user's real estate assets."),
   }),
   liabilities: z.object({
     loans: z.array(z.object({
-      type: z.string().describe("Type of loan (e.g., Home Loan, Car Loan)."),
+      type: z.string().describe("Type of loan (e.g., Home Loan, Car Loan, Personal Loan)."),
       outstanding_amount: z.number().describe("The remaining amount to be paid in Indian Rupees (₹)."),
     })).describe("List of user's outstanding loans."),
     credit_cards: z.array(z.object({
@@ -49,11 +49,15 @@ const FinancialDataSchema = z.object({
     })).describe("List of user's credit card balances."),
   }),
   investments: z.object({
-      EPF: z.object({
-          balance: z.number().describe("The current balance in the Employee Provident Fund in Indian Rupees (₹).")
-      }).describe("Employee Provident Fund details.")
+      sips: z.array(z.object({
+          name: z.string().describe("Name of the SIP fund."),
+          monthly_investment: z.number().describe("Monthly investment amount in Indian Rupees (₹)."),
+      })).optional().describe("Systematic Investment Plans."),
+      ppf: z.object({
+          balance: z.number().describe("The current balance in the Public Provident Fund in Indian Rupees (₹).")
+      }).describe("Public Provident Fund (PPF) details. Map EPF to this if PPF is not present.")
   }),
-  net_worth: z.number().describe("The calculated net worth (Total Assets - Total Liabilities) in Indian Rupees (₹). If not provided, calculate it."),
+  net_worth: z.number().describe("The calculated net worth (Total Assets - Total Liabilities) in Indian Rupees (₹). If provided in the text, use that value. Otherwise, you must calculate it."),
   credit_score: z.number().optional().describe("The user's credit score (e.g., CIBIL score).")
 }).describe('A structured representation of a user\'s financial data.');
 
@@ -68,18 +72,20 @@ const prompt = ai.definePrompt({
   input: {schema: z.string()},
   output: {schema: FinancialDataSchema},
   model: 'googleai/gemini-1.5-flash-latest',
-  prompt: `You are an expert financial data analyst. Your task is to analyze the following raw text, which contains a user's financial information. The text could be in any format (JSON, CSV, unstructured sentences, etc.).
+  prompt: `You are an expert financial data analyst. Your task is to analyze the following raw text, which contains a user's financial information. The text could be in any format (JSON, CSV, unstructured sentences, bullet points, etc.).
 
 Your goal is to extract all relevant financial details and structure them into a valid JSON object according to the provided schema.
 
-- All monetary values should be in Indian Rupees (₹). If a currency symbol is not present, assume INR.
-- Carefully identify all assets (bank accounts, stocks, mutual funds, real estate, EPF) and liabilities (loans, credit cards).
-- If the user's name is not explicitly provided, use a placeholder like "Valued User".
-- If age is not provided, use a reasonable default like 30.
-- If net worth is not explicitly mentioned, you MUST calculate it by summing all assets and subtracting all liabilities. Total assets include bank balances, mutual funds, stocks (shares * price), real estate, and EPF balance.
-- Fill in every field of the schema as accurately as possible based on the input text. If a particular piece of information (e.g., credit score) is missing, you can omit it if the schema allows, otherwise provide a sensible default (e.g., 0 for a balance, an empty array [] for lists).
-- Generate a user_id, for example 'user_12345'.
-- It is critical that your output is a single, valid JSON object that strictly adheres to the schema. Do not include any text or explanations outside of the JSON object.
+**CRITICAL INSTRUCTIONS:**
+- All monetary values must be in Indian Rupees (₹). If a currency symbol is not present, assume INR. Remove commas from numbers.
+- **Net Worth:** If net worth is explicitly provided in the text, use that value. Otherwise, you MUST calculate it by summing all assets and subtracting all liabilities. Total assets include bank balances, mutual funds, stocks (shares * price), real estate, and PPF balance.
+- **Stocks:** For each stock, you must have 'ticker', 'shares', and 'current_price'. Calculate the total value by multiplying shares by the current price.
+- **Digital Gold:** Treat "Digital Gold" as a type of real estate asset.
+- **PPF/EPF:** The schema uses a 'ppf' field. If you see "EPF" or "Provident Fund", map it to the 'ppf' object.
+- **SIPs:** Extract Systematic Investment Plan details into the 'sips' array under 'investments'.
+- **Defaults:** Fill in every field of the schema as accurately as possible. If a piece of information is missing (e.g., credit score), you can omit it if the schema allows. For other missing fields, provide a sensible default (e.g., 0 for a balance, an empty array [] for lists, "Valued User" for a name, 30 for age).
+- **User ID:** Generate a random user_id, for example 'user_12345'.
+- **Output Format:** It is absolutely critical that your output is a single, valid JSON object that strictly adheres to the schema. Do not include any text, explanations, or markdown formatting outside of the JSON object itself.
 
 Raw Data Input:
 \`\`\`

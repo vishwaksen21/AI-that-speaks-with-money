@@ -1,4 +1,3 @@
-
 export const LOCAL_STORAGE_KEY = 'userFinancialData';
 
 export const defaultFinancialData = {
@@ -43,10 +42,10 @@ export const defaultFinancialData = {
       },
     ],
     real_estate: [
-        {
-            property_type: 'Digital Gold',
-            market_value: 94550,
-        }
+      {
+        property_type: 'Digital Gold',
+        market_value: 94550,
+      },
     ],
   },
   liabilities: {
@@ -64,35 +63,45 @@ export const defaultFinancialData = {
     ],
   },
   investments: {
-    EPF: { // Using EPF field to store PPF balance for schema consistency
+    sips: [
+      {
+        name: 'UTI Nifty Index Fund',
+        monthly_investment: 4000,
+      },
+    ],
+    ppf: {
       balance: 120000,
     },
   },
-  net_worth: 243000,
+  net_worth: 337850, // This is a calculated value based on the assets and liabilities above.
   credit_score: 765,
 };
 
 export function getFinancialData() {
-  // This function now runs exclusively on the client, so `window` is safe to use.
   if (typeof window === 'undefined') {
     return defaultFinancialData;
   }
-  
-  const storedData = localStorage.getItem(LOCAL_STORAGE_KEY);
-  
-  if (!storedData) {
-    // If no data exists, store and return the default.
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(defaultFinancialData));
-    return defaultFinancialData;
-  }
-  
+
   try {
-    // Try to parse the stored data.
-    return JSON.parse(storedData);
+    const storedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (storedData) {
+      return JSON.parse(storedData);
+    } else {
+      localStorage.setItem(
+        LOCAL_STORAGE_KEY,
+        JSON.stringify(defaultFinancialData)
+      );
+      return defaultFinancialData;
+    }
   } catch (error) {
-    console.error('Failed to parse financial data from localStorage, using default:', error);
-    // If parsing fails (e.g., corrupted data), store and return the default.
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(defaultFinancialData));
+    console.error(
+      'Failed to parse financial data from localStorage, using default:',
+      error
+    );
+    localStorage.setItem(
+      LOCAL_STORAGE_KEY,
+      JSON.stringify(defaultFinancialData)
+    );
     return defaultFinancialData;
   }
 }

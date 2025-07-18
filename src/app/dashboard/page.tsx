@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -30,8 +29,8 @@ const calculateTotalAssets = (data: any) => {
     const mutualFunds = data.assets.mutual_funds?.reduce((sum: number, mf: any) => sum + (mf.current_value || 0), 0) || 0;
     const stocks = data.assets.stocks?.reduce((sum: number, stock: any) => sum + ((stock.shares || 0) * (stock.current_price || 0)), 0) || 0;
     const realEstate = data.assets.real_estate?.reduce((sum: number, prop: any) => sum + (prop.market_value || 0), 0) || 0;
-    const epf = data.investments?.EPF?.balance || 0;
-    return bankBalance + mutualFunds + stocks + realEstate + epf;
+    const ppf = data.investments?.ppf?.balance || data.investments?.EPF?.balance || 0; // Check for ppf or fallback to EPF
+    return bankBalance + mutualFunds + stocks + realEstate + ppf;
 };
 
 // Helper function to calculate total liabilities, now part of the component
@@ -47,7 +46,6 @@ export default function DashboardPage() {
 
   useEffect(() => {
     // Directly fetch and set data on the client side.
-    // This ensures we always get the latest from localStorage.
     const financialData = getFinancialData();
     setData(financialData);
   }, []);
@@ -93,7 +91,9 @@ export default function DashboardPage() {
   if (data?.assets?.real_estate) {
       assetAllocationData.push({ name: 'Real Estate', value: data.assets.real_estate.reduce((sum: number, prop: any) => sum + prop.market_value, 0) });
   }
-  if (data?.investments?.EPF) {
+   if (data?.investments?.ppf?.balance) {
+      assetAllocationData.push({ name: 'PPF', value: data.investments.ppf.balance });
+  } else if (data?.investments?.EPF?.balance) {
       assetAllocationData.push({ name: 'EPF', value: data.investments.EPF.balance });
   }
   
