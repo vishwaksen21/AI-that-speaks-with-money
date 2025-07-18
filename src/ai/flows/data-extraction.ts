@@ -85,7 +85,7 @@ const prompt = ai.definePrompt({
   prompt: `You are an expert financial data analyst. Your task is to analyze the following financial information, which can be from raw text or an image, and structure it into a valid JSON object matching the provided schema.
 
 CRITICAL INSTRUCTIONS:
-1.  **Analyze the Input**: Analyze the provided input. It will be either an image or raw text, but not both.
+1.  **Analyze the Input**: Analyze the provided input. It will be either an image or raw text, but not both. Use your OCR capabilities for images and table recognition for structured data.
     {{#if photoDataUri}}
     Image of Financial Document: {{media url=photoDataUri}}
     {{/if}}
@@ -156,4 +156,3 @@ const dataExtractionFlow = ai.defineFlow(
     throw new Error("The AI model returned no output after all retry attempts.");
   }
 );
-
