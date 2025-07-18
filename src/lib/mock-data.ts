@@ -43,7 +43,10 @@ export function getFinancialData() {
     }
     try {
         const storedData = localStorage.getItem(LOCAL_STORAGE_KEY);
-        return storedData ? JSON.parse(storedData) : defaultFinancialData;
+        if (storedData) {
+            return JSON.parse(storedData);
+        }
+        return defaultFinancialData;
     } catch (error) {
         console.error("Failed to parse financial data from localStorage", error);
         return defaultFinancialData;

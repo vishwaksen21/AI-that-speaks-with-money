@@ -12,6 +12,9 @@ import { DollarSign, TrendingUp, TrendingDown } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 function formatCurrency(amount: number) {
+  if (typeof amount !== 'number' || isNaN(amount)) {
+    return '₹--';
+  }
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: 'INR',
@@ -26,7 +29,8 @@ export default function DashboardPage() {
 
   useEffect(() => {
     // Ensure this runs only on the client
-    setData(getFinancialData());
+    const financialData = getFinancialData();
+    setData(financialData);
     setLoading(false);
   }, []);
 
@@ -75,7 +79,7 @@ export default function DashboardPage() {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(data.assets.totalAssets)}</div>
+              <div className="text-2xl font-bold">{formatCurrency(data.assets?.totalAssets)}</div>
                <p className="text-xs text-muted-foreground">+5.1% from last month</p>
             </CardContent>
           </Card>
@@ -85,7 +89,7 @@ export default function DashboardPage() {
               <TrendingDown className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(data.liabilities.totalLiabilities)}</div>
+              <div className="text-2xl font-bold">{formatCurrency(data.liabilities?.totalLiabilities)}</div>
                <p className="text-xs text-muted-foreground">-1.2% from last month</p>
             </CardContent>
           </Card>
