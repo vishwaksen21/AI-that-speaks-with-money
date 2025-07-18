@@ -26,7 +26,7 @@ export function AppLayout({
           <div className="flex items-center gap-2">
             <Logo className="w-8 h-8 text-sidebar-primary" />
             <span className="text-lg font-semibold font-headline text-sidebar-foreground">
-              FinanceAI
+              Fi Money
             </span>
           </div>
         </SidebarHeader>
