@@ -92,7 +92,7 @@ export default function LandingPage() {
                         </ul>
                     </div>
                      <div className="relative h-64 md:h-80 rounded-lg overflow-hidden">
-                        <Image src="https://storage.googleapis.com/static.aiprompt.io/5c7cf1c5-e51c-4b17-a006-2182061217e1.png" alt="Security & Privacy First shield" layout="fill" objectFit="cover" />
+                        <Image src="https://storage.googleapis.com/static.aiprompt.io/5c7cf1c5-e51c-4b17-a006-2182061217e1.png" alt="Security & Privacy First shield" fill style={{ objectFit: 'cover' }} />
                     </div>
                 </div>
             </section>
