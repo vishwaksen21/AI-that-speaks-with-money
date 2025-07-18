@@ -13,11 +13,9 @@ const AgentInputSchema = z.object({
   financialData: z.string().describe('The user\'s consolidated financial data in JSON format.'),
 });
 
-const AgentOutputSchema = z.object({
-  advice: z.string().describe('A single, comprehensive recommendation document in Markdown format.'),
-});
+const AgentOutputSchema = z.string().describe('A single, comprehensive recommendation document in Markdown format.');
 
-export async function generateSavingsAdvice(input: z.infer<typeof AgentInputSchema>): Promise<z.infer<typeof AgentOutputSchema>> {
+export async function generateSavingsAdvice(input: z.infer<typeof AgentInputSchema>): Promise<{ advice: string }> {
   return savingsAgentFlow(input);
 }
 
@@ -27,7 +25,7 @@ const savingsAgentPrompt = ai.definePrompt({
     schema: AgentInputSchema,
   },
   output: {
-    schema: z.string().describe('A single, comprehensive recommendation document in Markdown format.'),
+    schema: AgentOutputSchema,
   },
   prompt: `You are a professional financial planning AI focused on savings and debt. Your task is to provide personalized, actionable advice based on the user's data. Analyze their income, savings, and liabilities.
 
@@ -48,7 +46,7 @@ const savingsAgentFlow = ai.defineFlow(
   {
     name: 'savingsAgentFlow',
     inputSchema: AgentInputSchema,
-    outputSchema: AgentOutputSchema,
+    outputSchema: z.object({ advice: z.string() }),
   },
   async input => {
     const {output} = await savingsAgentPrompt(input);
