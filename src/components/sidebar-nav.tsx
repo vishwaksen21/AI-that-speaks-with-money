@@ -1,7 +1,9 @@
+
 'use client';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useState } from 'react';
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -17,11 +19,21 @@ import {
   LogIn,
   Mic,
   Home,
+  ChevronDown,
 } from 'lucide-react';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
+import { cn } from '@/lib/utils';
 
 const mainNavItems = [
   { href: '/', label: 'Home', icon: Home },
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+];
+
+const aiToolsNavItems = [
   { href: '/chat', label: 'Chat with AI', icon: MessageCircle },
   { href: '/voice-assistant', label: 'Voice Assistant', icon: Mic },
   { href: '/scenario-simulator', label: 'Scenario Simulator', icon: Bot },
@@ -35,6 +47,7 @@ const accountNavItems = [
 
 export function SidebarNav() {
   const pathname = usePathname();
+  const [isAiToolsOpen, setIsAiToolsOpen] = useState(pathname.startsWith('/chat') || pathname.startsWith('/voice-assistant') || pathname.startsWith('/scenario-simulator'));
 
   return (
     <SidebarMenu>
@@ -53,6 +66,42 @@ export function SidebarNav() {
             </SidebarMenuButton>
             </SidebarMenuItem>
         ))}
+
+        <SidebarMenuItem>
+            <Collapsible open={isAiToolsOpen} onOpenChange={setIsAiToolsOpen}>
+                <CollapsibleTrigger asChild>
+                    <SidebarMenuButton
+                        variant="ghost"
+                        className="w-full justify-start group-data-[collapsible=icon]:w-8"
+                        tooltip="AI Tools"
+                    >
+                        <Bot />
+                        <span className="group-data-[collapsible=icon]:hidden flex-1 text-left">AI Tools</span>
+                        <ChevronDown className={cn("group-data-[collapsible=icon]:hidden h-4 w-4 transition-transform", isAiToolsOpen && "rotate-180")} />
+                    </SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="group-data-[collapsible=icon]:hidden ml-7 flex flex-col gap-1 border-l pl-2 mt-1">
+                     {aiToolsNavItems.map((item) => (
+                        <SidebarMenuItem key={item.href} className="p-0 m-0">
+                        <SidebarMenuButton
+                            asChild
+                            variant="ghost"
+                            size="sm"
+                            isActive={pathname === item.href}
+                            tooltip={item.label}
+                            className="justify-start w-full"
+                        >
+                            <Link href={item.href}>
+                            <item.icon />
+                            <span>{item.label}</span>
+                            </Link>
+                        </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    ))}
+                </CollapsibleContent>
+            </Collapsible>
+        </SidebarMenuItem>
+        
          <SidebarGroup className="p-0 pt-4">
             <SidebarGroupLabel className="px-2 group-data-[collapsible=icon]:px-0">
                 <span className="group-data-[collapsible=icon]:hidden">Account Pages</span>
