@@ -1,6 +1,6 @@
 
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AppLayout } from '@/components/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -9,6 +9,7 @@ import { Loader2, Wand2 } from 'lucide-react';
 import { getScenarioResponse } from './actions';
 import { Skeleton } from '@/components/ui/skeleton';
 import ReactMarkdown from 'react-markdown';
+import { getFinancialData } from '@/lib/mock-data';
 
 interface ScenarioResult {
   analysis: string;
@@ -20,6 +21,12 @@ export default function ScenarioSimulatorPage() {
   const [result, setResult] = useState<ScenarioResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [financialDataString, setFinancialDataString] = useState('');
+
+  useEffect(() => {
+      const data = getFinancialData();
+      setFinancialDataString(JSON.stringify(data, null, 2));
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,7 +37,7 @@ export default function ScenarioSimulatorPage() {
     setResult(null);
 
     try {
-      const response = await getScenarioResponse(scenario);
+      const response = await getScenarioResponse(scenario, financialDataString);
       setResult({
         analysis: response.scenarioAnalysis,
         recommendations: response.recommendations,

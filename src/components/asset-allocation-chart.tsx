@@ -1,4 +1,7 @@
+
 'use client';
+
+import { useState, useEffect } from 'react';
 import {
   PieChart,
   Pie,
@@ -7,15 +10,25 @@ import {
   Tooltip,
   Legend,
 } from 'recharts';
-import { userFinancialData } from '@/lib/mock-data';
+import { getFinancialData } from '@/lib/mock-data';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
-const data = userFinancialData.assets.cashAndInvestments.breakdown.map(
-  (item) => ({ name: item.type, value: item.amount })
-);
-
 export function AssetAllocationChart() {
+    const [data, setData] = useState<any[]>([]);
+
+    useEffect(() => {
+        const financialData = getFinancialData();
+        const chartData = financialData.assets.cashAndInvestments.breakdown.map(
+            (item: any) => ({ name: item.type, value: item.amount })
+        );
+        setData(chartData);
+    }, []);
+
+    if (data.length === 0) {
+        return <div style={{height: 300}} />;
+    }
+    
   return (
     <ResponsiveContainer width="100%" height={300}>
       <PieChart>

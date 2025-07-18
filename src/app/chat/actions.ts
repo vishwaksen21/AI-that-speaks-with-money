@@ -1,12 +1,13 @@
+
 'use server';
 
 import { generatePersonalizedFinancialInsights } from '@/ai/flows/insight-generation';
-import { financialDataString } from '@/lib/mock-data';
+// Note: We get the data on the client and pass it in, so we don't need mock data here.
 
-export async function getChatResponse(userQuestion: string) {
+export async function getChatResponse(userQuestion: string, financialData: string) {
   try {
     const response = await generatePersonalizedFinancialInsights({
-      financialData: financialDataString,
+      financialData: financialData,
       userQuestion: userQuestion,
     });
     return { insight: response.insights };

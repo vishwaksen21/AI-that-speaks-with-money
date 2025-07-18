@@ -12,6 +12,7 @@ import { getChatResponse } from './actions';
 import { Skeleton } from '@/components/ui/skeleton';
 import ReactMarkdown from 'react-markdown';
 import { Logo } from '@/components/icons';
+import { getFinancialData } from '@/lib/mock-data';
 
 interface Message {
   id: string;
@@ -24,9 +25,13 @@ export default function ChatPage() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const [financialDataString, setFinancialDataString] = useState('');
 
   useEffect(() => {
-    // Load chat history from local storage on component mount
+    // Load financial data and chat history on mount
+    const data = getFinancialData();
+    setFinancialDataString(JSON.stringify(data, null, 2));
+
     try {
       const savedMessages = localStorage.getItem('chatHistory');
       if (savedMessages) {
@@ -38,13 +43,12 @@ export default function ChatPage() {
   }, []);
 
   useEffect(() => {
-    // Save chat history to local storage whenever messages change
     if (messages.length > 0) {
-        try {
-            localStorage.setItem('chatHistory', JSON.stringify(messages));
-        } catch (error) {
-            console.error('Failed to save messages to local storage', error);
-        }
+      try {
+        localStorage.setItem('chatHistory', JSON.stringify(messages));
+      } catch (error) {
+        console.error('Failed to save messages to local storage', error);
+      }
     }
   }, [messages]);
 
@@ -71,7 +75,7 @@ export default function ChatPage() {
     setIsLoading(true);
 
     try {
-      const { insight } = await getChatResponse(input);
+      const { insight } = await getChatResponse(input, financialDataString);
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',

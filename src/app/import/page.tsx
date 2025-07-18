@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Upload, FileText, CheckCircle, Loader2, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { uploadFinancialData } from './actions';
+import { LOCAL_STORAGE_KEY } from '@/lib/mock-data';
 
 export default function ImportDataPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -38,15 +39,20 @@ export default function ImportDataPage() {
     reader.onload = async (e) => {
       try {
         const fileContent = e.target?.result as string;
+        // First, validate on the server
         const result = await uploadFinancialData(fileContent);
 
         if (result.success) {
+            // Then, save to localStorage to be used by the app
+            localStorage.setItem(LOCAL_STORAGE_KEY, fileContent);
+
             setUploadSuccess(true);
             toast({
                 title: 'Upload Successful!',
                 description: 'Your financial data has been processed.',
             });
-            setTimeout(() => router.push('/dashboard'), 1500);
+            // Reload to ensure all components get the new data from localStorage
+            setTimeout(() => window.location.href = '/dashboard', 1500);
         } else {
             throw new Error(result.error || 'An unknown error occurred.');
         }

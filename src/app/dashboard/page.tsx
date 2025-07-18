@@ -1,11 +1,15 @@
 
+'use client';
+
+import { useState, useEffect } from 'react';
 import { AppLayout } from '@/components/app-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { RecentTransactions } from '@/components/recent-transactions';
 import { NetWorthChart } from '@/components/net-worth-chart';
 import { AssetAllocationChart } from '@/components/asset-allocation-chart';
-import { userFinancialData } from '@/lib/mock-data';
+import { getFinancialData } from '@/lib/mock-data';
 import { DollarSign, TrendingUp, TrendingDown } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 function formatCurrency(amount: number) {
   return new Intl.NumberFormat('en-IN', {
@@ -17,6 +21,30 @@ function formatCurrency(amount: number) {
 }
 
 export default function DashboardPage() {
+  const [data, setData] = useState<any>(null);
+
+  useEffect(() => {
+    setData(getFinancialData());
+  }, []);
+
+  if (!data) {
+    return (
+        <AppLayout pageTitle="Dashboard">
+             <div className="space-y-6">
+                <div className="grid gap-4 md:grid-cols-3">
+                    <Card><CardHeader><Skeleton className="h-4 w-24" /></CardHeader><CardContent><Skeleton className="h-8 w-32" /></CardContent></Card>
+                    <Card><CardHeader><Skeleton className="h-4 w-24" /></CardHeader><CardContent><Skeleton className="h-8 w-32" /></CardContent></Card>
+                    <Card><CardHeader><Skeleton className="h-4 w-24" /></CardHeader><CardContent><Skeleton className="h-8 w-32" /></CardContent></Card>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+                    <Card className="lg:col-span-4"><CardContent className="pt-6"><Skeleton className="h-[300px] w-full" /></CardContent></Card>
+                    <Card className="lg:col-span-3"><CardContent className="pt-6"><Skeleton className="h-[300px] w-full" /></CardContent></Card>
+                </div>
+             </div>
+        </AppLayout>
+    )
+  }
+
   return (
     <AppLayout pageTitle="Dashboard">
       <div className="space-y-6">
@@ -28,7 +56,7 @@ export default function DashboardPage() {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(userFinancialData.netWorth)}</div>
+              <div className="text-2xl font-bold">{formatCurrency(data.netWorth)}</div>
               <p className="text-xs text-muted-foreground">+2.5% from last month</p>
             </CardContent>
           </Card>
@@ -38,7 +66,7 @@ export default function DashboardPage() {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(userFinancialData.assets.totalAssets)}</div>
+              <div className="text-2xl font-bold">{formatCurrency(data.assets.totalAssets)}</div>
                <p className="text-xs text-muted-foreground">+5.1% from last month</p>
             </CardContent>
           </Card>
@@ -48,7 +76,7 @@ export default function DashboardPage() {
               <TrendingDown className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(userFinancialData.liabilities.totalLiabilities)}</div>
+              <div className="text-2xl font-bold">{formatCurrency(data.liabilities.totalLiabilities)}</div>
                <p className="text-xs text-muted-foreground">-1.2% from last month</p>
             </CardContent>
           </Card>

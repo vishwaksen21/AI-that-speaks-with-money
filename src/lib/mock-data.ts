@@ -1,4 +1,7 @@
-export const userFinancialData = {
+
+export const LOCAL_STORAGE_KEY = 'userFinancialData';
+
+export const defaultFinancialData = {
   assets: {
     cashAndInvestments: {
       total: 650000,
@@ -34,4 +37,17 @@ export const userFinancialData = {
   monthlyExpenses: 45000,
 };
 
-export const financialDataString = JSON.stringify(userFinancialData, null, 2);
+export function getFinancialData() {
+    if (typeof window === 'undefined') {
+        return defaultFinancialData;
+    }
+    try {
+        const storedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+        return storedData ? JSON.parse(storedData) : defaultFinancialData;
+    } catch (error) {
+        console.error("Failed to parse financial data from localStorage", error);
+        return defaultFinancialData;
+    }
+}
+
+export const financialDataString = JSON.stringify(getFinancialData(), null, 2);

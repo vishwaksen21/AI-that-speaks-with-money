@@ -1,12 +1,13 @@
+
 'use server';
 
 import { simulateFinancialScenario } from '@/ai/flows/scenario-simulation';
-import { financialDataString } from '@/lib/mock-data';
+// Note: We get the data on the client and pass it in, so we don't need mock data here.
 
-export async function getScenarioResponse(scenarioDescription: string) {
+export async function getScenarioResponse(scenarioDescription: string, financialData: string) {
   try {
     const response = await simulateFinancialScenario({
-      financialData: financialDataString,
+      financialData: financialData,
       scenarioDescription: scenarioDescription,
     });
     return response;
