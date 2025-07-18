@@ -25,16 +25,15 @@ function formatCurrency(amount: number) {
 
 export default function DashboardPage() {
   const [data, setData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Ensure this runs only on the client
-    const financialData = getFinancialData();
-    setData(financialData);
-    setLoading(false);
+    // This effect runs only on the client, after the component has mounted.
+    // It safely retrieves data from localStorage or falls back to defaults.
+    setData(getFinancialData());
   }, []);
 
-  if (loading || !data) {
+  // Show a loading skeleton if data hasn't been loaded from the client yet.
+  if (!data) {
     return (
         <AppLayout pageTitle="Dashboard">
              <div className="space-y-6">

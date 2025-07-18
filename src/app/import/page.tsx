@@ -51,8 +51,8 @@ export default function ImportDataPage() {
                 title: 'Upload Successful!',
                 description: 'Your financial data has been processed.',
             });
-            // Reload to ensure all components get the new data from localStorage
-            setTimeout(() => window.location.href = '/dashboard', 1500);
+            // Use client-side router to navigate
+            setTimeout(() => router.push('/dashboard'), 1500);
         } else {
             throw new Error(result.error || 'An unknown error occurred.');
         }
