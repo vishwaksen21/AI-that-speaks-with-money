@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { AppLayout } from '@/components/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Loader2, Wand2, LineChart, PiggyBank, Receipt } from 'lucide-react';
+import { Loader2, Wand2, LineChart, PiggyBank, Receipt, AlertTriangle } from 'lucide-react';
 import { getInvestmentAdvice, getSavingsAdvice, getExpenseAdvice } from './actions';
 import { Skeleton } from '@/components/ui/skeleton';
 import ReactMarkdown from 'react-markdown';
@@ -51,10 +51,14 @@ export default function AgentsPage() {
         response = await getExpenseAdvice(cleanedDataString);
       }
       
-      setResult({ agent, advice: response.advice });
+      if (response && response.advice && !response.advice.toLowerCase().includes('error')) {
+        setResult({ agent, advice: response.advice });
+      } else {
+         setError(response?.advice || `Failed to get advice from the ${agent} agent. The AI returned an invalid response.`);
+      }
 
-    } catch (err) {
-      setError(`Failed to get advice from the ${agent} agent. Please try again.`);
+    } catch (err: any) {
+      setError(err.message || `An unexpected error occurred with the ${agent} agent.`);
     } finally {
       setLoadingAgent(null);
     }
@@ -123,6 +127,7 @@ export default function AgentsPage() {
 
         {error && (
             <Alert variant="destructive">
+                <AlertTriangle className="h-4 w-4" />
                 <AlertTitle>Generation Failed</AlertTitle>
                 <AlertDescription>{error}</AlertDescription>
             </Alert>

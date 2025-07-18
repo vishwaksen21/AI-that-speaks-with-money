@@ -67,8 +67,13 @@ const investmentAgentFlow = ai.defineFlow(
   async (input) => {
     const {output} = await investmentAgentPrompt(input);
 
-    if (!output || !output.advice) {
-      throw new Error("The AI model was unable to generate investment advice for this profile.");
+    if (
+      !output ||
+      typeof output !== 'object' ||
+      !output.advice ||
+      typeof output.advice !== 'string'
+    ) {
+      throw new Error("Invalid or empty advice. Please try again with clearer data.");
     }
 
     return output;

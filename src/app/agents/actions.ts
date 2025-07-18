@@ -6,11 +6,14 @@ import { generateSavingsAdvice } from '@/ai/flows/savings-agent';
 import { generateExpenseAdvice } from '@/ai/flows/expense-agent';
 
 function handleApiError(error: any, agentName: string) {
-  console.error(`Error getting ${agentName} advice:`, error);
-  if (error.message && error.message.includes('429')) {
-    throw new Error('API quota exceeded. Please try again later.');
+  const errorMessage = error?.message || `An unknown error occurred with the ${agentName} agent.`;
+  console.error(`Error in ${agentName} agent action:`, errorMessage);
+  
+  if (errorMessage.includes('429')) {
+    return { advice: 'API quota exceeded. Please try again later.' };
   }
-  throw new Error(`Failed to get response from ${agentName} AI. Details: ${error.message}`);
+  
+  return { advice: `Failed to get a valid response from the ${agentName} agent. Please try again. Error: ${errorMessage}` };
 }
 
 export async function getInvestmentAdvice(financialData: string) {
@@ -18,7 +21,7 @@ export async function getInvestmentAdvice(financialData: string) {
     const response = await generateInvestmentAdvice({ financialData });
     return response;
   } catch (error) {
-    handleApiError(error, 'investment');
+    return handleApiError(error, 'investment');
   }
 }
 
@@ -27,7 +30,7 @@ export async function getSavingsAdvice(financialData: string) {
     const response = await generateSavingsAdvice({ financialData });
     return response;
   } catch (error) {
-    handleApiError(error, 'savings');
+    return handleApiError(error, 'savings');
   }
 }
 
@@ -36,6 +39,6 @@ export async function getExpenseAdvice(financialData: string) {
     const response = await generateExpenseAdvice({ financialData });
     return response;
   } catch (error) {
-    handleApiError(error, 'expense');
+    return handleApiError(error, 'expense');
   }
 }
