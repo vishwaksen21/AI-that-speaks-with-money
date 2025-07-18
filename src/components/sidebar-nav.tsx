@@ -22,6 +22,7 @@ import {
   ChevronDown,
   Upload,
   UserPlus,
+  Sparkles,
 } from 'lucide-react';
 import {
   Collapsible,
@@ -40,6 +41,7 @@ const dataNavItems = [
 ];
 
 const aiToolsNavItems = [
+  { href: '/recommendations', label: 'Recommendations', icon: Sparkles },
   { href: '/chat', label: 'Chat with AI', icon: MessageCircle },
   { href: '/voice-assistant', label: 'Voice Assistant', icon: Mic },
   { href: '/scenario-simulator', label: 'Scenario Simulator', icon: Bot },
@@ -54,7 +56,9 @@ const accountNavItems = [
 
 export function SidebarNav() {
   const pathname = usePathname();
-  const [isAiToolsOpen, setIsAiToolsOpen] = useState(pathname.startsWith('/chat') || pathname.startsWith('/voice-assistant') || pathname.startsWith('/scenario-simulator'));
+  const [isAiToolsOpen, setIsAiToolsOpen] = useState(
+      aiToolsNavItems.some(item => pathname.startsWith(item.href))
+  );
 
   return (
     <SidebarMenu>
