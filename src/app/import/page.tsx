@@ -64,7 +64,10 @@ export default function ImportDataPage() {
         }
 
       } catch (err: any) {
-        const friendlyError = err.message || 'An unexpected error occurred. Please try again.';
+        let friendlyError = err.message || 'An unexpected error occurred. Please try again.';
+        if (typeof friendlyError === 'string' && friendlyError.includes('429')) {
+            friendlyError = "You've exceeded the request limit for the AI service. Please wait a moment and try again."
+        }
         setError(friendlyError);
         toast({
           title: 'Upload Failed',

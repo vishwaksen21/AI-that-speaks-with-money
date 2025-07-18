@@ -61,7 +61,7 @@ const calculateTotalLiabilities = (data: FinancialData): number => {
 
 export default function DashboardPage() {
   const [data, setData] = useState<FinancialData | null>(null);
-
+  
   useEffect(() => {
     const financialData = getFinancialData();
     setData(financialData);
