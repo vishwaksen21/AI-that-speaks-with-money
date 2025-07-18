@@ -101,15 +101,17 @@ const mergeDeep = (target: any, source: any): any => {
 export function getFinancialData(): FinancialData {
   // This function can only be called on the client-side.
   if (typeof window === 'undefined') {
-    return sampleFinancialData; // Return rich sample data for server rendering if needed
+    return sampleFinancialData;
   }
   
   try {
     const storedData = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (storedData) {
-      const parsedData = JSON.parse(storedData);
-      // Deep merge the parsed data with the default structure to ensure all fields exist.
-      // This prevents errors if the stored data is malformed or incomplete.
+      const parsedData = JSON.parse(storedData) as FinancialData;
+      // If the stored data is invalid/empty (e.g., from a failed import), use sample data.
+      if (!parsedData || !parsedData.profile_name || parsedData.profile_name === "Valued User") {
+        return sampleFinancialData;
+      }
       return mergeDeep(defaultFinancialData, parsedData);
     } else {
       // If no data is in storage, return the rich sample data.

@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { RecentTransactions } from '@/components/recent-transactions';
 import { NetWorthChart } from '@/components/net-worth-chart';
 import { AssetAllocationChart } from '@/components/asset-allocation-chart';
-import { getFinancialData, LOCAL_STORAGE_KEY } from '@/lib/mock-data';
+import { getFinancialData, LOCAL_STORAGE_KEY, sampleFinancialData } from '@/lib/mock-data';
 import type { FinancialData } from '@/ai/flows/data-extraction';
 import { DollarSign, TrendingUp, TrendingDown, PlusCircle, User, Briefcase, IndianRupee } from 'lucide-react';
 import { CreditScore as CreditScoreIcon } from '@/components/icons';
@@ -48,12 +48,20 @@ export default function DashboardPage() {
   const [data, setData] = useState<FinancialData | null>(null);
   
   useEffect(() => {
+    // On initial mount, check if there's any data. If not, populate with sample data.
+    const storedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (!storedData) {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(sampleFinancialData));
+    }
+    
     const financialData = getFinancialData();
     setData(financialData);
 
-    const handleStorageChange = () => {
-        const updatedFinancialData = getFinancialData();
-        setData(updatedFinancialData);
+    const handleStorageChange = (event: StorageEvent) => {
+        if (event.key === LOCAL_STORAGE_KEY) {
+            const updatedFinancialData = getFinancialData();
+            setData(updatedFinancialData);
+        }
     };
 
     window.addEventListener('storage', handleStorageChange);
@@ -100,6 +108,12 @@ export default function DashboardPage() {
 
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newData));
         
+        // Manually dispatch a storage event to trigger updates in other tabs/components
+        window.dispatchEvent(new StorageEvent('storage', {
+            key: LOCAL_STORAGE_KEY,
+            newValue: JSON.stringify(newData),
+        }));
+
         return newData;
     });
   }
