@@ -27,7 +27,6 @@ const savingsAgentPrompt = ai.definePrompt({
     schema: AgentInputSchema,
   },
   output: {
-    // The AI is now expected to return a single string, not a JSON object.
     schema: z.string().describe('A single, comprehensive recommendation document in Markdown format.'),
   },
   prompt: `You are a professional financial planning AI focused on savings and debt. Your task is to provide personalized, actionable advice based on the user's data. Analyze their income, savings, and liabilities.
@@ -49,7 +48,6 @@ const savingsAgentFlow = ai.defineFlow(
   {
     name: 'savingsAgentFlow',
     inputSchema: AgentInputSchema,
-    // The flow's final output still matches what the client expects.
     outputSchema: AgentOutputSchema,
   },
   async input => {
@@ -57,7 +55,6 @@ const savingsAgentFlow = ai.defineFlow(
     if (!output) {
       throw new Error("The AI model was unable to generate savings and debt advice for this profile.");
     }
-    // We wrap the raw string output into the expected object structure here.
     return { advice: output };
   }
 );
