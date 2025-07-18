@@ -20,13 +20,41 @@ const data = [
 ];
 
 function formatYAxis(amount: number, currency: string) {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency,
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-      notation: 'compact',
-    }).format(amount);
+    try {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: currency,
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+            notation: 'compact',
+        }).format(amount);
+    } catch (e) {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+            notation: 'compact',
+        }).format(amount);
+    }
+}
+
+function formatTooltip(amount: number, currency: string) {
+    try {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: currency,
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).format(amount);
+    } catch(e) {
+         return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).format(amount);
+    }
 }
 
 export function NetWorthChart({ currency = 'INR' }: { currency?: string }) {
@@ -55,13 +83,7 @@ export function NetWorthChart({ currency = 'INR' }: { currency?: string }) {
                 backgroundColor: 'hsl(var(--background))',
                 border: '1px solid hsl(var(--border))',
             }}
-            formatter={(value: number) => 
-                new Intl.NumberFormat('en-US', {
-                    style: 'currency',
-                    currency: currency,
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 0,
-                }).format(value)
+            formatter={(value: number) => formatTooltip(value, currency)
             }
         />
         <Area type="monotone" dataKey="netWorth" stroke="hsl(var(--primary))" fill="url(#colorNetWorth)" fillOpacity={1} />
