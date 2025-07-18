@@ -1,6 +1,6 @@
-
 import type { FinancialData as FinancialDataType } from '@/ai/flows/data-extraction';
 import { calculateNetWorth } from './financial-calculations';
+import { snehaRaoFinancialData } from './sneha-rao-data';
 
 export type FinancialData = FinancialDataType;
 
@@ -97,10 +97,10 @@ const mergeDeep = (target: any, source: any): any => {
   return output;
 };
 
-
 export function getFinancialData(): FinancialData {
   // This function can only be called on the client-side.
   if (typeof window === 'undefined') {
+    // During server-side rendering or build, return the primary sample data.
     return sampleFinancialData;
   }
   
@@ -108,18 +108,27 @@ export function getFinancialData(): FinancialData {
     const storedData = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (storedData) {
       const parsedData = JSON.parse(storedData) as FinancialData;
-      // If the stored data is invalid/empty (e.g., from a failed import), use sample data.
-      if (!parsedData || !parsedData.profile_name || parsedData.profile_name === "Valued User") {
+      // Use a more reliable check to see if the stored data is valid.
+      // If it's empty or still the default placeholder, return the primary sample data.
+      if (!parsedData || !parsedData.user_id || parsedData.user_id === "user_default_123") {
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(sampleFinancialData));
         return sampleFinancialData;
       }
+       // If the user has "imported" Sneha's data, use that.
+      if (parsedData.user_id === snehaRaoFinancialData.user_id) {
+          return mergeDeep(defaultFinancialData, snehaRaoFinancialData);
+      }
+      // Otherwise, return the parsed data from storage (which might be Alex Johnson's profile).
       return mergeDeep(defaultFinancialData, parsedData);
     } else {
-      // If no data is in storage, return the rich sample data.
+      // If no data is in storage, initialize it with the primary sample data.
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(sampleFinancialData));
       return sampleFinancialData;
     }
   } catch (error) {
     console.error('Failed to parse financial data from localStorage:', error);
-    // If parsing fails for any reason, return the sample data as a fallback.
+    // If parsing fails, fallback to the primary sample data.
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(sampleFinancialData));
     return sampleFinancialData;
   }
 }
