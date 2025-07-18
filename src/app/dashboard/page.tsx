@@ -65,7 +65,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const financialData = getFinancialData();
     setData(financialData);
-  }, []);
+  });
 
   const handleAddTransaction = (newTransaction: {
     description: string;
