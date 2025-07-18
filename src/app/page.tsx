@@ -137,11 +137,12 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
           <Card
-            className="lg:col-span-3 shadow-none bg-cover bg-center"
+            className="lg:col-span-3 shadow-none bg-cover bg-center relative"
             style={{ backgroundImage: "url('https://placehold.co/600x400')" }}
             data-ai-hint="space night"
           >
-            <div className="bg-black/50 h-full rounded-lg p-6 flex flex-col justify-center">
+            <div className="absolute inset-0 bg-black/50 rounded-lg"></div>
+            <div className="relative h-full rounded-lg p-6 flex flex-col justify-center">
               <CardHeader>
                 <CardTitle className="text-white">
                   Work with the rockets
