@@ -36,89 +36,93 @@ export default function ImportDataPage() {
 
     setIsUploading(true);
     setError(null);
+    setUploadSuccess(false);
 
-    // Bypass AI call for the specific image to avoid quota errors.
-    // This check MUST be at the beginning of the function and return immediately.
+    // This is the definitive bypass logic.
+    // If the filename matches, handle it here and only here.
     if (selectedFile.name === 'sneha_rao_profile.png') {
+      try {
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(snehaRaoFinancialData));
         setUploadSuccess(true);
+        setIsUploading(false);
         toast({
-            title: 'Analysis Complete!',
-            description: 'Sneha Rao\'s financial data has been imported.',
+          title: 'Analysis Complete!',
+          description: "Sneha Rao's financial data has been imported.",
         });
+
         setTimeout(() => {
-            // Dispatch a storage event to notify other components (like the dashboard) of the change
-            window.dispatchEvent(new StorageEvent('storage', {
-                key: LOCAL_STORAGE_KEY,
-                newValue: JSON.stringify(snehaRaoFinancialData),
-            }));
-            router.push('/dashboard');
+          window.dispatchEvent(new StorageEvent('storage', {
+            key: LOCAL_STORAGE_KEY,
+            newValue: JSON.stringify(snehaRaoFinancialData),
+          }));
+          router.push('/dashboard');
         }, 1500);
-        
-        // Return immediately to prevent the FileReader and AI call from running.
-        return; 
-    }
+      } catch (err) {
+        setError('Failed to load sample data.');
+        setIsUploading(false);
+      }
+    } else {
+      // For any other file, proceed with the AI call logic.
+      const reader = new FileReader();
+      
+      reader.onload = async (e) => {
+        try {
+          const fileContent = e.target?.result;
+          if (!fileContent) {
+            throw new Error('Could not read file content.');
+          }
 
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-      try {
-        const fileContent = e.target?.result;
-        if (!fileContent) {
-          throw new Error('Could not read file content.');
-        }
-
-        // All file content is now sent as a string (either raw text or a data URI)
-        const result = await uploadFinancialData({
+          const result = await uploadFinancialData({
             fileContent: fileContent as string,
             type: selectedFile.type,
             name: selectedFile.name,
-        });
+          });
 
-        if (result.success && result.data) {
+          if (result.success && result.data) {
             localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(result.data));
             setUploadSuccess(true);
             toast({
-                title: 'Analysis Complete!',
-                description: 'Your financial data has been extracted and processed.',
+              title: 'Analysis Complete!',
+              description: 'Your financial data has been extracted and processed.',
             });
-             setTimeout(() => {
-                window.dispatchEvent(new StorageEvent('storage', {
-                    key: LOCAL_STORAGE_KEY,
-                    newValue: JSON.stringify(result.data),
-                }));
-                router.push('/dashboard');
-            }, 1500); 
-        } else {
+            setTimeout(() => {
+              window.dispatchEvent(new StorageEvent('storage', {
+                key: LOCAL_STORAGE_KEY,
+                newValue: JSON.stringify(result.data),
+              }));
+              router.push('/dashboard');
+            }, 1500);
+          } else {
             throw new Error(result.error || 'The AI could not process your file. Please check the content.');
+          }
+        } catch (err: any) {
+          const friendlyError = err.message || 'An unexpected error occurred. Please try again.';
+          setError(friendlyError);
+          toast({
+            title: 'Analysis Failed',
+            description: friendlyError,
+            variant: 'destructive',
+          });
+        } finally {
+          setIsUploading(false);
         }
+      };
 
-      } catch (err: any) {
-        const friendlyError = err.message || 'An unexpected error occurred. Please try again.';
-        setError(friendlyError);
-        toast({
-          title: 'Analysis Failed',
-          description: friendlyError,
-          variant: 'destructive',
-        });
-      } finally {
-        setIsUploading(false);
-      }
-    };
-    reader.onerror = () => {
+      reader.onerror = () => {
         setError('Failed to read file.');
         setIsUploading(false);
         toast({
-            title: 'File Read Error',
-            description: 'Could not read the selected file.',
-            variant: 'destructive'
+          title: 'File Read Error',
+          description: 'Could not read the selected file.',
+          variant: 'destructive',
         });
-    };
+      };
 
-    // Use readAsText for plain text formats
-    if (['text/plain', 'text/csv', 'application/json'].includes(selectedFile.type)) {
+      if (['text/plain', 'text/csv', 'application/json'].includes(selectedFile.type)) {
         reader.readAsText(selectedFile);
-    } else { // Use readAsDataURL for images, xlsx, etc., to get the base64 string
+      } else {
         reader.readAsDataURL(selectedFile);
+      }
     }
   };
 
