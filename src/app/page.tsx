@@ -12,23 +12,12 @@ import {
   CreditCard,
   ShoppingCart,
   ArrowUp,
-  ArrowDown,
 } from 'lucide-react';
 import { userFinancialData } from '@/lib/mock-data';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Legend,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip as RechartsTooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import { SalesOverviewChart } from '@/components/sales-overview-chart';
+import { ActiveUsersChart } from '@/components/active-users-chart';
 
 function formatCurrency(amount: number) {
   return new Intl.NumberFormat('en-IN', {
@@ -82,29 +71,6 @@ function DashboardCard({
     </Card>
   );
 }
-
-const salesData = [
-  { name: 'Apr', sales: 21000, expenses: 15000 },
-  { name: 'May', sales: 25000, expenses: 16000 },
-  { name: 'Jun', sales: 28000, expenses: 17000 },
-  { name: 'Jul', sales: 32000, expenses: 19000 },
-  { name: 'Aug', sales: 35000, expenses: 22000 },
-  { name: 'Sep', sales: 31000, expenses: 20000 },
-  { name: 'Oct', sales: 38000, expenses: 25000 },
-  { name: 'Nov', sales: 42000, expenses: 28000 },
-  { name: 'Dec', sales: 45000, expenses: 30000 },
-];
-const activeUsersData = [
-  { name: 'Apr', users: 200 },
-  { name: 'May', users: 220 },
-  { name: 'Jun', users: 180 },
-  { name: 'Jul', users: 250 },
-  { name: 'Aug', users: 230 },
-  { name: 'Sep', users: 300 },
-  { name: 'Oct', users: 280 },
-  { name: 'Nov', users: 320 },
-  { name: 'Dec', users: 350 },
-];
 
 export default function DashboardPage() {
   return (
@@ -204,27 +170,7 @@ export default function DashboardPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={salesData}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <RechartsTooltip />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="sales"
-                    stroke="hsl(var(--primary))"
-                    strokeWidth={2}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="expenses"
-                    stroke="hsl(var(--secondary-foreground))"
-                    strokeWidth={2}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              <SalesOverviewChart />
             </CardContent>
           </Card>
 
@@ -234,20 +180,7 @@ export default function DashboardPage() {
               <CardDescription>(+23%) than last week</CardDescription>
             </CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={activeUsersData}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <RechartsTooltip
-                    contentStyle={{
-                      backgroundColor: 'hsl(var(--background))',
-                      border: '1px solid hsl(var(--border))',
-                    }}
-                  />
-                  <Bar dataKey="users" fill="hsl(var(--primary))" barSize={30} radius={[4, 4, 0, 0]}/>
-                </BarChart>
-              </ResponsiveContainer>
+              <ActiveUsersChart />
             </CardContent>
           </Card>
         </div>
