@@ -28,17 +28,18 @@ export const defaultFinancialData: FinancialData = {
     ppf: 0,
   },
   net_worth: 0,
-  credit_score: 0,
+  credit_score: 750,
 };
 
-export function getFinancialData(): FinancialData | null {
+export function getFinancialData(): FinancialData {
   if (typeof window === 'undefined') {
     return defaultFinancialData;
   }
   try {
     const storedData = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (storedData) {
-      return JSON.parse(storedData);
+      // If data exists, parse it and return.
+      return JSON.parse(storedData) as FinancialData;
     } else {
       // If no data is in storage, set the default data and return it.
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(defaultFinancialData));
