@@ -1,4 +1,5 @@
 import * as React from 'react';
+import Link from 'next/link';
 import {
   SidebarProvider,
   Sidebar,
@@ -24,12 +25,12 @@ export function AppLayout({
     <SidebarProvider>
       <Sidebar variant="sidebar" collapsible="icon">
         <SidebarHeader>
-          <div className="flex items-center gap-2 p-2">
-            <Logo className="w-8 h-8 text-sidebar-primary" />
-            <span className="text-lg font-semibold font-headline text-sidebar-foreground group-data-[collapsible=icon]:hidden">
-              Fi Money
-            </span>
-          </div>
+          <Link href="/dashboard" className="flex items-center gap-2 p-2 focus:outline-none focus:ring-2 focus:ring-sidebar-ring rounded-md">
+              <Logo className="w-8 h-8 text-sidebar-primary" />
+              <span className="text-lg font-semibold font-headline text-sidebar-foreground group-data-[collapsible=icon]:hidden">
+                Fi Money
+              </span>
+          </Link>
         </SidebarHeader>
         <SidebarContent>
           <SidebarNav />
