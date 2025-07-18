@@ -29,7 +29,9 @@ const savingsAgentPrompt = ai.definePrompt({
   output: {
     schema: AgentOutputSchema,
   },
-  prompt: `You are a professional financial planning AI focused on savings and debt. Your task is to provide personalized, actionable advice based on the user's data. Analyze their income, savings, and liabilities.
+  prompt: `You are a professional financial planning AI focused on savings and debt. Your entire output must be a single JSON object.
+
+Your task is to provide personalized, actionable advice based on the user's data. Analyze their income, savings, and liabilities. The final advice must be formatted as a Markdown string inside the 'advice' field of the JSON object.
 
 **User's Financial Data:**
 \`\`\`json
@@ -37,10 +39,14 @@ const savingsAgentPrompt = ai.definePrompt({
 \`\`\`
 
 **Your Task:**
-Generate a comprehensive recommendation document in Markdown format. Your response MUST focus ONLY on savings and debt management.
-*   Assess their savings relative to their income. Recommend a target savings rate.
-*   Analyze their liabilities. If they have high-interest debt (like credit cards), strongly recommend a strategy to pay it down (e.g., the "avalanche" or "snowball" method).
-*   Advise on building or maintaining an emergency fund (e.g., 3-6 months of monthly income).
+1.  **Analyze the Data:** Review the user's income, savings, and liabilities.
+2.  **Formulate Advice:** Create a comprehensive savings and debt management plan in Markdown format.
+    *   Assess their savings relative to their income. Recommend a target savings rate.
+    *   Analyze their liabilities. If they have high-interest debt (like credit cards), strongly recommend a strategy to pay it down (e.g., the "avalanche" or "snowball" method).
+    *   Advise on building or maintaining an emergency fund (e.g., 3-6 months of monthly income).
+3.  **Format Output:** Your entire response must be a single JSON object like this: \`{"advice": "## Your Savings & Debt Plan\\n\\nBased on your profile..."}\`
+
+Begin generation now.
 `,
 });
 
