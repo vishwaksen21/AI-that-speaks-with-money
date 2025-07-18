@@ -7,13 +7,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { RecentTransactions } from '@/components/recent-transactions';
 import { NetWorthChart } from '@/components/net-worth-chart';
 import { AssetAllocationChart } from '@/components/asset-allocation-chart';
-import { getFinancialData, defaultFinancialData, LOCAL_STORAGE_KEY } from '@/lib/mock-data';
+import { getFinancialData, LOCAL_STORAGE_KEY } from '@/lib/mock-data';
 import type { FinancialData } from '@/ai/flows/data-extraction';
 import { DollarSign, TrendingUp, TrendingDown, PlusCircle, User, Briefcase, IndianRupee } from 'lucide-react';
 import { CreditScore as CreditScoreIcon } from '@/components/icons';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -23,7 +23,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 
 function formatCurrency(amount: number, currency: string = 'INR') {
   if (typeof amount !== 'number' || isNaN(amount)) {
-    // Return a placeholder that indicates a value is expected
     try {
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
@@ -32,11 +31,10 @@ function formatCurrency(amount: number, currency: string = 'INR') {
             maximumFractionDigits: 0,
         }).format(0).replace(/0/g, '--');
     } catch (e) {
-        // Fallback for invalid currency code
         return '$--';
     }
   }
-  return new Intl.NumberFormat('en-IN', { // Use en-IN for Indian formatting
+  return new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: currency,
     minimumFractionDigits: 0,
@@ -44,7 +42,6 @@ function formatCurrency(amount: number, currency: string = 'INR') {
   }).format(amount);
 }
 
-// Helper function to safely calculate total assets
 const calculateTotalAssets = (data: FinancialData): number => {
     if (!data) return 0;
     const bankBalance = data.bank_accounts?.reduce((sum, acc) => sum + (acc.balance || 0), 0) || 0;
@@ -55,7 +52,6 @@ const calculateTotalAssets = (data: FinancialData): number => {
     return bankBalance + mutualFunds + stocks + realEstate + ppf;
 };
 
-// Helper function to safely calculate total liabilities
 const calculateTotalLiabilities = (data: FinancialData): number => {
     if (!data) return 0;
     const loans = data.loans?.reduce((sum, loan) => sum + (loan.outstanding_amount || 0), 0) || 0;
@@ -67,8 +63,6 @@ export default function DashboardPage() {
   const [data, setData] = useState<FinancialData | null>(null);
 
   useEffect(() => {
-    // This effect runs once on the client after the component mounts.
-    // It safely retrieves data from localStorage and updates the state.
     const financialData = getFinancialData();
     setData(financialData);
   }, []);
@@ -81,14 +75,12 @@ export default function DashboardPage() {
     setData(currentData => {
         if (!currentData) return null;
 
-        // Create a deep copy to avoid direct state mutation
         const newData = JSON.parse(JSON.stringify(currentData));
 
         const transactionAmount = newTransaction.type === 'income' 
             ? newTransaction.amount 
             : -newTransaction.amount;
         
-        // Add to a new 'transactions' array if it doesn't exist
         if (!newData.transactions) {
             newData.transactions = [];
         }
@@ -96,31 +88,26 @@ export default function DashboardPage() {
             id: `txn_${Date.now()}`,
             description: newTransaction.description,
             amount: transactionAmount,
-            date: new Date().toISOString().split('T')[0], // YYYY-MM-DD
+            date: new Date().toISOString().split('T')[0],
             category: newTransaction.type === 'income' ? 'Income' : 'Expense',
         });
 
-        // Update the first bank account's balance
         if (newData.bank_accounts && newData.bank_accounts.length > 0) {
             newData.bank_accounts[0].balance += transactionAmount;
         } else {
-             // If no bank account, create one
             newData.bank_accounts = [{ bank: 'Primary Account', balance: transactionAmount }];
         }
 
-        // Recalculate net worth
         const newTotalAssets = calculateTotalAssets(newData);
         const newTotalLiabilities = calculateTotalLiabilities(newData);
         newData.net_worth = newTotalAssets - newTotalLiabilities;
 
-        // Save to localStorage
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newData));
         
         return newData;
     });
   }
 
-  // Show a loading skeleton if data has not been loaded from the client yet.
   if (!data) {
     return (
         <AppLayout pageTitle="Dashboard">
@@ -144,11 +131,11 @@ export default function DashboardPage() {
     )
   }
 
-  // Once data is loaded, perform calculations
   const totalAssets = calculateTotalAssets(data);
   const totalLiabilities = calculateTotalLiabilities(data);
   const netWorth = data.net_worth;
   const currency = data.profile?.currency || 'INR';
+  const name = data.profile?.name?.split(' ')[0] || 'User';
 
   const assetAllocationData = [];
   if (data.bank_accounts?.length) {
@@ -168,9 +155,8 @@ export default function DashboardPage() {
   }
 
   return (
-    <AppLayout pageTitle="Dashboard">
+    <AppLayout pageTitle={`Hello, ${name}!`}>
       <div className="space-y-6">
-        {/* Top Cards */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -214,7 +200,6 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        {/* Charts */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
           <Card className="lg:col-span-4">
             <CardHeader>
@@ -236,12 +221,10 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        {/* Details Section */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Profile & Investments */}
             <div className="lg:col-span-1 space-y-6">
                 <Card>
-                    <CardHeader><CardTitle className="font-headline">Profile</CardTitle></CardHeader>
+                    <CardHeader><CardTitle className="font-headline text-lg">Profile</CardTitle></CardHeader>
                     <CardContent className="space-y-3 text-sm">
                         <div className="flex justify-between items-center"><span className="text-muted-foreground flex items-center gap-2"><User size={16}/> Name</span> <strong>{data.profile.name}</strong></div>
                         <div className="flex justify-between items-center"><span className="text-muted-foreground">Age</span> <strong>{data.profile.age}</strong></div>
@@ -250,16 +233,16 @@ export default function DashboardPage() {
                     </CardContent>
                 </Card>
                  <Card>
-                    <CardHeader><CardTitle className="font-headline">Investments</CardTitle></CardHeader>
+                    <CardHeader><CardTitle className="font-headline text-lg">Investments</CardTitle></CardHeader>
                     <CardContent>
-                         <h4 className="font-semibold mb-2">Mutual Funds</h4>
+                         <h4 className="font-semibold mb-2 text-base">Mutual Funds</h4>
                         <Table>
                             <TableHeader><TableRow><TableHead>Fund</TableHead><TableHead className="text-right">Value</TableHead></TableRow></TableHeader>
                             <TableBody>
                                 {data.mutual_funds?.map(mf => <TableRow key={mf.name}><TableCell>{mf.name}</TableCell><TableCell className="text-right">{formatCurrency(mf.current_value, currency)}</TableCell></TableRow>)}
                             </TableBody>
                         </Table>
-                         <h4 className="font-semibold mt-4 mb-2">Systematic Investment Plans (SIPs)</h4>
+                         <h4 className="font-semibold mt-4 mb-2 text-base">SIPs</h4>
                          <Table>
                             <TableHeader><TableRow><TableHead>Fund</TableHead><TableHead className="text-right">Monthly</TableHead></TableRow></TableHeader>
                             <TableBody>
@@ -269,26 +252,25 @@ export default function DashboardPage() {
                     </CardContent>
                 </Card>
             </div>
-             {/* Assets */}
              <div className="lg:col-span-1 space-y-6">
                 <Card>
-                    <CardHeader><CardTitle className="font-headline">Assets</CardTitle></CardHeader>
+                    <CardHeader><CardTitle className="font-headline text-lg">Assets</CardTitle></CardHeader>
                     <CardContent>
-                        <h4 className="font-semibold mb-2">Bank Accounts</h4>
+                        <h4 className="font-semibold mb-2 text-base">Bank Accounts</h4>
                         <Table>
                            <TableHeader><TableRow><TableHead>Bank</TableHead><TableHead className="text-right">Balance</TableHead></TableRow></TableHeader>
                            <TableBody>
                                 {data.bank_accounts?.map(acc => <TableRow key={acc.bank}><TableCell>{acc.bank}</TableCell><TableCell className="text-right">{formatCurrency(acc.balance, currency)}</TableCell></TableRow>)}
                            </TableBody>
                         </Table>
-                        <h4 className="font-semibold mt-4 mb-2">Stocks</h4>
+                        <h4 className="font-semibold mt-4 mb-2 text-base">Stocks</h4>
                          <Table>
                             <TableHeader><TableRow><TableHead>Stock</TableHead><TableHead className="text-right">Value</TableHead></TableRow></TableHeader>
                             <TableBody>
                                 {data.stocks?.map(s => <TableRow key={s.ticker}><TableCell>{s.ticker}</TableCell><TableCell className="text-right">{formatCurrency(s.shares * s.current_price, currency)}</TableCell></TableRow>)}
                             </TableBody>
                         </Table>
-                         <h4 className="font-semibold mt-4 mb-2">Other Assets</h4>
+                         <h4 className="font-semibold mt-4 mb-2 text-base">Other Assets</h4>
                          <Table>
                              <TableBody>
                                 {data.real_estate?.map(re => <TableRow key={re.property_type}><TableCell>{re.property_type}</TableCell><TableCell className="text-right">{formatCurrency(re.market_value, currency)}</TableCell></TableRow>)}
@@ -298,19 +280,18 @@ export default function DashboardPage() {
                     </CardContent>
                 </Card>
             </div>
-             {/* Liabilities */}
             <div className="lg:col-span-1 space-y-6">
                 <Card>
-                    <CardHeader><CardTitle className="font-headline">Liabilities</CardTitle></CardHeader>
+                    <CardHeader><CardTitle className="font-headline text-lg">Liabilities</CardTitle></CardHeader>
                     <CardContent>
-                        <h4 className="font-semibold mb-2">Loans</h4>
+                        <h4 className="font-semibold mb-2 text-base">Loans</h4>
                         <Table>
                             <TableHeader><TableRow><TableHead>Type</TableHead><TableHead className="text-right">Outstanding</TableHead></TableRow></TableHeader>
                             <TableBody>
                                {data.loans?.map(l => <TableRow key={l.type}><TableCell>{l.type}</TableCell><TableCell className="text-right">{formatCurrency(l.outstanding_amount, currency)}</TableCell></TableRow>)}
                             </TableBody>
                         </Table>
-                        <h4 className="font-semibold mt-4 mb-2">Credit Cards</h4>
+                        <h4 className="font-semibold mt-4 mb-2 text-base">Credit Cards</h4>
                         <Table>
                             <TableHeader><TableRow><TableHead>Issuer</TableHead><TableHead className="text-right">Balance</TableHead></TableRow></TableHeader>
                              <TableBody>
@@ -322,7 +303,6 @@ export default function DashboardPage() {
             </div>
         </div>
 
-        {/* Recent Transactions */}
          <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
@@ -358,7 +338,6 @@ function AddTransactionDialog({ onAddTransaction, currency }: { onAddTransaction
                 description: `${description} for ${formatCurrency(Math.abs(numericAmount), currency)} has been recorded.`
             });
 
-            // Reset form and close dialog
             setDescription('');
             setAmount('');
             setType('expense');
@@ -432,4 +411,3 @@ function AddTransactionDialog({ onAddTransaction, currency }: { onAddTransaction
         </Dialog>
     );
 }
-
