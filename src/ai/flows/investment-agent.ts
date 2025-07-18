@@ -13,9 +13,11 @@ const AgentInputSchema = z.object({
   financialData: z.string().describe('The user\'s consolidated financial data in JSON format.'),
 });
 
-const AgentOutputSchema = z.string().describe('A single, comprehensive recommendation document in Markdown format.');
+const AgentOutputSchema = z.object({
+  advice: z.string().describe('A single, comprehensive recommendation document in Markdown format.'),
+});
 
-export async function generateInvestmentAdvice(input: z.infer<typeof AgentInputSchema>): Promise<{ advice: string }> {
+export async function generateInvestmentAdvice(input: z.infer<typeof AgentInputSchema>): Promise<z.infer<typeof AgentOutputSchema>> {
   return investmentAgentFlow(input);
 }
 
@@ -46,13 +48,13 @@ const investmentAgentFlow = ai.defineFlow(
   {
     name: 'investmentAgentFlow',
     inputSchema: AgentInputSchema,
-    outputSchema: z.object({ advice: z.string() }),
+    outputSchema: AgentOutputSchema,
   },
   async input => {
     const {output} = await investmentAgentPrompt(input);
     if (!output) {
       throw new Error("The AI model was unable to generate investment advice for this profile.");
     }
-    return { advice: output };
+    return output;
   }
 );
