@@ -10,6 +10,7 @@ import { getChatResponse, getTextToSpeech } from './actions';
 import { Skeleton } from '@/components/ui/skeleton';
 import ReactMarkdown from 'react-markdown';
 import { Logo } from '@/components/icons';
+import { getFinancialData } from '@/lib/mock-data';
 
 interface Message {
   id: string;
@@ -19,17 +20,20 @@ interface Message {
 
 export default function VoiceAssistantPage() {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   // @ts-ignore
   const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const [financialDataString, setFinancialDataString] = useState('');
 
 
   useEffect(() => {
+    // Load financial data on mount
+    const data = getFinancialData();
+    setFinancialDataString(JSON.stringify(data, null, 2));
+
     if (scrollAreaRef.current) {
       scrollAreaRef.current.scrollTo({
         top: scrollAreaRef.current.scrollHeight,
@@ -76,7 +80,7 @@ export default function VoiceAssistantPage() {
     setIsLoading(true);
 
     try {
-      const { insight } = await getChatResponse(transcript);
+      const { insight } = await getChatResponse(transcript, financialDataString);
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',

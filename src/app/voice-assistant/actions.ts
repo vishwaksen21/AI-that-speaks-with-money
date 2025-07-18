@@ -2,12 +2,11 @@
 
 import { generatePersonalizedFinancialInsights } from '@/ai/flows/insight-generation';
 import { textToSpeech } from '@/ai/flows/tts';
-import { financialDataString } from '@/lib/mock-data';
 
-export async function getChatResponse(userQuestion: string) {
+export async function getChatResponse(userQuestion: string, financialData: string) {
   try {
     const response = await generatePersonalizedFinancialInsights({
-      financialData: financialDataString,
+      financialData: financialData,
       userQuestion: userQuestion,
     });
     return { insight: response.insights };

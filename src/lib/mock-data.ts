@@ -49,5 +49,3 @@ export function getFinancialData() {
         return defaultFinancialData;
     }
 }
-
-export const financialDataString = JSON.stringify(getFinancialData(), null, 2);
