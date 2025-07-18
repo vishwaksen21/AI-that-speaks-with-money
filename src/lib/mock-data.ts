@@ -42,10 +42,9 @@ export function getFinancialData(): FinancialData {
     if (storedData) {
       // If data exists, parse it and return.
       const parsedData = JSON.parse(storedData);
-      return parsedData as FinancialData;
+      return parsedData;
     } else {
       // If no data is in storage, return the default data.
-      // The dashboard can decide if it wants to store this default.
       return defaultFinancialData;
     }
   } catch (error) {

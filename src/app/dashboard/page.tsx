@@ -7,8 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { RecentTransactions } from '@/components/recent-transactions';
 import { NetWorthChart } from '@/components/net-worth-chart';
 import { AssetAllocationChart } from '@/components/asset-allocation-chart';
-import { getFinancialData, defaultFinancialData } from '@/lib/mock-data';
-import type { FinancialData } from '@/lib/mock-data';
+import { getFinancialData } from '@/lib/mock-data';
+import type { FinancialData } from '@/ai/flows/data-extraction';
 import { DollarSign, TrendingUp, TrendingDown } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
