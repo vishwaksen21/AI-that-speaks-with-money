@@ -1,3 +1,4 @@
+
 import { AppLayout } from '@/components/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -71,7 +72,7 @@ export default function LandingPage() {
             <section id="security" className="bg-secondary py-16">
                  <div className="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
                     <div>
-                        <h2 className="text-3xl md:text-4xl font-bold font-headline">Security & Privacy First</h2>
+                        <h2 className="text-3xl md:text-4xl font-bold font-headline">Security &amp; Privacy First</h2>
                         <p className="text-muted-foreground mt-4 mb-6">
                             Your data security is our top priority. We use industry-leading protocols to ensure your financial information is always safe, secure, and under your control.
                         </p>
@@ -171,4 +172,3 @@ export default function LandingPage() {
         </div>
     </AppLayout>
   );
-}
