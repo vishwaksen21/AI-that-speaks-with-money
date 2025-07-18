@@ -10,7 +10,13 @@ import {
   Legend,
 } from 'recharts';
 
-const COLORS = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)', 'var(--chart-5)'];
+const COLORS = [
+    'hsl(262 82% 58%)',
+    'hsl(142.1 76.2% 46.3%)',
+    'hsl(30 80% 55%)',
+    'hsl(280 65% 60%)',
+    'hsl(340 75% 55%)'
+];
 
 interface AssetAllocationChartProps {
     data: { name: string, value: number }[];
