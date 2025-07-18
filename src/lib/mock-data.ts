@@ -32,23 +32,25 @@ export const defaultFinancialData: FinancialData = {
 };
 
 export function getFinancialData(): FinancialData {
+  // This function can only be called on the client-side.
   if (typeof window === 'undefined') {
     return defaultFinancialData;
   }
+  
   try {
     const storedData = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (storedData) {
       // If data exists, parse it and return.
-      return JSON.parse(storedData) as FinancialData;
+      const parsedData = JSON.parse(storedData);
+      return parsedData as FinancialData;
     } else {
-      // If no data is in storage, set the default data and return it.
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(defaultFinancialData));
+      // If no data is in storage, return the default data.
+      // The dashboard can decide if it wants to store this default.
       return defaultFinancialData;
     }
   } catch (error) {
     console.error('Failed to parse financial data from localStorage:', error);
-    // If parsing fails, reset to default and return it.
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(defaultFinancialData));
+    // If parsing fails for any reason, return the default data.
     return defaultFinancialData;
   }
 }
