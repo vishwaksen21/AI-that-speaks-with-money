@@ -80,24 +80,26 @@ export function SidebarNav() {
                         <ChevronDown className={cn("group-data-[collapsible=icon]:hidden h-4 w-4 transition-transform", isAiToolsOpen && "rotate-180")} />
                     </SidebarMenuButton>
                 </CollapsibleTrigger>
-                <CollapsibleContent className="group-data-[collapsible=icon]:hidden ml-7 flex flex-col gap-1 border-l pl-2 mt-1">
-                     {aiToolsNavItems.map((item) => (
-                        <SidebarMenuItem key={item.href} className="p-0 m-0">
-                            <SidebarMenuButton
-                                asChild
-                                variant="ghost"
-                                size="sm"
-                                isActive={pathname === item.href}
-                                tooltip={item.label}
-                                className="justify-start w-full"
-                            >
-                                <Link href={item.href}>
-                                <item.icon />
-                                <span>{item.label}</span>
-                                </Link>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                    ))}
+                <CollapsibleContent>
+                    <SidebarMenu className="group-data-[collapsible=icon]:hidden ml-7 border-l pl-2 mt-1">
+                        {aiToolsNavItems.map((item) => (
+                            <SidebarMenuItem key={item.href} className="p-0 m-0">
+                                <SidebarMenuButton
+                                    asChild
+                                    variant="ghost"
+                                    size="sm"
+                                    isActive={pathname === item.href}
+                                    tooltip={item.label}
+                                    className="justify-start w-full"
+                                >
+                                    <Link href={item.href}>
+                                    <item.icon />
+                                    <span>{item.label}</span>
+                                    </Link>
+                                </SidebarMenuButton>
+                            </SidebarMenuItem>
+                        ))}
+                    </SidebarMenu>
                 </CollapsibleContent>
             </Collapsible>
         </SidebarMenuItem>
