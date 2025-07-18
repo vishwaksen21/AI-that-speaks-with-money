@@ -2,21 +2,35 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { AppLayout } from '@/components/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Upload, FileJson, CheckCircle } from 'lucide-react';
+import { Upload, FileJson, CheckCircle, Loader2 } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 export default function ImportDataPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
+  const { toast } = useToast();
+  const router = useRouter();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
-      setSelectedFile(event.target.files[0]);
-      setUploadSuccess(false);
+      const file = event.target.files[0];
+      if (file.type === 'application/json') {
+        setSelectedFile(file);
+        setUploadSuccess(false);
+      } else {
+        toast({
+          title: 'Invalid File Type',
+          description: 'Please select a valid JSON file.',
+          variant: 'destructive',
+        });
+        setSelectedFile(null);
+      }
     }
   };
 
@@ -24,11 +38,16 @@ export default function ImportDataPage() {
     if (!selectedFile) return;
 
     setIsUploading(true);
-    // Simulate upload process
+    // Simulate upload and processing
     setTimeout(() => {
       setIsUploading(false);
       setUploadSuccess(true);
-      setSelectedFile(null);
+      toast({
+        title: 'Upload Successful!',
+        description: 'Your financial data has been processed.',
+      });
+      // Optionally redirect after success
+      setTimeout(() => router.push('/dashboard'), 1000);
     }, 1500);
   };
 
@@ -50,7 +69,7 @@ export default function ImportDataPage() {
               </div>
             </div>
 
-            {selectedFile && (
+            {selectedFile && !uploadSuccess && (
               <div className="flex items-center gap-3 p-3 rounded-md border bg-muted">
                 <FileJson className="h-5 w-5 text-muted-foreground" />
                 <div className="flex-1 text-sm">
@@ -60,10 +79,10 @@ export default function ImportDataPage() {
               </div>
             )}
             
-            <Button onClick={handleUpload} disabled={!selectedFile || isUploading} className="w-full">
+            <Button onClick={handleUpload} disabled={!selectedFile || isUploading || uploadSuccess} className="w-full">
               {isUploading ? (
                 <>
-                  <Upload className="mr-2 h-4 w-4 animate-pulse" />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Uploading...
                 </>
               ) : (
@@ -75,9 +94,9 @@ export default function ImportDataPage() {
             </Button>
             
             {uploadSuccess && (
-                <div className="flex items-center gap-3 p-4 rounded-md border text-green-700 bg-green-50 border-green-200">
+                <div className="flex items-center gap-3 p-4 rounded-md border text-green-700 bg-green-50 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800">
                     <CheckCircle className="h-5 w-5" />
-                    <p className="font-medium text-sm">File uploaded successfully! Your data is now being processed.</p>
+                    <p className="font-medium text-sm">File uploaded successfully! Redirecting to dashboard...</p>
                 </div>
             )}
           </CardContent>
