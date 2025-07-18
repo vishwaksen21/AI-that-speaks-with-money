@@ -22,12 +22,14 @@ function formatCurrency(amount: number) {
 
 export default function DashboardPage() {
   const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setData(getFinancialData());
+    setLoading(false);
   }, []);
 
-  if (!data) {
+  if (loading) {
     return (
         <AppLayout pageTitle="Dashboard">
              <div className="space-y-6">
@@ -44,6 +46,8 @@ export default function DashboardPage() {
         </AppLayout>
     )
   }
+
+  const assetAllocationData = data?.assets?.cashAndInvestments?.breakdown?.map((item: any) => ({ name: item.type, value: item.amount })) || [];
 
   return (
     <AppLayout pageTitle="Dashboard">
@@ -99,7 +103,7 @@ export default function DashboardPage() {
               <CardDescription>Your current investment distribution.</CardDescription>
             </CardHeader>
             <CardContent>
-              <AssetAllocationChart />
+              <AssetAllocationChart data={assetAllocationData} />
             </CardContent>
           </Card>
         </div>

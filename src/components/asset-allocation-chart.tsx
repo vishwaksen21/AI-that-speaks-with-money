@@ -1,7 +1,6 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
 import {
   PieChart,
   Pie,
@@ -10,23 +9,15 @@ import {
   Tooltip,
   Legend,
 } from 'recharts';
-import { getFinancialData } from '@/lib/mock-data';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
-export function AssetAllocationChart() {
-    const [data, setData] = useState<any[]>([]);
+interface AssetAllocationChartProps {
+    data: { name: string, value: number }[];
+}
 
-    useEffect(() => {
-        const financialData = getFinancialData();
-        const breakdown = financialData?.assets?.cashAndInvestments?.breakdown;
-        const chartData = breakdown
-            ? breakdown.map((item: any) => ({ name: item.type, value: item.amount }))
-            : [];
-        setData(chartData);
-    }, []);
-
-    if (data.length === 0) {
+export function AssetAllocationChart({ data }: AssetAllocationChartProps) {
+    if (!data || data.length === 0) {
         return <div style={{height: 300}} className="flex items-center justify-center text-muted-foreground">No asset allocation data available.</div>;
     }
     
