@@ -7,7 +7,7 @@ import { AppLayout } from '@/components/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Upload, FileJson, CheckCircle, Loader2, AlertTriangle } from 'lucide-react';
+import { Upload, FileText, CheckCircle, Loader2, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { uploadFinancialData } from './actions';
 
@@ -22,18 +22,9 @@ export default function ImportDataPage() {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
-      if (file.type === 'application/json') {
-        setSelectedFile(file);
-        setUploadSuccess(false);
-        setError(null);
-      } else {
-        toast({
-          title: 'Invalid File Type',
-          description: 'Please select a valid JSON file.',
-          variant: 'destructive',
-        });
-        setSelectedFile(null);
-      }
+      setSelectedFile(file);
+      setUploadSuccess(false);
+      setError(null);
     }
   };
 
@@ -89,21 +80,21 @@ export default function ImportDataPage() {
         <Card>
           <CardHeader>
             <CardTitle className="font-headline">Import Your Financial Data</CardTitle>
-            <CardDescription>Upload a JSON file with your consolidated financial information to get started.</CardDescription>
+            <CardDescription>Upload a file with your consolidated financial information to get started.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
               <label htmlFor="file-upload" className="font-medium">
-                JSON File
+                Data File
               </label>
               <div className="flex items-center gap-4">
-                <Input id="file-upload" type="file" accept=".json" onChange={handleFileChange} className="flex-1" disabled={isUploading} />
+                <Input id="file-upload" type="file" onChange={handleFileChange} className="flex-1" disabled={isUploading} />
               </div>
             </div>
 
             {selectedFile && !uploadSuccess && (
               <div className="flex items-center gap-3 p-3 rounded-md border bg-muted">
-                <FileJson className="h-5 w-5 text-muted-foreground" />
+                <FileText className="h-5 w-5 text-muted-foreground" />
                 <div className="flex-1 text-sm">
                   <p className="font-medium">{selectedFile.name}</p>
                   <p className="text-xs text-muted-foreground">{(selectedFile.size / 1024).toFixed(2)} KB</p>
@@ -133,7 +124,7 @@ export default function ImportDataPage() {
             )}
             {error && (
                  <div className="flex items-center gap-3 p-4 rounded-md border text-destructive-foreground bg-destructive/10 border-destructive/20">
-                    <AlertTriangle className="h-5 w-5" />
+                    <AlertTriangle className="h-5 w-s5" />
                     <p className="font-medium text-sm">{error}</p>
                 </div>
             )}
