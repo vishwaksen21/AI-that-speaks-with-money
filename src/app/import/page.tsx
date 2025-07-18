@@ -7,7 +7,7 @@ import { AppLayout } from '@/components/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Upload, FileText, CheckCircle, Loader2, AlertTriangle } from 'lucide-react';
+import { Upload, FileText, CheckCircle, Loader2, AlertTriangle, Wand2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { uploadFinancialData } from './actions';
 import { LOCAL_STORAGE_KEY } from '@/lib/mock-data';
@@ -39,22 +39,21 @@ export default function ImportDataPage() {
     reader.onload = async (e) => {
       try {
         const fileContent = e.target?.result as string;
-        // First, validate on the server
+        // Send the raw file content to the server action with AI
         const result = await uploadFinancialData(fileContent);
 
-        if (result.success) {
-            // Then, save to localStorage to be used by the app
-            localStorage.setItem(LOCAL_STORAGE_KEY, fileContent);
+        if (result.success && result.data) {
+            // Save the AI-structured data to localStorage
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(result.data, null, 2));
 
             setUploadSuccess(true);
             toast({
-                title: 'Upload Successful!',
-                description: 'Your financial data has been processed.',
+                title: 'Analysis Complete!',
+                description: 'Your financial data has been extracted and processed.',
             });
-            // Use client-side router to navigate
             setTimeout(() => router.push('/dashboard'), 1500);
         } else {
-            throw new Error(result.error || 'An unknown error occurred.');
+            throw new Error(result.error || 'The AI could not process your file. Please try a different format or check the content.');
         }
 
       } catch (err: any) {
@@ -85,8 +84,8 @@ export default function ImportDataPage() {
       <div className="max-w-2xl mx-auto">
         <Card>
           <CardHeader>
-            <CardTitle className="font-headline">Import Your Financial Data</CardTitle>
-            <CardDescription>Upload a file with your consolidated financial information to get started.</CardDescription>
+            <CardTitle className="font-headline">Import Your Financial Data with AI</CardTitle>
+            <CardDescription>Upload a file (txt, csv, json, etc.) with your financial info. Our AI will analyze and structure it for you.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
@@ -112,12 +111,12 @@ export default function ImportDataPage() {
               {isUploading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Uploading...
+                  Analyzing with AI...
                 </>
               ) : (
                 <>
-                  <Upload className="mr-2 h-4 w-4" />
-                  Upload and Process File
+                  <Wand2 className="mr-2 h-4 w-4" />
+                  Upload and Analyze
                 </>
               )}
             </Button>
@@ -125,7 +124,7 @@ export default function ImportDataPage() {
             {uploadSuccess && (
                 <div className="flex items-center gap-3 p-4 rounded-md border text-green-700 bg-green-50 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800">
                     <CheckCircle className="h-5 w-5" />
-                    <p className="font-medium text-sm">File uploaded successfully! Redirecting to dashboard...</p>
+                    <p className="font-medium text-sm">Analysis successful! Redirecting to dashboard...</p>
                 </div>
             )}
             {error && (
