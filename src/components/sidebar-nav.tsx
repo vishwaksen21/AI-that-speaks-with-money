@@ -20,6 +20,7 @@ import {
   Mic,
   Home,
   ChevronDown,
+  Upload,
 } from 'lucide-react';
 import {
   Collapsible,
@@ -33,6 +34,10 @@ const mainNavItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
 ];
 
+const dataNavItems = [
+    { href: '/import', label: 'Import Data', icon: Upload },
+];
+
 const aiToolsNavItems = [
   { href: '/chat', label: 'Chat with AI', icon: MessageCircle },
   { href: '/voice-assistant', label: 'Voice Assistant', icon: Mic },
@@ -40,8 +45,8 @@ const aiToolsNavItems = [
 ];
 
 const accountNavItems = [
-    { href: '#', label: 'Profile', icon: User },
-    { href: '#', label: 'Sign In', icon: LogIn },
+    { href: '/profile', label: 'Profile', icon: User },
+    { href: '/signin', label: 'Sign In', icon: LogIn },
 ];
 
 
@@ -67,42 +72,63 @@ export function SidebarNav() {
             </SidebarMenuItem>
         ))}
 
-        <SidebarMenuItem>
-            <Collapsible open={isAiToolsOpen} onOpenChange={setIsAiToolsOpen}>
-                <CollapsibleTrigger asChild>
-                    <SidebarMenuButton
-                        variant="ghost"
-                        className="w-full justify-start group-data-[collapsible=icon]:w-8"
-                        tooltip="AI Tools"
-                    >
-                        <Bot />
-                        <span className="group-data-[collapsible=icon]:hidden flex-1 text-left">AI Tools</span>
-                        <ChevronDown className={cn("group-data-[collapsible=icon]:hidden h-4 w-4 transition-transform", isAiToolsOpen && "rotate-180")} />
-                    </SidebarMenuButton>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                    <SidebarMenu className="group-data-[collapsible=icon]:hidden ml-7 border-l pl-2 mt-1">
-                        {aiToolsNavItems.map((item) => (
-                            <SidebarMenuItem key={item.href} className="p-0 m-0">
-                                <SidebarMenuButton
-                                    asChild
-                                    variant="ghost"
-                                    size="sm"
-                                    isActive={pathname === item.href}
-                                    tooltip={item.label}
-                                    className="justify-start w-full"
-                                >
-                                    <Link href={item.href}>
-                                    <item.icon />
-                                    <span>{item.label}</span>
-                                    </Link>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                        ))}
-                    </SidebarMenu>
-                </CollapsibleContent>
-            </Collapsible>
-        </SidebarMenuItem>
+        <SidebarGroup className="p-0 pt-4">
+            <SidebarGroupLabel className="px-2 group-data-[collapsible=icon]:px-0">
+                <span className="group-data-[collapsible=icon]:hidden">Data Management</span>
+            </SidebarGroupLabel>
+            {dataNavItems.map((item) => (
+                <SidebarMenuItem key={item.label}>
+                <SidebarMenuButton
+                    asChild
+                    isActive={pathname === item.href}
+                    tooltip={item.label}
+                    className="justify-start"
+                >
+                    <Link href={item.href}>
+                    <item.icon />
+                    <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
+                    </Link>
+                </SidebarMenuButton>
+                </SidebarMenuItem>
+            ))}
+        </SidebarGroup>
+
+        <Collapsible open={isAiToolsOpen} onOpenChange={setIsAiToolsOpen} asChild>
+          <SidebarMenuItem>
+              <CollapsibleTrigger asChild>
+                  <SidebarMenuButton
+                      variant="ghost"
+                      className="w-full justify-start group-data-[collapsible=icon]:w-8"
+                      tooltip="AI Tools"
+                  >
+                      <Bot />
+                      <span className="group-data-[collapsible=icon]:hidden flex-1 text-left">AI Tools</span>
+                      <ChevronDown className={cn("group-data-[collapsible=icon]:hidden h-4 w-4 transition-transform", isAiToolsOpen && "rotate-180")} />
+                  </SidebarMenuButton>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                  <SidebarMenu className="group-data-[collapsible=icon]:hidden ml-7 border-l pl-2 mt-1">
+                      {aiToolsNavItems.map((item) => (
+                          <SidebarMenuItem key={item.href} className="p-0 m-0">
+                              <SidebarMenuButton
+                                  asChild
+                                  variant="ghost"
+                                  size="sm"
+                                  isActive={pathname === item.href}
+                                  tooltip={item.label}
+                                  className="justify-start w-full"
+                              >
+                                  <Link href={item.href}>
+                                  <item.icon />
+                                  <span>{item.label}</span>
+                                  </Link>
+                              </SidebarMenuButton>
+                          </SidebarMenuItem>
+                      ))}
+                  </SidebarMenu>
+              </CollapsibleContent>
+          </SidebarMenuItem>
+        </Collapsible>
         
          <SidebarGroup className="p-0 pt-4">
             <SidebarGroupLabel className="px-2 group-data-[collapsible=icon]:px-0">
