@@ -1,3 +1,4 @@
+
 'use client';
 import {
   AreaChart,
@@ -18,17 +19,17 @@ const data = [
   { name: 'Jun', netWorth: 675000 },
 ];
 
-function formatCurrency(amount: number) {
-    return new Intl.NumberFormat('en-IN', {
+function formatYAxis(amount: number, currency: string) {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'INR',
+      currency: currency,
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
       notation: 'compact',
     }).format(amount);
-  }
+}
 
-export function NetWorthChart() {
+export function NetWorthChart({ currency = 'INR' }: { currency?: string }) {
   return (
     <ResponsiveContainer width="100%" height={300}>
       <AreaChart
@@ -48,12 +49,20 @@ export function NetWorthChart() {
         </defs>
         <CartesianGrid strokeDasharray="3 3" vertical={false} strokeOpacity={0.2} />
         <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} />
-        <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => formatCurrency(value as number)} />
+        <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => formatYAxis(value as number, currency)} />
         <Tooltip
              contentStyle={{
                 backgroundColor: 'hsl(var(--background))',
                 border: '1px solid hsl(var(--border))',
             }}
+            formatter={(value: number) => 
+                new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: currency,
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                }).format(value)
+            }
         />
         <Area type="monotone" dataKey="netWorth" stroke="hsl(var(--primary))" fill="url(#colorNetWorth)" fillOpacity={1} />
       </AreaChart>

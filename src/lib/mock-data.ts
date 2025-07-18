@@ -12,6 +12,7 @@ export const defaultFinancialData: FinancialData = {
     age: 30,
     employment_status: "Salaried",
     monthly_income: 0,
+    currency: "INR",
   },
   bank_accounts: [],
   mutual_funds: [],
@@ -37,6 +38,10 @@ export function getFinancialData(): FinancialData {
     if (storedData) {
       // If data exists, parse it and return.
       const parsedData = JSON.parse(storedData);
+      // Add currency default if it's missing from old data
+      if (!parsedData.profile.currency) {
+        parsedData.profile.currency = 'INR';
+      }
       return parsedData;
     } else {
       // If no data is in storage, return the default data.

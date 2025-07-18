@@ -19,13 +19,24 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 
 
-function formatCurrency(amount: number) {
+function formatCurrency(amount: number, currency: string = 'INR') {
   if (typeof amount !== 'number' || isNaN(amount)) {
-    return '₹--';
+    // Return a placeholder that indicates a value is expected
+    try {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency,
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).format(0).replace(/0/g, '--');
+    } catch (e) {
+        // Fallback for invalid currency code
+        return '$--';
+    }
   }
-  return new Intl.NumberFormat('en-IN', {
+  return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'INR',
+    currency: currency,
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount);
@@ -134,6 +145,7 @@ export default function DashboardPage() {
   const totalAssets = calculateTotalAssets(data);
   const totalLiabilities = calculateTotalLiabilities(data);
   const netWorth = data.net_worth;
+  const currency = data.profile?.currency || 'INR';
 
   const assetAllocationData = [];
   if (data.bank_accounts?.length) {
@@ -163,7 +175,7 @@ export default function DashboardPage() {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(netWorth)}</div>
+              <div className="text-2xl font-bold">{formatCurrency(netWorth, currency)}</div>
               <p className="text-xs text-muted-foreground">+2.5% from last month</p>
             </CardContent>
           </Card>
@@ -173,7 +185,7 @@ export default function DashboardPage() {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(totalAssets)}</div>
+              <div className="text-2xl font-bold">{formatCurrency(totalAssets, currency)}</div>
                <p className="text-xs text-muted-foreground">+5.1% from last month</p>
             </CardContent>
           </Card>
@@ -183,7 +195,7 @@ export default function DashboardPage() {
               <TrendingDown className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(totalLiabilities)}</div>
+              <div className="text-2xl font-bold">{formatCurrency(totalLiabilities, currency)}</div>
                <p className="text-xs text-muted-foreground">-1.2% from last month</p>
             </CardContent>
           </Card>
@@ -197,7 +209,7 @@ export default function DashboardPage() {
                <CardDescription>Your net worth trend over the last 6 months.</CardDescription>
             </CardHeader>
             <CardContent className="pl-2">
-              <NetWorthChart />
+              <NetWorthChart currency={currency}/>
             </CardContent>
           </Card>
           <Card className="lg:col-span-3">
@@ -218,10 +230,10 @@ export default function DashboardPage() {
                 <CardTitle className="font-headline">Recent Transactions</CardTitle>
                 <CardDescription>Your most recent financial activities.</CardDescription>
               </div>
-               <AddTransactionDialog onAddTransaction={handleAddTransaction} />
+               <AddTransactionDialog onAddTransaction={handleAddTransaction} currency={currency}/>
             </CardHeader>
             <CardContent>
-              <RecentTransactions transactions={data.transactions || []} />
+              <RecentTransactions transactions={data.transactions || []} currency={currency} />
             </CardContent>
           </Card>
       </div>
@@ -230,7 +242,7 @@ export default function DashboardPage() {
 }
 
 
-function AddTransactionDialog({ onAddTransaction }: { onAddTransaction: (t: any) => void }) {
+function AddTransactionDialog({ onAddTransaction, currency }: { onAddTransaction: (t: any) => void, currency: string }) {
     const [isOpen, setIsOpen] = useState(false);
     const [description, setDescription] = useState('');
     const [amount, setAmount] = useState('');
@@ -244,7 +256,7 @@ function AddTransactionDialog({ onAddTransaction }: { onAddTransaction: (t: any)
             
             toast({
                 title: 'Transaction Added!',
-                description: `${description} for ${formatCurrency(Math.abs(numericAmount))} has been recorded.`
+                description: `${description} for ${formatCurrency(Math.abs(numericAmount), currency)} has been recorded.`
             });
 
             // Reset form and close dialog
@@ -285,7 +297,7 @@ function AddTransactionDialog({ onAddTransaction }: { onAddTransaction: (t: any)
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="amount" className="text-right">
-                            Amount (₹)
+                            Amount ({currency})
                         </Label>
                         <Input
                             id="amount"
@@ -293,7 +305,7 @@ function AddTransactionDialog({ onAddTransaction }: { onAddTransaction: (t: any)
                             value={amount}
                             onChange={(e) => setAmount(e.target.value)}
                             className="col-span-3"
-                            placeholder="e.g., 1500"
+                            placeholder="e.g., 50"
                         />
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">

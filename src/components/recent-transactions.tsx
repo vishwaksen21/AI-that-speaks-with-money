@@ -1,3 +1,4 @@
+
 import {
   Table,
   TableBody,
@@ -19,18 +20,19 @@ interface Transaction {
 
 interface RecentTransactionsProps {
   transactions: Transaction[];
+  currency?: string;
 }
 
-function formatCurrency(amount: number) {
-  return new Intl.NumberFormat('en-IN', {
+function formatCurrency(amount: number, currency: string = 'INR') {
+  return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'INR',
+    currency: currency,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(amount);
 }
 
-export function RecentTransactions({ transactions }: RecentTransactionsProps) {
+export function RecentTransactions({ transactions, currency = 'INR' }: RecentTransactionsProps) {
   if (!transactions || transactions.length === 0) {
     return (
       <div className="flex items-center justify-center h-24 text-muted-foreground">
@@ -71,7 +73,7 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
               </Badge>
             </TableCell>
             <TableCell className={`text-right font-semibold ${transaction.amount > 0 ? 'text-green-600' : ''}`}>
-              {formatCurrency(transaction.amount)}
+              {formatCurrency(transaction.amount, currency)}
             </TableCell>
           </TableRow>
         ))}

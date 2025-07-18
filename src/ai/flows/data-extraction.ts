@@ -18,39 +18,40 @@ const FinancialDataSchema = z.object({
     name: z.string().describe("The user's full name."),
     age: z.number().describe("The user's age."),
     employment_status: z.string().describe("The user's employment status (e.g., Salaried, Self-employed, Freelancer)."),
-    monthly_income: z.number().describe("The user's monthly income in Indian Rupees (₹)."),
+    monthly_income: z.number().describe("The user's monthly income in the profile's currency."),
+    currency: z.string().describe("The ISO 4217 currency code for all monetary values in this profile (e.g., 'INR', 'USD', 'EUR').")
   }),
   bank_accounts: z.array(z.object({
     bank: z.string().describe("Name of the bank."),
-    balance: z.number().describe("Account balance in Indian Rupees (₹)."),
+    balance: z.number().describe("Account balance in the profile's currency."),
   })).describe("List of user's bank accounts."),
   mutual_funds: z.array(z.object({
       name: z.string().describe("Name of the mutual fund."),
-      current_value: z.number().describe("Current market value of the holding in Indian Rupees (₹)."),
+      current_value: z.number().describe("Current market value of the holding in the profile's currency."),
   })).describe("List of user's mutual fund investments."),
   stocks: z.array(z.object({
       ticker: z.string().describe("The stock ticker symbol or company name (e.g., TCS, Reliance Industries)."),
       shares: z.number().describe("Number of shares held."),
-      current_price: z.number().describe("Current price per share in Indian Rupees (₹)."),
+      current_price: z.number().describe("Current price per share in the profile's currency."),
   })).describe("List of user's stock holdings."),
   real_estate: z.array(z.object({
       property_type: z.string().describe("Type of property (e.g., Apartment, Land, Digital Gold)."),
-      market_value: z.number().describe("Current market value of the property in Indian Rupees (₹)."),
+      market_value: z.number().describe("Current market value of the property in the profile's currency."),
   })).describe("List of user's real estate assets."),
   loans: z.array(z.object({
     type: z.string().describe("Type of loan (e.g., Home Loan, Car Loan, Personal Loan)."),
-    outstanding_amount: z.number().describe("The remaining amount to be paid in Indian Rupees (₹)."),
+    outstanding_amount: z.number().describe("The remaining amount to be paid in the profile's currency."),
   })).describe("List of user's outstanding loans."),
   credit_cards: z.array(z.object({
     issuer: z.string().describe("The bank or institution that issued the credit card."),
-    outstanding_balance: z.number().describe("The current outstanding balance on the card in Indian Rupees (₹)."),
+    outstanding_balance: z.number().describe("The current outstanding balance on the card in the profile's currency."),
   })).describe("List of user's credit card balances."),
   sips: z.array(z.object({
       name: z.string().describe("Name of the SIP fund."),
-      monthly_investment: z.number().describe("Monthly investment amount in Indian Rupees (₹)."),
+      monthly_investment: z.number().describe("Monthly investment amount in the profile's currency."),
   })).describe("Systematic Investment Plans. This should not be optional."),
-  ppf: z.number().describe("The current balance in the Public Provident Fund in Indian Rupees (₹)."),
-  net_worth: z.number().describe("The calculated net worth (Total Assets - Total Liabilities) in Indian Rupees (₹). If provided in the text, use that value. Otherwise, you must calculate it."),
+  ppf: z.number().describe("The current balance in the Public Provident Fund in the profile's currency."),
+  net_worth: z.number().describe("The calculated net worth (Total Assets - Total Liabilities) in the profile's currency. If provided in the text, use that value. Otherwise, you must calculate it."),
   credit_score: z.number().optional().describe("The user's credit score (e.g., CIBIL score)."),
   transactions: z.array(z.object({
     id: z.string(),
@@ -76,7 +77,7 @@ const prompt = ai.definePrompt({
 
 CRITICAL INSTRUCTIONS:
 - Your entire output must be ONLY the JSON object. Do not include any other text, explanations, or markdown formatting like \`\`\`json.
-- All monetary values must be in Indian Rupees (₹). Remove commas and currency symbols from numbers.
+- Currency: Identify the currency from the text (e.g., from symbols like $, €, ₹, or words like "dollars", "rupees"). Use the appropriate ISO 4217 code (e.g., 'USD', 'EUR', 'INR'). If no currency is mentioned, default to 'INR'. Store this in the 'profile.currency' field. All monetary values must be numbers, without commas or currency symbols.
 - Net Worth: If net worth is explicitly provided, use that value. Otherwise, you MUST calculate it by summing all assets (bank accounts, mutual funds, stocks (shares * price), real estate, PPF) and subtracting all liabilities (loans, credit cards).
 - Stocks: The 'stocks' array in the output must contain ticker, shares, and current_price for each stock.
 - Digital Gold: Treat "Digital Gold" as a type of real_estate asset.
