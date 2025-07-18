@@ -26,6 +26,29 @@ export default function ChatPage() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Load chat history from local storage on component mount
+    try {
+      const savedMessages = localStorage.getItem('chatHistory');
+      if (savedMessages) {
+        setMessages(JSON.parse(savedMessages));
+      }
+    } catch (error) {
+      console.error('Failed to load messages from local storage', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Save chat history to local storage whenever messages change
+    if (messages.length > 0) {
+        try {
+            localStorage.setItem('chatHistory', JSON.stringify(messages));
+        } catch (error) {
+            console.error('Failed to save messages to local storage', error);
+        }
+    }
+  }, [messages]);
+
+  useEffect(() => {
     if (scrollAreaRef.current) {
       scrollAreaRef.current.scrollTo({
         top: scrollAreaRef.current.scrollHeight,
