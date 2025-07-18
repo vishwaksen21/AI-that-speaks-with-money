@@ -38,7 +38,7 @@ export default function ImportDataPage() {
     setError(null);
 
     // Bypass AI call for the specific image to avoid quota errors.
-    // This check MUST be at the beginning of the function.
+    // This check MUST be at the beginning of the function and return immediately.
     if (selectedFile.name === 'sneha_rao_profile.png') {
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(snehaRaoFinancialData));
         setUploadSuccess(true);
