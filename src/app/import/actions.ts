@@ -2,7 +2,7 @@
 'use server';
 
 import { extractFinancialData } from '@/ai/flows/data-extraction';
-import { FileParserService } from '@/services/file-parser';
+import { parseFile } from '@/services/file-parser';
 
 export async function uploadFinancialData(
   file: { buffer: number[]; type: string }
@@ -11,7 +11,7 @@ export async function uploadFinancialData(
 
   try {
     const buffer = Buffer.from(file.buffer);
-    const fileContent = await FileParserService.parse(buffer, file.type);
+    const fileContent = await parseFile(buffer, file.type);
     
     if (!fileContent.trim()) {
         throw new Error('The file appears to be empty or could not be parsed correctly.');
