@@ -22,7 +22,7 @@ import {
   ChevronDown,
   Upload,
   UserPlus,
-  Sparkles,
+  Wand2,
 } from 'lucide-react';
 import {
   Collapsible,
@@ -41,7 +41,7 @@ const dataNavItems = [
 ];
 
 const aiToolsNavItems = [
-  { href: '/recommendations', label: 'Recommendations', icon: Sparkles },
+  { href: '/agents', label: 'AI Agents', icon: Wand2 },
   { href: '/chat', label: 'Chat with AI', icon: MessageCircle },
   { href: '/voice-assistant', label: 'Voice Assistant', icon: Mic },
   { href: '/scenario-simulator', label: 'Scenario Simulator', icon: Bot },
