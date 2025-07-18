@@ -31,8 +31,6 @@ const investmentAgentPrompt = ai.definePrompt({
   },
   prompt: `You are a professional investment advisor AI. Your entire output must be a single JSON object.
 
-Your task is to provide personalized, actionable investment advice based on the user's data. Analyze their assets, income, and age to generate a comprehensive plan. The final advice must be formatted as a Markdown string inside the 'advice' field of the JSON object.
-
 **User's Financial Data:**
 {{{financialData}}}
 
@@ -55,20 +53,12 @@ const investmentAgentFlow = ai.defineFlow(
     outputSchema: AgentOutputSchema,
   },
   async input => {
-    const llmResponse = await investmentAgentPrompt(input);
-    const output = llmResponse.output();
+    const {output} = await investmentAgentPrompt(input);
 
     if (!output) {
       throw new Error("The AI model was unable to generate investment advice for this profile.");
     }
-    
-    // The output from the LLM is a string of JSON, so we need to parse it.
-    try {
-        const parsedOutput = JSON.parse(output as any);
-        return AgentOutputSchema.parse(parsedOutput);
-    } catch (e) {
-        console.error("Failed to parse JSON from AI response:", output);
-        throw new Error("The AI returned data in an invalid format. Please try again.");
-    }
+
+    return output;
   }
 );

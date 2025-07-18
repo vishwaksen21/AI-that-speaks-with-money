@@ -3,7 +3,7 @@
 /**
  * @fileOverview An AI flow to generate personalized expense optimization advice.
  *
- * - generateExpenseAdvice - A function that takes financial data and returns expense advice.
+ * - generateExpenseAdvice - a function that takes financial data and returns expense advice.
  */
 
 import {ai} from '@/ai/genkit';
@@ -55,20 +55,12 @@ const expenseAgentFlow = ai.defineFlow(
     outputSchema: AgentOutputSchema,
   },
   async input => {
-    const llmResponse = await expenseAgentPrompt(input);
-    const output = llmResponse.output();
+    const {output} = await expenseAgentPrompt(input);
 
     if (!output) {
       throw new Error("The AI model was unable to generate expense advice for this profile.");
     }
 
-    // The output from the LLM is a string of JSON, so we need to parse it.
-    try {
-        const parsedOutput = JSON.parse(output as any);
-        return AgentOutputSchema.parse(parsedOutput);
-    } catch (e) {
-        console.error("Failed to parse JSON from AI response:", output);
-        throw new Error("The AI returned data in an invalid format. Please try again.");
-    }
+    return output;
   }
 );
