@@ -82,7 +82,7 @@ export default function ChatPage() {
                 {message.role === 'assistant' && (
                   <Avatar className="w-8 h-8 border">
                     <AvatarFallback className="bg-primary text-primary-foreground">
-                       <Logo className="w-5 h-5 text-sidebar-primary" />
+                       <Logo className="w-5 h-5" />
                     </AvatarFallback>
                   </Avatar>
                 )}
@@ -112,7 +112,7 @@ export default function ChatPage() {
               <div className="flex items-start gap-4">
                 <Avatar className="w-8 h-8 border">
                   <AvatarFallback className="bg-primary text-primary-foreground">
-                     <Logo className="w-5 h-5 text-sidebar-primary" />
+                     <Logo className="w-5 h-5" />
                   </AvatarFallback>
                 </Avatar>
                 <div className="max-w-xl p-3 rounded-lg bg-card border space-y-2">

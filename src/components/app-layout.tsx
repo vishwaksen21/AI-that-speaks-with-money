@@ -43,12 +43,9 @@ export function AppLayout({
         <header className="flex items-center justify-between p-4 border-b bg-background">
           <div className="flex items-center gap-4">
             <SidebarTrigger className="md:hidden" />
-            <div>
-              <p className="text-sm text-muted-foreground">Pages / {pageTitle}</p>
-              <h1 className="text-lg font-bold font-headline text-primary">
-                {pageTitle}
-              </h1>
-            </div>
+            <h1 className="text-xl font-bold font-headline text-primary">
+              {pageTitle}
+            </h1>
           </div>
           <div className="flex items-center gap-2">
              <Button variant="ghost" size="icon">
