@@ -28,7 +28,7 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
   const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
   return (
-    <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" className="text-[10px] font-medium">
+    <text x={x} y={y} fill="hsl(var(--primary-foreground))" textAnchor="middle" dominantBaseline="central" className="text-[10px] font-medium">
       <tspan x={x} dy="-0.5em">{name}</tspan>
       <tspan x={x} dy="1.1em">{`${(percent * 100).toFixed(0)}%`}</tspan>
     </text>
