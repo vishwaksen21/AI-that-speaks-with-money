@@ -65,6 +65,17 @@ export default function DashboardPage() {
   useEffect(() => {
     const financialData = getFinancialData();
     setData(financialData);
+
+    const handleStorageChange = () => {
+        const updatedFinancialData = getFinancialData();
+        setData(updatedFinancialData);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+        window.removeEventListener('storage', handleStorageChange);
+    };
   }, []);
 
   const handleAddTransaction = (newTransaction: {
@@ -411,5 +422,3 @@ function AddTransactionDialog({ onAddTransaction, currency }: { onAddTransaction
         </Dialog>
     );
 }
-
-    

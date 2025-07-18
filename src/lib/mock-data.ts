@@ -70,5 +70,3 @@ export function getFinancialData(): FinancialData {
     return defaultFinancialData;
   }
 }
-
-    
