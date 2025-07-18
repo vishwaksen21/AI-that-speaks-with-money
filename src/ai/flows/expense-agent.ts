@@ -35,9 +35,7 @@ const expenseAgentPrompt = ai.definePrompt({
 Your task is to provide personalized, actionable advice on optimizing spending. Analyze the user's income and known regular investments (SIPs). The final advice must be formatted as a Markdown string inside the 'advice' field of the JSON object.
 
 **User's Financial Data:**
-\`\`\`json
 {{{financialData}}}
-\`\`\`
 
 **Your Task:**
 1.  **Analyze the Data:** Review the user's monthly income versus their SIPs and other known regular expenses if available.

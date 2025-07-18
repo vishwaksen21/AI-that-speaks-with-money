@@ -10,7 +10,7 @@ function handleApiError(error: any, agentName: string) {
   if (error.message && error.message.includes('429')) {
     throw new Error('API quota exceeded. Please try again later.');
   }
-  throw new Error(`Failed to get response from ${agentName} AI.`);
+  throw new Error(`Failed to get response from ${agentName} AI. Details: ${error.message}`);
 }
 
 export async function getInvestmentAdvice(financialData: string) {

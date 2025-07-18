@@ -34,9 +34,7 @@ const savingsAgentPrompt = ai.definePrompt({
 Your task is to provide personalized, actionable advice based on the user's data. Analyze their income, savings, and liabilities. The final advice must be formatted as a Markdown string inside the 'advice' field of the JSON object.
 
 **User's Financial Data:**
-\`\`\`json
 {{{financialData}}}
-\`\`\`
 
 **Your Task:**
 1.  **Analyze the Data:** Review the user's income, savings, and liabilities.
