@@ -37,7 +37,7 @@ const savingsAgentPrompt = ai.definePrompt({
 \`\`\`
 
 **Your Task:**
-Generate a response in Markdown format for the 'advice' field. Your response MUST focus ONLY on savings and debt management.
+Generate a comprehensive recommendation document in Markdown format. Your response MUST focus ONLY on savings and debt management.
 *   Assess their savings relative to their income. Recommend a target savings rate.
 *   Analyze their liabilities. If they have high-interest debt (like credit cards), strongly recommend a strategy to pay it down (e.g., the "avalanche" or "snowball" method).
 *   Advise on building or maintaining an emergency fund (e.g., 3-6 months of monthly income).

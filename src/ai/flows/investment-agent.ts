@@ -37,7 +37,7 @@ const investmentAgentPrompt = ai.definePrompt({
 \`\`\`
 
 **Your Task:**
-Generate a response in Markdown format for the 'advice' field. Your response MUST focus ONLY on investment strategy.
+Generate a comprehensive recommendation document in Markdown format. Your response MUST focus ONLY on investment strategy.
 *   Based on the user's age, income, and existing assets, recommend a suitable asset allocation (e.g., 70% equity, 30% debt).
 *   Suggest specific *types* of investments for each category (e.g., for equity, suggest a mix of index funds and blue-chip stocks; for debt, suggest government bonds or high-quality corporate bonds).
 *   Provide clear reasoning for your recommendations. Keep the advice educational and do not suggest specific stocks or funds by name.

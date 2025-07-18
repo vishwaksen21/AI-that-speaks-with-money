@@ -37,7 +37,7 @@ const expenseAgentPrompt = ai.definePrompt({
 \`\`\`
 
 **Your Task:**
-Generate a response in Markdown format for the 'advice' field. Your response MUST focus ONLY on expense optimization.
+Generate a comprehensive recommendation document in Markdown format. Your response MUST focus ONLY on expense optimization.
 *   Analyze their monthly income versus their SIPs and other known regular expenses if available in the data.
 *   Provide general advice on tracking expenses and identifying areas for potential cutbacks to increase their savings rate. For example, suggest reviewing discretionary spending categories.
 *   Suggest practical tips for budgeting and mindful spending.
