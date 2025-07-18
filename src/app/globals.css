@@ -84,3 +84,21 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .btn-glow {
+      @apply relative overflow-hidden;
+  }
+  .btn-glow:before {
+      content: '';
+      @apply absolute w-0 h-0 bg-primary/20 rounded-full;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%,-50%);
+      transition: width .3s ease, height .3s ease;
+  }
+  .btn-glow:hover:before, .btn-glow:focus:before {
+      @apply w-full h-auto;
+      padding-bottom: 100%;
+  }
+}
