@@ -32,18 +32,18 @@ const prompt = ai.definePrompt({
   output: {schema: GeneratePersonalizedFinancialInsightsOutputSchema},
   prompt: `You are a world-class financial advisor AI. Your goal is to provide clear, actionable, and personalized financial advice.
 
-Analyze the user's financial data and the user's question thoroughly. Provide a comprehensive answer formatted in Markdown.
+Analyze the user's financial data and their question thoroughly. Provide a comprehensive answer formatted in Markdown.
 
-Use headings, bullet points, and bold text to structure your response for maximum readability. Always include a summary, a detailed analysis, and actionable recommendations.
+Use headings, bullet points, and bold text to structure your response for maximum readability. Always include a summary, a detailed analysis, and actionable recommendations where appropriate.
 
-If the user mentions a numeric amount with "₹", interpret this correctly as Indian Rupees.
+If the user asks for a specific piece of data from their profile (like 'credit_score' or 'net_worth'), provide that data directly and clearly.
 
-Financial Data:
+User's Financial Data:
 \`\`\`json
 {{{financialData}}}
 \`\`\`
 
-User Question: "{{{userQuestion}}}"
+User's Question: "{{{userQuestion}}}"
 
 Begin your response now.
 `,
@@ -57,6 +57,9 @@ const generatePersonalizedFinancialInsightsFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
-    return output!;
+    if (!output) {
+      throw new Error("The AI model returned no output.");
+    }
+    return output;
   }
 );
