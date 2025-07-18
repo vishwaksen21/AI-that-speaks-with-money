@@ -32,15 +32,16 @@ const investmentAgentPrompt = ai.definePrompt({
   prompt: `
 You are a professional AI financial advisor.
 
-You will be given a user's financial data. Based on that, your task is to analyze the data and provide personalized investment advice. The advice should be educational and not suggest specific stocks or funds by name.
+You will receive a user's financial data. Analyze it and generate clear, safe investment advice. The advice should be educational and not suggest specific stocks or funds by name.
 
-⚠️ IMPORTANT:
-- Your response MUST be ONLY a valid JSON object.
-- Do NOT include any explanation or additional text.
-- The JSON must strictly match this format:
-  {
-    "advice": "<your investment advice here as a markdown-formatted string>"
-  }
+⚠️ Very Important Instructions:
+- Respond ONLY with a valid JSON object.
+- DO NOT include any commentary, explanation, or extra characters.
+- Your entire output MUST look exactly like this format:
+
+{
+  "advice": "<your investment advice here as a markdown-formatted string>"
+}
 
 ---
 
@@ -49,7 +50,11 @@ You will be given a user's financial data. Based on that, your task is to analyz
 
 ---
 
-Now generate the JSON response:
+Now respond with only the JSON object.
+If the data is unclear, respond with:
+{
+  "advice": "Please provide more detailed financial data for accurate investment advice."
+}
 `,
 });
 

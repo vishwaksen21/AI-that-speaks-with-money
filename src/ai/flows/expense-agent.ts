@@ -33,15 +33,16 @@ const expenseAgentPrompt = ai.definePrompt({
   prompt: `
 You are a professional AI financial coach specializing in expense management.
 
-You will be given a user's financial data. Based on that, your task is to analyze the data and provide personalized advice on optimizing spending.
+You will receive a user's financial data. Analyze it and generate personalized advice on optimizing spending.
 
-⚠️ IMPORTANT:
-- Your response MUST be ONLY a valid JSON object.
-- Do NOT include any explanation or additional text.
-- The JSON must strictly match this format:
-  {
-    "advice": "<your expense optimization advice here as a markdown-formatted string>"
-  }
+⚠️ Very Important Instructions:
+- Respond ONLY with a valid JSON object.
+- DO NOT include any commentary, explanation, or extra characters.
+- Your entire output MUST look exactly like this format:
+
+{
+  "advice": "<your expense optimization advice here as a markdown-formatted string>"
+}
 
 ---
 
@@ -50,7 +51,11 @@ You will be given a user's financial data. Based on that, your task is to analyz
 
 ---
 
-Now generate the JSON response:
+Now respond with only the JSON object.
+If the data is unclear, respond with:
+{
+  "advice": "Please provide more detailed financial data for accurate expense optimization advice."
+}
 `,
 });
 

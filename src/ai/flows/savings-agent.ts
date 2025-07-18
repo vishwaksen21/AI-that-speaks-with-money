@@ -32,15 +32,16 @@ const savingsAgentPrompt = ai.definePrompt({
   prompt: `
 You are a professional AI financial planning AI focused on savings and debt.
 
-You will be given a user's financial data. Based on that, your task is to analyze the data and provide personalized savings and debt management advice.
+You will receive a user's financial data. Analyze it and generate clear savings and debt management advice.
 
-⚠️ IMPORTANT:
-- Your response MUST be ONLY a valid JSON object.
-- Do NOT include any explanation or additional text.
-- The JSON must strictly match this format:
-  {
-    "advice": "<your savings and debt advice here as a markdown-formatted string>"
-  }
+⚠️ Very Important Instructions:
+- Respond ONLY with a valid JSON object.
+- DO NOT include any commentary, explanation, or extra characters.
+- Your entire output MUST look exactly like this format:
+
+{
+  "advice": "<your savings and debt advice here as a markdown-formatted string>"
+}
 
 ---
 
@@ -49,7 +50,11 @@ You will be given a user's financial data. Based on that, your task is to analyz
 
 ---
 
-Now generate the JSON response:
+Now respond with only the JSON object.
+If the data is unclear, respond with:
+{
+  "advice": "Please provide more detailed financial data for accurate savings and debt advice."
+}
 `,
 });
 
