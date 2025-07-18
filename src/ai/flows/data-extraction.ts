@@ -100,7 +100,8 @@ const dataExtractionFlow = ai.defineFlow(
     outputSchema: FinancialDataSchema,
   },
   async (input) => {
-    const {output} = await prompt(input);
+    const response = await prompt(input);
+    const output = response.output();
     if (!output) {
         throw new Error("The AI model could not extract data. The file might be empty or in an unrecognizable format.");
     }
