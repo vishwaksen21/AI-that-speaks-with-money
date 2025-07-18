@@ -30,7 +30,7 @@ const calculateTotalAssets = (data: any) => {
     const mutualFunds = data.assets.mutual_funds?.reduce((sum: number, mf: any) => sum + (mf.current_value || 0), 0) || 0;
     const stocks = data.assets.stocks?.reduce((sum: number, stock: any) => sum + ((stock.shares || 0) * (stock.current_price || 0)), 0) || 0;
     const realEstate = data.assets.real_estate?.reduce((sum: number, prop: any) => sum + (prop.market_value || 0), 0) || 0;
-    const ppf = data.investments?.ppf?.balance || data.investments?.EPF?.balance || 0;
+    const ppf = data.investments?.ppf?.balance || 0;
     return bankBalance + mutualFunds + stocks + realEstate + ppf;
 };
 
@@ -82,21 +82,19 @@ export default function DashboardPage() {
 
   const assetAllocationData = [];
   if (data?.assets?.bank_accounts) {
-    assetAllocationData.push({ name: 'Bank Accounts', value: data.assets.bank_accounts.reduce((sum: number, acc: any) => sum + acc.balance, 0) });
+    assetAllocationData.push({ name: 'Bank Accounts', value: data.assets.bank_accounts.reduce((sum: number, acc: any) => sum + (acc.balance || 0), 0) });
   }
   if (data?.assets?.mutual_funds) {
-    assetAllocationData.push({ name: 'Mutual Funds', value: data.assets.mutual_funds.reduce((sum: number, mf: any) => sum + mf.current_value, 0) });
+    assetAllocationData.push({ name: 'Mutual Funds', value: data.assets.mutual_funds.reduce((sum: number, mf: any) => sum + (mf.current_value || 0), 0) });
   }
   if (data?.assets?.stocks) {
-    assetAllocationData.push({ name: 'Stocks', value: data.assets.stocks.reduce((sum: number, stock: any) => sum + (stock.shares * stock.current_price), 0) });
+    assetAllocationData.push({ name: 'Stocks', value: data.assets.stocks.reduce((sum: number, stock: any) => sum + ((stock.shares || 0) * (stock.current_price || 0)), 0) });
   }
   if (data?.assets?.real_estate) {
-      assetAllocationData.push({ name: 'Real Estate', value: data.assets.real_estate.reduce((sum: number, prop: any) => sum + prop.market_value, 0) });
+      assetAllocationData.push({ name: 'Real Estate', value: data.assets.real_estate.reduce((sum: number, prop: any) => sum + (prop.market_value || 0), 0) });
   }
    if (data?.investments?.ppf?.balance) {
       assetAllocationData.push({ name: 'PPF', value: data.investments.ppf.balance });
-  } else if (data?.investments?.EPF?.balance) {
-      assetAllocationData.push({ name: 'EPF', value: data.investments.EPF.balance });
   }
   
 
