@@ -76,15 +76,20 @@ const prompt = ai.definePrompt({
   prompt: `You are an expert financial data analyst. Your task is to analyze the following raw text, which contains a user's financial information, and structure it into a valid JSON object matching the provided schema.
 
 CRITICAL INSTRUCTIONS:
-- Your entire output must be ONLY the JSON object. Do not include any other text, explanations, or markdown formatting like \`\`\`json.
-- Currency: Identify the currency from the text (e.g., from symbols like $, €, ₹, or words like "dollars", "rupees"). Use the appropriate ISO 4217 code (e.g., 'USD', 'EUR', 'INR'). If no currency is mentioned, default to 'INR'. Store this in the 'profile.currency' field. All monetary values must be numbers, without commas or currency symbols.
-- Net Worth: If net worth is explicitly provided, use that value. Otherwise, you MUST calculate it by summing all assets (bank accounts, mutual funds, stocks (shares * price), real estate, PPF) and subtracting all liabilities (loans, credit cards).
-- Stocks: The 'stocks' array in the output must contain ticker, shares, and current_price for each stock.
-- Digital Gold: Treat "Digital Gold" as a type of real_estate asset.
-- PPF/EPF: Map any provident fund balance to the 'ppf' number field.
-- Defaults: You must fill in every field of the schema as accurately as possible. For missing fields, provide a sensible default (e.g., 0 for a number, an empty array [] for lists, "Valued User" for name, 30 for age). Do not leave any required fields out.
-- User ID: Generate a random user_id, for example 'user_12345'.
-- Transactions: The 'transactions' field is for application use only. Do NOT populate it. If it is optional, omit it.
+1.  **Output Format**: Your entire output must be ONLY the JSON object. Do not include any other text, explanations, or markdown formatting like \`\`\`json.
+2.  **Data Source**: Use ONLY the information provided in the input text. Do NOT invent or hallucinate any data. If a field's value is not present in the text, use a sensible default (0 for numbers, an empty array [] for lists, "N/A" for strings like employment_status).
+3.  **Currency**: Identify the currency from the text (e.g., from symbols like $, €, ₹, or words like "dollars", "rupees"). Use the appropriate ISO 4217 code (e.g., 'USD', 'EUR', 'INR'). If no currency is mentioned, default to 'INR'. Store this in 'profile.currency'. All monetary values in the JSON must be numbers, without commas or currency symbols.
+4.  **Net Worth Calculation**: If 'net_worth' is explicitly provided in the text, use that value. Otherwise, you MUST calculate it by summing all assets (bank accounts, mutual funds, stocks (shares * price), real estate, PPF) and subtracting all liabilities (loans, credit cards).
+5.  **Specific Mappings**:
+    *   Treat "Digital Gold" as a 'real_estate' asset.
+    *   Map any provident fund balance (EPF, PF) to the 'ppf' field.
+    *   The 'stocks' array must contain 'ticker', 'shares', and 'current_price' for each stock.
+6.  **Defaults for Missing Data**:
+    *   If any financial list (e.g., stocks, loans) is not mentioned, return an empty array \`[]\`.
+    *   If \`ppf\` or \`credit_score\` is not mentioned, use \`0\`.
+    *   If profile information like \`name\` or \`age\` is missing, use "Valued User" and 30 respectively.
+7.  **User ID**: Generate a random user_id, for example 'user_12345'.
+8.  **Transactions Field**: The 'transactions' field is for application use only. Do NOT populate it. If it is optional, omit it from the final JSON.
 
 Here is the financial data to process:
 ---
