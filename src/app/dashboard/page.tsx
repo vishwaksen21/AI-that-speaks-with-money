@@ -9,7 +9,8 @@ import { NetWorthChart } from '@/components/net-worth-chart';
 import { AssetAllocationChart } from '@/components/asset-allocation-chart';
 import { getFinancialData, defaultFinancialData, LOCAL_STORAGE_KEY } from '@/lib/mock-data';
 import type { FinancialData } from '@/ai/flows/data-extraction';
-import { DollarSign, TrendingUp, TrendingDown, PlusCircle } from 'lucide-react';
+import { DollarSign, TrendingUp, TrendingDown, PlusCircle, User, Briefcase, IndianRupee } from 'lucide-react';
+import { CreditScore as CreditScoreIcon } from '@/components/icons';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -17,6 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 
 function formatCurrency(amount: number, currency: string = 'INR') {
@@ -34,7 +36,7 @@ function formatCurrency(amount: number, currency: string = 'INR') {
         return '$--';
     }
   }
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('en-IN', { // Use en-IN for Indian formatting
     style: 'currency',
     currency: currency,
     minimumFractionDigits: 0,
@@ -123,7 +125,8 @@ export default function DashboardPage() {
     return (
         <AppLayout pageTitle="Dashboard">
              <div className="space-y-6">
-                <div className="grid gap-4 md:grid-cols-3">
+                <div className="grid gap-4 md:grid-cols-4">
+                    <Card><CardHeader className="pb-2"><Skeleton className="h-5 w-24" /></CardHeader><CardContent><Skeleton className="h-8 w-32" /><Skeleton className="h-4 w-40 mt-1" /></CardContent></Card>
                     <Card><CardHeader className="pb-2"><Skeleton className="h-5 w-24" /></CardHeader><CardContent><Skeleton className="h-8 w-32" /><Skeleton className="h-4 w-40 mt-1" /></CardContent></Card>
                     <Card><CardHeader className="pb-2"><Skeleton className="h-5 w-24" /></CardHeader><CardContent><Skeleton className="h-8 w-32" /><Skeleton className="h-4 w-40 mt-1" /></CardContent></Card>
                     <Card><CardHeader className="pb-2"><Skeleton className="h-5 w-24" /></CardHeader><CardContent><Skeleton className="h-8 w-32" /><Skeleton className="h-4 w-40 mt-1" /></CardContent></Card>
@@ -168,7 +171,7 @@ export default function DashboardPage() {
     <AppLayout pageTitle="Dashboard">
       <div className="space-y-6">
         {/* Top Cards */}
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium font-headline">Total Net Worth</CardTitle>
@@ -199,6 +202,16 @@ export default function DashboardPage() {
                <p className="text-xs text-muted-foreground">-1.2% from last month</p>
             </CardContent>
           </Card>
+           <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium font-headline">Credit Score</CardTitle>
+              <CreditScoreIcon className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{data.credit_score || 'N/A'}</div>
+               <p className="text-xs text-muted-foreground">Last updated today</p>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Charts */}
@@ -221,6 +234,92 @@ export default function DashboardPage() {
               <AssetAllocationChart data={assetAllocationData} />
             </CardContent>
           </Card>
+        </div>
+
+        {/* Details Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Profile & Investments */}
+            <div className="lg:col-span-1 space-y-6">
+                <Card>
+                    <CardHeader><CardTitle className="font-headline">Profile</CardTitle></CardHeader>
+                    <CardContent className="space-y-3 text-sm">
+                        <div className="flex justify-between items-center"><span className="text-muted-foreground flex items-center gap-2"><User size={16}/> Name</span> <strong>{data.profile.name}</strong></div>
+                        <div className="flex justify-between items-center"><span className="text-muted-foreground">Age</span> <strong>{data.profile.age}</strong></div>
+                        <div className="flex justify-between items-center"><span className="text-muted-foreground flex items-center gap-2"><Briefcase size={16}/> Employment</span> <strong>{data.profile.employment_status}</strong></div>
+                         <div className="flex justify-between items-center"><span className="text-muted-foreground flex items-center gap-2"><IndianRupee size={16}/> Income</span> <strong>{formatCurrency(data.profile.monthly_income, currency)}</strong></div>
+                    </CardContent>
+                </Card>
+                 <Card>
+                    <CardHeader><CardTitle className="font-headline">Investments</CardTitle></CardHeader>
+                    <CardContent>
+                         <h4 className="font-semibold mb-2">Mutual Funds</h4>
+                        <Table>
+                            <TableHeader><TableRow><TableHead>Fund</TableHead><TableHead className="text-right">Value</TableHead></TableRow></TableHeader>
+                            <TableBody>
+                                {data.mutual_funds?.map(mf => <TableRow key={mf.name}><TableCell>{mf.name}</TableCell><TableCell className="text-right">{formatCurrency(mf.current_value, currency)}</TableCell></TableRow>)}
+                            </TableBody>
+                        </Table>
+                         <h4 className="font-semibold mt-4 mb-2">Systematic Investment Plans (SIPs)</h4>
+                         <Table>
+                            <TableHeader><TableRow><TableHead>Fund</TableHead><TableHead className="text-right">Monthly</TableHead></TableRow></TableHeader>
+                            <TableBody>
+                                {data.sips?.map(sip => <TableRow key={sip.name}><TableCell>{sip.name}</TableCell><TableCell className="text-right">{formatCurrency(sip.monthly_investment, currency)}</TableCell></TableRow>)}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
+            </div>
+             {/* Assets */}
+             <div className="lg:col-span-1 space-y-6">
+                <Card>
+                    <CardHeader><CardTitle className="font-headline">Assets</CardTitle></CardHeader>
+                    <CardContent>
+                        <h4 className="font-semibold mb-2">Bank Accounts</h4>
+                        <Table>
+                           <TableHeader><TableRow><TableHead>Bank</TableHead><TableHead className="text-right">Balance</TableHead></TableRow></TableHeader>
+                           <TableBody>
+                                {data.bank_accounts?.map(acc => <TableRow key={acc.bank}><TableCell>{acc.bank}</TableCell><TableCell className="text-right">{formatCurrency(acc.balance, currency)}</TableCell></TableRow>)}
+                           </TableBody>
+                        </Table>
+                        <h4 className="font-semibold mt-4 mb-2">Stocks</h4>
+                         <Table>
+                            <TableHeader><TableRow><TableHead>Stock</TableHead><TableHead className="text-right">Value</TableHead></TableRow></TableHeader>
+                            <TableBody>
+                                {data.stocks?.map(s => <TableRow key={s.ticker}><TableCell>{s.ticker}</TableCell><TableCell className="text-right">{formatCurrency(s.shares * s.current_price, currency)}</TableCell></TableRow>)}
+                            </TableBody>
+                        </Table>
+                         <h4 className="font-semibold mt-4 mb-2">Other Assets</h4>
+                         <Table>
+                             <TableBody>
+                                {data.real_estate?.map(re => <TableRow key={re.property_type}><TableCell>{re.property_type}</TableCell><TableCell className="text-right">{formatCurrency(re.market_value, currency)}</TableCell></TableRow>)}
+                                <TableRow><TableCell>PPF</TableCell><TableCell className="text-right">{formatCurrency(data.ppf, currency)}</TableCell></TableRow>
+                             </TableBody>
+                         </Table>
+                    </CardContent>
+                </Card>
+            </div>
+             {/* Liabilities */}
+            <div className="lg:col-span-1 space-y-6">
+                <Card>
+                    <CardHeader><CardTitle className="font-headline">Liabilities</CardTitle></CardHeader>
+                    <CardContent>
+                        <h4 className="font-semibold mb-2">Loans</h4>
+                        <Table>
+                            <TableHeader><TableRow><TableHead>Type</TableHead><TableHead className="text-right">Outstanding</TableHead></TableRow></TableHeader>
+                            <TableBody>
+                               {data.loans?.map(l => <TableRow key={l.type}><TableCell>{l.type}</TableCell><TableCell className="text-right">{formatCurrency(l.outstanding_amount, currency)}</TableCell></TableRow>)}
+                            </TableBody>
+                        </Table>
+                        <h4 className="font-semibold mt-4 mb-2">Credit Cards</h4>
+                        <Table>
+                            <TableHeader><TableRow><TableHead>Issuer</TableHead><TableHead className="text-right">Balance</TableHead></TableRow></TableHeader>
+                             <TableBody>
+                                {data.credit_cards?.map(cc => <TableRow key={cc.issuer}><TableCell>{cc.issuer}</TableCell><TableCell className="text-right">{formatCurrency(cc.outstanding_balance, currency)}</TableCell></TableRow>)}
+                             </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
+            </div>
         </div>
 
         {/* Recent Transactions */}
@@ -333,3 +432,4 @@ function AddTransactionDialog({ onAddTransaction, currency }: { onAddTransaction
         </Dialog>
     );
 }
+
