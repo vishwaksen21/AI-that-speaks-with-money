@@ -14,13 +14,11 @@ import {z} from 'genkit';
 // This schema defines the target JSON structure. It is flatter to be more reliable for AI generation.
 const FinancialDataSchema = z.object({
   user_id: z.string().describe('A unique identifier for the user, e.g., user_12345.'),
-  profile: z.object({
-    name: z.string().describe("The user's full name."),
-    age: z.number().describe("The user's age."),
-    employment_status: z.string().describe("The user's employment status (e.g., Salaried, Self-employed, Freelancer)."),
-    monthly_income: z.number().describe("The user's monthly income in the profile's currency."),
-    currency: z.string().describe("The ISO 4217 currency code for all monetary values in this profile (e.g., 'INR', 'USD', 'EUR').")
-  }),
+  profile_name: z.string().describe("The user's full name."),
+  profile_age: z.number().describe("The user's age."),
+  profile_employment_status: z.string().describe("The user's employment status (e.g., Salaried, Self-employed, Freelancer)."),
+  profile_monthly_income: z.number().describe("The user's monthly income in the profile's currency."),
+  profile_currency: z.string().describe("The ISO 4217 currency code for all monetary values in this profile (e.g., 'INR', 'USD', 'EUR')."),
   bank_accounts: z.array(z.object({
     bank: z.string().describe("Name of the bank."),
     balance: z.number().describe("Account balance in the profile's currency."),
@@ -78,7 +76,7 @@ const prompt = ai.definePrompt({
 CRITICAL INSTRUCTIONS:
 1.  **Output Format**: Your entire output must be ONLY the JSON object. Do not include any other text, explanations, or markdown formatting like \`\`\`json.
 2.  **Data Source**: Use ONLY the information provided in the input text. Do NOT invent or hallucinate any data. If a field's value is not present in the text, use a sensible default (0 for numbers, an empty array [] for lists, "N/A" for strings like employment_status).
-3.  **Currency**: Identify the currency from the text (e.g., from symbols like $, €, ₹, or words like "dollars", "rupees"). Use the appropriate ISO 4217 code (e.g., 'USD', 'EUR', 'INR'). If no currency is mentioned, default to 'INR'. Store this in 'profile.currency'. All monetary values in the JSON must be numbers, without commas or currency symbols.
+3.  **Currency**: Identify the currency from the text (e.g., from symbols like $, €, ₹, or words like "dollars", "rupees"). Use the appropriate ISO 4217 code (e.g., 'USD', 'EUR', 'INR'). If no currency is mentioned, default to 'INR'. Store this in 'profile_currency'. All monetary values in the JSON must be numbers, without commas or currency symbols.
 4.  **Net Worth Calculation**: If 'net_worth' is explicitly provided in the text, use that value. Otherwise, you MUST calculate it by summing all assets (bank accounts, mutual funds, stocks (shares * price), real estate, PPF) and subtracting all liabilities (loans, credit cards).
 5.  **Specific Mappings**:
     *   Treat "Digital Gold" as a 'real_estate' asset.
@@ -87,9 +85,9 @@ CRITICAL INSTRUCTIONS:
 6.  **Defaults for Missing Data**:
     *   If any financial list (e.g., stocks, loans) is not mentioned, return an empty array \`[]\`.
     *   If \`ppf\` or \`credit_score\` is not mentioned, use \`0\`.
-    *   If profile information like \`name\` or \`age\` is missing, use "Valued User" and 30 respectively.
+    *   If profile information like \`profile_name\` or \`profile_age\` is missing, use "Valued User" and 30 respectively.
 7.  **User ID**: Generate a random user_id, for example 'user_12345'.
-8.  **Transactions Field**: The 'transactions' field is for application use only. Do NOT populate it. If it is optional, omit it from the final JSON.
+8.  **Transactions Field**: The 'transactions' field is for application use only. Do NOT populate it. Return an empty array \`[]\` for this field.
 
 Here is the financial data to process:
 ---
@@ -139,3 +137,5 @@ const dataExtractionFlow = ai.defineFlow(
     throw new Error("The AI model returned no output after all retry attempts.");
   }
 );
+
+    

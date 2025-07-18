@@ -7,13 +7,11 @@ export const LOCAL_STORAGE_KEY = 'userFinancialData';
 
 export const defaultFinancialData: FinancialData = {
   user_id: "user_default_123",
-  profile: {
-    name: "Valued User",
-    age: 30,
-    employment_status: "Salaried",
-    monthly_income: 0,
-    currency: "INR",
-  },
+  profile_name: "Valued User",
+  profile_age: 30,
+  profile_employment_status: "N/A",
+  profile_monthly_income: 0,
+  profile_currency: "INR",
   bank_accounts: [],
   mutual_funds: [],
   stocks: [],
@@ -23,7 +21,7 @@ export const defaultFinancialData: FinancialData = {
   sips: [],
   ppf: 0,
   net_worth: 0,
-  credit_score: 750,
+  credit_score: 0,
   transactions: [],
 };
 
@@ -37,7 +35,7 @@ const mergeDeep = (target: any, source: any): any => {
   const output = { ...target };
   if (isObject(target) && isObject(source)) {
     Object.keys(source).forEach(key => {
-      if (isObject(source[key]) && key in target) {
+      if (isObject(source[key]) && key in target && isObject(target[key])) {
         output[key] = mergeDeep(target[key], source[key]);
       } else {
         Object.assign(output, { [key]: source[key] });
@@ -72,3 +70,5 @@ export function getFinancialData(): FinancialData {
     return defaultFinancialData;
   }
 }
+
+    

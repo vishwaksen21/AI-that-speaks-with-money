@@ -134,8 +134,8 @@ export default function DashboardPage() {
   const totalAssets = calculateTotalAssets(data);
   const totalLiabilities = calculateTotalLiabilities(data);
   const netWorth = data.net_worth;
-  const currency = data.profile?.currency || 'INR';
-  const name = data.profile?.name?.split(' ')[0] || 'User';
+  const currency = data.profile_currency || 'INR';
+  const name = data.profile_name?.split(' ')[0] || 'User';
 
   const assetAllocationData = [];
   if (data.bank_accounts?.length) {
@@ -226,10 +226,10 @@ export default function DashboardPage() {
                 <Card>
                     <CardHeader><CardTitle className="font-headline text-lg">Profile</CardTitle></CardHeader>
                     <CardContent className="space-y-3 text-sm">
-                        <div className="flex justify-between items-center"><span className="text-muted-foreground flex items-center gap-2"><User size={16}/> Name</span> <strong>{data.profile.name}</strong></div>
-                        <div className="flex justify-between items-center"><span className="text-muted-foreground">Age</span> <strong>{data.profile.age}</strong></div>
-                        <div className="flex justify-between items-center"><span className="text-muted-foreground flex items-center gap-2"><Briefcase size={16}/> Employment</span> <strong>{data.profile.employment_status}</strong></div>
-                         <div className="flex justify-between items-center"><span className="text-muted-foreground flex items-center gap-2"><IndianRupee size={16}/> Income</span> <strong>{formatCurrency(data.profile.monthly_income, currency)}</strong></div>
+                        <div className="flex justify-between items-center"><span className="text-muted-foreground flex items-center gap-2"><User size={16}/> Name</span> <strong>{data.profile_name}</strong></div>
+                        <div className="flex justify-between items-center"><span className="text-muted-foreground">Age</span> <strong>{data.profile_age}</strong></div>
+                        <div className="flex justify-between items-center"><span className="text-muted-foreground flex items-center gap-2"><Briefcase size={16}/> Employment</span> <strong>{data.profile_employment_status}</strong></div>
+                         <div className="flex justify-between items-center"><span className="text-muted-foreground flex items-center gap-2"><IndianRupee size={16}/> Income</span> <strong>{formatCurrency(data.profile_monthly_income, currency)}</strong></div>
                     </CardContent>
                 </Card>
                  <Card>
@@ -411,3 +411,5 @@ function AddTransactionDialog({ onAddTransaction, currency }: { onAddTransaction
         </Dialog>
     );
 }
+
+    
