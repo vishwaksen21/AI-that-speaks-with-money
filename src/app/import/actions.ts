@@ -10,7 +10,7 @@ export async function uploadFinancialData(
   console.log('Received file on the server. Type:', file.type, 'Is image:', file.isImage);
 
   try {
-    let flowInput: DataExtractionInput = { rawData: '', photoDataUri: '' };
+    let flowInput: DataExtractionInput = {};
 
     if (file.isImage) {
         if (typeof file.fileContent !== 'string') {
@@ -46,3 +46,4 @@ export async function uploadFinancialData(
     return { success: false, error: error.message || 'An error occurred while processing the file with AI.' };
   }
 }
+

@@ -6,7 +6,7 @@
  *
  * - extractFinancialData - A function that takes raw text or an image and returns structured financial data.
  * - DataExtractionInput - The Zod schema for the input to the extraction flow.
- * - FinancialDataSchema - The Zod schema defining the structure of the financial data.
+ * - FinancialData - The Zod schema defining the structure of the financial data.
  */
 
 import {ai} from '@/ai/genkit';
@@ -15,7 +15,10 @@ import {z} from 'genkit';
 const DataExtractionInputSchema = z.object({
   rawData: z.string().optional().describe('The raw text data from a file (e.g., txt, csv).'),
   photoDataUri: z.string().optional().describe("A photo of a financial document, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."),
-}).describe('Input for the financial data extraction flow, can be either text or an image.');
+}).refine(data => !!data.rawData || !!data.photoDataUri, {
+    message: "Either rawData or photoDataUri must be provided.",
+}).describe('Input for the financial data extraction flow. Only one of rawData or photoDataUri should be used.');
+
 export type DataExtractionInput = z.infer<typeof DataExtractionInputSchema>;
 
 
@@ -82,27 +85,29 @@ const prompt = ai.definePrompt({
   prompt: `You are an expert financial data analyst. Your task is to analyze the following financial information, which can be from raw text or an image, and structure it into a valid JSON object matching the provided schema.
 
 CRITICAL INSTRUCTIONS:
-1.  **Analyze the Input**: Prioritize the image if provided; otherwise, use the raw text.
+1.  **Analyze the Input**: Analyze the provided input. It will be either an image or raw text, but not both.
     {{#if photoDataUri}}
     Image of Financial Document: {{media url=photoDataUri}}
-    {{else if rawData}}
+    {{/if}}
+    {{#if rawData}}
     Raw Text Data:
     ---
     {{{rawData}}}
     ---
     {{/if}}
 2.  **Output Format**: Your entire output must be ONLY the JSON object. Do not include any other text, explanations, or markdown formatting like \`\`\`json.
-3.  **Data Source**: Use ONLY the information provided in the input. Do NOT invent or hallucinate any data. If a field's value is not present, use a sensible default (0 for numbers, an empty array [] for lists, "N/A" for strings like employment_status).
-4.  **Currency**: Identify the currency from the text (e.g., from symbols like $, €, ₹, or words like "dollars", "rupees"). Use the appropriate ISO 4217 code (e.g., 'USD', 'EUR', 'INR'). If no currency is mentioned, default to 'INR'. Store this in 'profile_currency'. All monetary values in the JSON must be numbers, without commas or currency symbols.
+3.  **Data Source**: Use ONLY the information provided in the input. Do NOT invent or hallucinate any data.
+4.  **Currency**: Identify the currency from the text (e.g., symbols like $, €, ₹, or words like "dollars", "rupees"). Use the appropriate ISO 4217 code (e.g., 'USD', 'EUR', 'INR'). If no currency is mentioned, default to 'INR'. Store this in 'profile_currency'. All monetary values in the JSON must be numbers, without commas or currency symbols.
 5.  **Net Worth Calculation**: If 'net_worth' is explicitly provided, use that value. Otherwise, you MUST calculate it by summing all assets (bank accounts, mutual funds, stocks (shares * price), real estate, PPF) and subtracting all liabilities (loans, credit cards).
 6.  **Specific Mappings**:
     *   Treat "Digital Gold" as a 'real_estate' asset.
     *   Map any provident fund balance (EPF, PF) to the 'ppf' field.
-    *   The 'stocks' array must contain 'ticker', 'shares', and 'current_price' for each stock.
 7.  **Defaults for Missing Data**:
     *   If any financial list (e.g., stocks, loans) is not mentioned, return an empty array \`[]\`.
     *   If \`ppf\` or \`credit_score\` is not mentioned, use \`0\`.
-    *   If profile information like \`profile_name\` or \`profile_age\` is missing, use "Valued User" and 30 respectively.
+    *   If \`profile_name\` is missing, use "Valued User".
+    *   If \`profile_age\` is missing, use \`30\`.
+    *   If \`profile_employment_status\` is missing, use \`"N/A"\`.
 8.  **User ID**: Generate a random user_id, for example 'user_12345'.
 9.  **Transactions Field**: The 'transactions' field is for application use only. Do NOT populate it. Return an empty array \`[]\` for this field.
 
@@ -115,7 +120,7 @@ const dataExtractionFlow = ai.defineFlow(
   {
     name: 'dataExtractionFlow',
     inputSchema: DataExtractionInputSchema,
-    outputSchema: FinancialDataSchema, // Your defined schema for structured output
+    outputSchema: FinancialDataSchema,
   },
   async (input) => {
     let attempts = 0;
@@ -147,7 +152,8 @@ const dataExtractionFlow = ai.defineFlow(
             delay *= 2; // Exponential backoff
         }
     }
-     // This should not be reached, but as a fallback:
+    // This should not be reached, but as a fallback:
     throw new Error("The AI model returned no output after all retry attempts.");
   }
 );
+
