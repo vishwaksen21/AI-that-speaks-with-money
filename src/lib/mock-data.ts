@@ -2,97 +2,74 @@
 export const LOCAL_STORAGE_KEY = 'userFinancialData';
 
 export const defaultFinancialData = {
-  user_id: 'user_12345',
+  user_id: 'user_56789',
   profile: {
-    name: 'Arjun Mehta',
-    age: 30,
-    employment_status: 'Salaried',
-    monthly_income: 85000,
+    name: 'Sneha Rao',
+    age: 27,
+    employment_status: 'Freelancer',
+    monthly_income: 60000,
   },
   assets: {
     bank_accounts: [
       {
-        bank: 'HDFC',
-        balance: 150000,
+        bank: 'Axis Bank',
+        balance: 45000,
       },
       {
-        bank: 'SBI',
-        balance: 70000,
+        bank: 'Kotak Bank',
+        balance: 55000,
       },
     ],
     mutual_funds: [
       {
-        name: 'Axis Bluechip Fund',
-        current_value: 125000,
-        type: 'Equity',
+        name: 'Nippon India Small Cap Fund (Equity)',
+        current_value: 82000,
       },
       {
-        name: 'ICICI Pru Balanced Advantage',
-        current_value: 98000,
-        type: 'Hybrid',
+        name: 'HDFC Hybrid Equity Fund (Hybrid)',
+        current_value: 64000,
       },
     ],
     stocks: [
       {
-        ticker: 'TCS',
-        shares: 10,
-        current_price: 3700,
+        ticker: 'Reliance Industries',
+        shares: 5,
+        current_price: 2950,
       },
       {
-        ticker: 'INFY',
-        shares: 20,
-        current_price: 1400,
+        ticker: 'HDFC Bank',
+        shares: 15,
+        current_price: 1720,
       },
     ],
     real_estate: [
-      {
-        property_type: 'Apartment',
-        market_value: 5500000,
-        location: 'Bangalore',
-      },
+        {
+            property_type: 'Digital Gold',
+            market_value: 94550,
+        }
     ],
   },
   liabilities: {
     loans: [
       {
-        type: 'Home Loan',
-        outstanding_amount: 3000000,
-        interest_rate: 8.1,
-      },
-      {
-        type: 'Car Loan',
-        outstanding_amount: 400000,
-        interest_rate: 9.5,
+        type: 'Personal Loan',
+        outstanding_amount: 150000,
       },
     ],
     credit_cards: [
       {
-        issuer: 'HDFC',
-        outstanding_balance: 15000,
-        limit: 100000,
+        issuer: 'ICICI Bank',
+        outstanding_balance: 8500,
       },
     ],
   },
   investments: {
-    SIPs: [
-      {
-        scheme: 'Mirae Asset Emerging Bluechip',
-        monthly_investment: 5000,
-        returns_percent: 14.2,
-      },
-      {
-        scheme: 'Parag Parikh Flexi Cap',
-        monthly_investment: 3000,
-        returns_percent: 12.8,
-      },
-    ],
-    EPF: {
-      balance: 240000,
-      monthly_contribution: 1800,
+    EPF: { // Using EPF field to store PPF balance for schema consistency
+      balance: 120000,
     },
   },
-  credit_score: 782,
-  net_worth: 6500000,
+  net_worth: 1235000,
+  credit_score: 765,
 };
 
 export function getFinancialData() {
@@ -102,6 +79,7 @@ export function getFinancialData() {
   try {
     const storedData = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (storedData) {
+      // Always parse data from localStorage to ensure it's an object
       return JSON.parse(storedData);
     }
     // If no data in local storage, set default data
