@@ -21,18 +21,28 @@ export default function RecommendationsPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [financialDataString, setFinancialDataString] = useState('');
+  const [financialDataObject, setFinancialDataObject] = useState(null);
 
   useEffect(() => {
     const data = getFinancialData();
-    setFinancialDataString(JSON.stringify(data, null, 2));
+    setFinancialDataObject(data as any);
   }, []);
 
   const handleGenerate = async () => {
+    if (!financialDataObject) return;
+
     setIsLoading(true);
     setError(null);
+    setResult(null);
 
     try {
-      const response = await getRecommendations(financialDataString);
+      // Create a copy of the data and remove the transactions array before sending to the AI.
+      // The transactions are not needed for high-level recommendations and can add noise.
+      const dataForAI = { ...financialDataObject };
+      delete (dataForAI as any).transactions;
+      const cleanedDataString = JSON.stringify(dataForAI, null, 2);
+
+      const response = await getRecommendations(cleanedDataString);
       setResult(response);
     } catch (err) {
       setError('Failed to generate recommendations. Please try again.');
@@ -55,7 +65,7 @@ export default function RecommendationsPage() {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <Button onClick={handleGenerate} disabled={isLoading} size="lg">
+                <Button onClick={handleGenerate} disabled={isLoading || !financialDataObject} size="lg">
                     {isLoading ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     ) : (
