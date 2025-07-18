@@ -11,10 +11,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import ReactMarkdown from 'react-markdown';
 import { getFinancialData } from '@/lib/mock-data';
 
+// The result is now a single markdown string.
 interface RecommendationResult {
-  investmentStrategy: string;
-  savingsAndDebt: string;
-  expenseOptimization: string;
+  recommendations: string;
 }
 
 export default function RecommendationsPage() {
@@ -73,29 +72,14 @@ export default function RecommendationsPage() {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="font-headline">Investment Strategy</CardTitle>
+                <Skeleton className="h-6 w-48 mb-2" />
+                <Skeleton className="h-4 w-64" />
               </CardHeader>
-              <CardContent className="space-y-2">
+              <CardContent className="space-y-4">
                 <Skeleton className="h-4 w-full" />
                 <Skeleton className="h-4 w-5/6" />
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle className="font-headline">Savings & Debt Management</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
                 <Skeleton className="h-4 w-full" />
                 <Skeleton className="h-4 w-4/6" />
-              </CardContent>
-            </Card>
-             <Card>
-              <CardHeader>
-                <CardTitle className="font-headline">Expense Optimization</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-5/6" />
               </CardContent>
             </Card>
           </div>
@@ -105,26 +89,10 @@ export default function RecommendationsPage() {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="font-headline">Investment Strategy</CardTitle>
+                <CardTitle className="font-headline">Your Personalized Recommendations</CardTitle>
               </CardHeader>
               <CardContent className="prose prose-sm max-w-none dark:prose-invert">
-                <ReactMarkdown>{result.investmentStrategy}</ReactMarkdown>
-              </CardContent>
-            </Card>
-             <Card>
-              <CardHeader>
-                <CardTitle className="font-headline">Savings & Debt Management</CardTitle>
-              </CardHeader>
-              <CardContent className="prose prose-sm max-w-none dark:prose-invert">
-                <ReactMarkdown>{result.savingsAndDebt}</ReactMarkdown>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle className="font-headline">Expense Optimization</CardTitle>
-              </CardHeader>
-              <CardContent className="prose prose-sm max-w-none dark:prose-invert">
-                <ReactMarkdown>{result.expenseOptimization}</ReactMarkdown>
+                <ReactMarkdown>{result.recommendations}</ReactMarkdown>
               </CardContent>
             </Card>
              <Card className="mt-4 border-yellow-200 bg-yellow-50 dark:border-yellow-900 dark:bg-yellow-900/20">
