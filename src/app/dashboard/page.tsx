@@ -52,7 +52,6 @@ const calculateTotalLiabilities = (data: FinancialData): number => {
 
 export default function DashboardPage() {
   const [data, setData] = useState<FinancialData | null>(null);
-  const { toast } = useToast();
 
   useEffect(() => {
     // This effect runs once on the client after the component mounts.
@@ -103,11 +102,6 @@ export default function DashboardPage() {
 
         // Save to localStorage
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newData));
-
-        toast({
-            title: 'Transaction Added!',
-            description: `${newTransaction.description} for ${formatCurrency(Math.abs(transactionAmount))} has been recorded.`
-        });
         
         return newData;
     });
@@ -241,11 +235,18 @@ function AddTransactionDialog({ onAddTransaction }: { onAddTransaction: (t: any)
     const [description, setDescription] = useState('');
     const [amount, setAmount] = useState('');
     const [type, setType] = useState<'income' | 'expense'>('expense');
+    const { toast } = useToast();
 
     const handleSubmit = () => {
         const numericAmount = parseFloat(amount);
         if (description && !isNaN(numericAmount) && numericAmount > 0) {
             onAddTransaction({ description, amount: numericAmount, type });
+            
+            toast({
+                title: 'Transaction Added!',
+                description: `${description} for ${formatCurrency(Math.abs(numericAmount))} has been recorded.`
+            });
+
             // Reset form and close dialog
             setDescription('');
             setAmount('');
@@ -320,4 +321,3 @@ function AddTransactionDialog({ onAddTransaction }: { onAddTransaction: (t: any)
         </Dialog>
     );
 }
-
