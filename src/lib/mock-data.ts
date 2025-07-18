@@ -1,9 +1,61 @@
 
 import type { FinancialData as FinancialDataType } from '@/ai/flows/data-extraction';
+import { calculateNetWorth } from './financial-calculations';
 
 export type FinancialData = FinancialDataType;
 
 export const LOCAL_STORAGE_KEY = 'userFinancialData';
+
+const sampleFinancialDataWithoutNetWorth = {
+  user_id: "user_sample_9876",
+  profile_name: "Alex Johnson",
+  profile_age: 34,
+  profile_employment_status: "Salaried",
+  profile_monthly_income: 150000,
+  profile_currency: "INR",
+  bank_accounts: [
+    { bank: "HDFC Bank", balance: 550000 },
+    { bank: "ICICI Bank", balance: 275000 },
+  ],
+  mutual_funds: [
+      { name: "Parag Parikh Flexi Cap", current_value: 320000 },
+      { name: "Navi Nifty 50 Index", current_value: 150000 },
+  ],
+  stocks: [
+      { ticker: "TCS", shares: 50, current_price: 3800 },
+      { ticker: "RELIANCE", shares: 25, current_price: 2900 },
+  ],
+  real_estate: [
+      { property_type: "Digital Gold", market_value: 75000 },
+  ],
+  loans: [
+    { type: "Car Loan", outstanding_amount: 450000 },
+  ],
+  credit_cards: [
+    { issuer: "HDFC Millennia", outstanding_balance: 35000 },
+    { issuer: "Amazon ICICI", outstanding_balance: 15000 },
+  ],
+  sips: [
+      { name: "Parag Parikh Flexi Cap", monthly_investment: 15000 },
+      { name: "Navi Nifty 50 Index", monthly_investment: 10000 },
+  ],
+  ppf: 450000,
+  credit_score: 780,
+  transactions: [
+    { id: 'txn_1', description: 'Salary Credit', amount: 150000, date: '2024-06-01', category: 'Income' },
+    { id: 'txn_2', description: 'Rent Payment', amount: -30000, date: '2024-06-02', category: 'Housing' },
+    { id: 'txn_3', description: 'Groceries', amount: -7500, date: '2024-06-05', category: 'Food' },
+    { id: 'txn_4', description: 'Weekend Trip', amount: -12000, date: '2024-06-08', category: 'Travel' },
+    { id: 'txn_5', description: 'Stock Purchase - RELIANCE', amount: -29000, date: '2024-06-10', category: 'Investment' },
+  ],
+};
+
+const sampleNetWorth = calculateNetWorth(sampleFinancialDataWithoutNetWorth);
+export const sampleFinancialData: FinancialData = {
+    ...sampleFinancialDataWithoutNetWorth,
+    net_worth: sampleNetWorth,
+};
+
 
 export const defaultFinancialData: FinancialData = {
   user_id: "user_default_123",
@@ -49,24 +101,23 @@ const mergeDeep = (target: any, source: any): any => {
 export function getFinancialData(): FinancialData {
   // This function can only be called on the client-side.
   if (typeof window === 'undefined') {
-    return defaultFinancialData;
+    return sampleFinancialData; // Return rich sample data for server rendering if needed
   }
   
   try {
     const storedData = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (storedData) {
       const parsedData = JSON.parse(storedData);
-      // Deep merge the parsed data with the default structure.
-      // This ensures that if the stored data is incomplete, it will be
-      // safely populated with default values for missing fields/objects.
+      // Deep merge the parsed data with the default structure to ensure all fields exist.
+      // This prevents errors if the stored data is malformed or incomplete.
       return mergeDeep(defaultFinancialData, parsedData);
     } else {
-      // If no data is in storage, return the default data.
-      return defaultFinancialData;
+      // If no data is in storage, return the rich sample data.
+      return sampleFinancialData;
     }
   } catch (error) {
     console.error('Failed to parse financial data from localStorage:', error);
-    // If parsing fails for any reason, return the default data.
-    return defaultFinancialData;
+    // If parsing fails for any reason, return the sample data as a fallback.
+    return sampleFinancialData;
   }
 }
