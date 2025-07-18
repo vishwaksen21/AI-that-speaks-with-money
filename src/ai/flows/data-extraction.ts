@@ -125,7 +125,7 @@ const dataExtractionFlow = ai.defineFlow(
   async (input) => {
     let attempts = 0;
     const maxAttempts = 3;
-    let delay = 1000; // start with 1 second
+    const delay = 1000; // initial delay in ms
 
     while (attempts < maxAttempts) {
         try {
@@ -142,14 +142,34 @@ const dataExtractionFlow = ai.defineFlow(
 
         } catch (error: any) {
             attempts++;
-            console.error(`Attempt ${attempts} failed:`, error.message);
-            if (attempts >= maxAttempts) {
-                 console.error("Max retry attempts reached. Failing.");
-                 throw new Error("The AI model failed to process the document after multiple attempts. The file might be in an unrecognized format or the AI service is temporarily unavailable.");
+            const isLastAttempt = attempts >= maxAttempts;
+            const errorMessage = error?.message || "Unknown error occurred";
+        
+            console.error(`Attempt ${attempts} failed:`, errorMessage);
+        
+            // Specific diagnostic suggestions
+            if (/format|unsupported|invalid/i.test(errorMessage)) {
+                console.warn("Hint: The file might be in an unrecognized or unsupported format. Try converting it to PDF or plain text.");
+            } else if (/temporarily unavailable|timeout|503|network/i.test(errorMessage)) {
+                console.warn("Hint: The AI service may be temporarily unavailable. Please check your internet connection or retry later.");
             }
-            console.log(`Waiting ${delay}ms before retrying...`);
-            await new Promise(resolve => setTimeout(resolve, delay));
-            delay *= 2; // Exponential backoff
+        
+            if (isLastAttempt) {
+                console.error("Max retry attempts reached. Aborting document processing.");
+        
+                throw new Error(
+                    "The AI model failed to process the document after multiple attempts. " +
+                    "Possible reasons:\n" +
+                    "• The file might be in an unrecognized or corrupted format (try converting it to PDF or .txt).\n" +
+                    "• The AI service might be temporarily unavailable (retry after some time).\n" +
+                    "Please verify your file and try again."
+                );
+            }
+        
+            // Retry with exponential backoff
+            const retryDelay = delay * Math.pow(2, attempts - 1);
+            console.log(`Waiting ${retryDelay}ms before retrying...`);
+            await new Promise(res => setTimeout(res, retryDelay));
         }
     }
     // This should not be reached, but as a fallback:
