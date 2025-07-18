@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Wand2 } from 'lucide-react';
 import { getScenarioResponse } from './actions';
 import { Skeleton } from '@/components/ui/skeleton';
+import ReactMarkdown from 'react-markdown';
 
 interface ScenarioResult {
   analysis: string;
@@ -98,16 +99,16 @@ export default function ScenarioSimulatorPage() {
               <CardHeader>
                 <CardTitle className="font-headline">Scenario Analysis</CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground whitespace-pre-wrap">{result.analysis}</p>
+              <CardContent className="prose prose-invert prose-sm max-w-none">
+                <ReactMarkdown>{result.analysis}</ReactMarkdown>
               </CardContent>
             </Card>
             <Card>
               <CardHeader>
                 <CardTitle className="font-headline">Recommendations</CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground whitespace-pre-wrap">{result.recommendations}</p>
+              <CardContent className="prose prose-invert prose-sm max-w-none">
+                <ReactMarkdown>{result.recommendations}</ReactMarkdown>
               </CardContent>
             </Card>
           </div>

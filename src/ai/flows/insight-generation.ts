@@ -18,7 +18,7 @@ const GeneratePersonalizedFinancialInsightsInputSchema = z.object({
 export type GeneratePersonalizedFinancialInsightsInput = z.infer<typeof GeneratePersonalizedFinancialInsightsInputSchema>;
 
 const GeneratePersonalizedFinancialInsightsOutputSchema = z.object({
-  insights: z.string().describe('The personalized financial insights.'),
+  insights: z.string().describe('A detailed, well-structured markdown response answering the user\'s question. The response should be broken down into logical sections with clear headings (e.g., "Analysis", "Key Observations", "Recommendations").'),
 });
 export type GeneratePersonalizedFinancialInsightsOutput = z.infer<typeof GeneratePersonalizedFinancialInsightsOutputSchema>;
 
@@ -30,13 +30,22 @@ const prompt = ai.definePrompt({
   name: 'generatePersonalizedFinancialInsightsPrompt',
   input: {schema: GeneratePersonalizedFinancialInsightsInputSchema},
   output: {schema: GeneratePersonalizedFinancialInsightsOutputSchema},
-  prompt: `You are a financial advisor. Analyze the user's financial data and answer the user's question.
+  prompt: `You are a world-class financial advisor AI. Your goal is to provide clear, actionable, and personalized financial advice.
 
-Financial Data: {{{financialData}}}
+Analyze the user's financial data and the user's question thoroughly. Provide a comprehensive answer formatted in Markdown.
 
-User Question: {{{userQuestion}}}
+Use headings, bullet points, and bold text to structure your response for maximum readability. Always include a summary, a detailed analysis, and actionable recommendations.
 
-Provide personalized financial insights based on the data and question. If the user mentions a numeric amount with "₹", interpret this correctly.
+If the user mentions a numeric amount with "₹", interpret this correctly as Indian Rupees.
+
+Financial Data:
+\`\`\`json
+{{{financialData}}}
+\`\`\`
+
+User Question: "{{{userQuestion}}}"
+
+Begin your response now.
 `,
 });
 

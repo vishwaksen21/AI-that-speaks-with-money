@@ -11,7 +11,7 @@ import {
 import { SidebarNav } from '@/components/sidebar-nav';
 import { Logo } from './icons';
 import { Button } from './ui/button';
-import { User, Bell } from 'lucide-react';
+import { User, Bell, Search } from 'lucide-react';
 
 export function AppLayout({
   children,
@@ -49,7 +49,10 @@ export function AppLayout({
               </h1>
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+             <Button variant="ghost" size="icon">
+              <Search className="h-5 w-5" />
+            </Button>
             <Button variant="ghost" size="icon">
               <User className="h-5 w-5" />
             </Button>

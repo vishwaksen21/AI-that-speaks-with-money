@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Send, User, Bot, Loader2 } from 'lucide-react';
 import { getChatResponse } from './actions';
 import { Skeleton } from '@/components/ui/skeleton';
+import ReactMarkdown from 'react-markdown';
 
 interface Message {
   id: string;
@@ -84,13 +85,17 @@ export default function ChatPage() {
                   </Avatar>
                 )}
                 <div
-                  className={`max-w-xl p-3 rounded-lg ${
+                  className={`max-w-3xl p-4 rounded-lg prose prose-invert prose-sm ${
                     message.role === 'user'
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-card'
                   }`}
                 >
-                  <p className="text-sm">{message.content}</p>
+                    {message.role === 'user' ? (
+                        <p>{message.content}</p>
+                    ) : (
+                        <ReactMarkdown>{message.content}</ReactMarkdown>
+                    )}
                 </div>
                 {message.role === 'user' && (
                   <Avatar className="w-8 h-8 border">
