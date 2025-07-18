@@ -84,7 +84,7 @@ CRITICAL INSTRUCTIONS:
 - PPF/EPF: Map any provident fund balance to the 'ppf' number field.
 - Defaults: You must fill in every field of the schema as accurately as possible. For missing fields, provide a sensible default (e.g., 0 for a number, an empty array [] for lists, "Valued User" for name, 30 for age). Do not leave any required fields out.
 - User ID: Generate a random user_id, for example 'user_12345'.
-- Transactions: The 'transactions' field is for application use only. Do NOT populate it. Return an empty array for it.
+- Transactions: The 'transactions' field is for application use only. Do NOT populate it. If it is optional, omit it.
 
 Here is the financial data to process:
 ---
