@@ -25,7 +25,7 @@ import {
   Line,
   LineChart,
   ResponsiveContainer,
-  Tooltip,
+  Tooltip as RechartsTooltip,
   XAxis,
   YAxis,
 } from 'recharts';
@@ -209,7 +209,7 @@ export default function DashboardPage() {
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
                   <XAxis dataKey="name" />
                   <YAxis />
-                  <Tooltip />
+                  <RechartsTooltip />
                   <Legend />
                   <Line
                     type="monotone"
@@ -239,7 +239,7 @@ export default function DashboardPage() {
                   <CartesianGrid strokeDasharray="3 3" vertical={false} />
                   <XAxis dataKey="name" />
                   <YAxis />
-                  <Tooltip
+                  <RechartsTooltip
                     contentStyle={{
                       backgroundColor: 'hsl(var(--background))',
                       border: '1px solid hsl(var(--border))',

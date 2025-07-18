@@ -11,8 +11,7 @@ import {
 import { SidebarNav } from '@/components/sidebar-nav';
 import { Logo } from './icons';
 import { Button } from './ui/button';
-import { Search, User, Bell } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { User, Bell } from 'lucide-react';
 
 export function AppLayout({
   children,
@@ -28,7 +27,7 @@ export function AppLayout({
           <div className="flex items-center gap-2 p-2">
             <Logo className="w-8 h-8 text-primary" />
             <span className="text-lg font-semibold font-headline text-foreground group-data-[collapsible=icon]:hidden">
-              Soft UI
+              Fi Money
             </span>
           </div>
         </SidebarHeader>
@@ -51,10 +50,6 @@ export function AppLayout({
             </div>
           </div>
           <div className="flex items-center gap-4">
-             <div className="relative hidden md:block">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Type here..." className="pl-9" />
-            </div>
             <Button variant="ghost" size="icon">
               <User className="h-5 w-5" />
             </Button>
