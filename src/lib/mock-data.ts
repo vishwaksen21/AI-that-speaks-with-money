@@ -27,6 +27,31 @@ export const defaultFinancialData: FinancialData = {
   transactions: [],
 };
 
+
+// Helper function for deep merging objects.
+const isObject = (item: any): item is Record<string, any> => {
+  return (item && typeof item === 'object' && !Array.isArray(item));
+};
+
+const mergeDeep = (target: any, source: any): any => {
+  const output = { ...target };
+  if (isObject(target) && isObject(source)) {
+    Object.keys(source).forEach(key => {
+      if (isObject(source[key])) {
+        if (!(key in target)) {
+          Object.assign(output, { [key]: source[key] });
+        } else {
+          output[key] = mergeDeep(target[key], source[key]);
+        }
+      } else {
+        Object.assign(output, { [key]: source[key] });
+      }
+    });
+  }
+  return output;
+};
+
+
 export function getFinancialData(): FinancialData {
   // This function can only be called on the client-side.
   if (typeof window === 'undefined') {
@@ -36,13 +61,11 @@ export function getFinancialData(): FinancialData {
   try {
     const storedData = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (storedData) {
-      // If data exists, parse it and return.
       const parsedData = JSON.parse(storedData);
-      // Add currency default if it's missing from old data
-      if (!parsedData.profile.currency) {
-        parsedData.profile.currency = 'INR';
-      }
-      return parsedData;
+      // Deep merge the parsed data with the default structure.
+      // This ensures that if the stored data is incomplete, it will be
+      // safely populated with default values for missing fields/objects.
+      return mergeDeep(defaultFinancialData, parsedData);
     } else {
       // If no data is in storage, return the default data.
       return defaultFinancialData;
