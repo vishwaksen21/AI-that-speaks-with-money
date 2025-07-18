@@ -21,6 +21,7 @@ import {
   Home,
   ChevronDown,
   Upload,
+  UserPlus,
 } from 'lucide-react';
 import {
   Collapsible,
@@ -47,6 +48,7 @@ const aiToolsNavItems = [
 const accountNavItems = [
     { href: '/profile', label: 'Profile', icon: User },
     { href: '/signin', label: 'Sign In', icon: LogIn },
+    { href: '/signup', label: 'Sign Up', icon: UserPlus },
 ];
 
 
