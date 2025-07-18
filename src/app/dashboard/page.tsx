@@ -23,18 +23,18 @@ function formatCurrency(amount: number) {
   }).format(amount);
 }
 
-// Helper function to calculate total assets, now part of the component
+// Helper function to safely calculate total assets
 const calculateTotalAssets = (data: any) => {
     if (!data?.assets) return 0;
     const bankBalance = data.assets.bank_accounts?.reduce((sum: number, acc: any) => sum + (acc.balance || 0), 0) || 0;
     const mutualFunds = data.assets.mutual_funds?.reduce((sum: number, mf: any) => sum + (mf.current_value || 0), 0) || 0;
     const stocks = data.assets.stocks?.reduce((sum: number, stock: any) => sum + ((stock.shares || 0) * (stock.current_price || 0)), 0) || 0;
     const realEstate = data.assets.real_estate?.reduce((sum: number, prop: any) => sum + (prop.market_value || 0), 0) || 0;
-    const ppf = data.investments?.ppf?.balance || 0;
+    const ppf = data.investments?.ppf || 0;
     return bankBalance + mutualFunds + stocks + realEstate + ppf;
 };
 
-// Helper function to calculate total liabilities, now part of the component
+// Helper function to safely calculate total liabilities
 const calculateTotalLiabilities = (data: any) => {
     if (!data?.liabilities) return 0;
     const loans = data.liabilities.loans?.reduce((sum: number, loan: any) => sum + (loan.outstanding_amount || 0), 0) || 0;
@@ -81,20 +81,20 @@ export default function DashboardPage() {
   const netWorth = data?.net_worth || (totalAssets - totalLiabilities);
 
   const assetAllocationData = [];
-  if (data?.assets?.bank_accounts) {
+  if (data?.assets?.bank_accounts?.length) {
     assetAllocationData.push({ name: 'Bank Accounts', value: data.assets.bank_accounts.reduce((sum: number, acc: any) => sum + (acc.balance || 0), 0) });
   }
-  if (data?.assets?.mutual_funds) {
+  if (data?.assets?.mutual_funds?.length) {
     assetAllocationData.push({ name: 'Mutual Funds', value: data.assets.mutual_funds.reduce((sum: number, mf: any) => sum + (mf.current_value || 0), 0) });
   }
-  if (data?.assets?.stocks) {
+  if (data?.assets?.stocks?.length) {
     assetAllocationData.push({ name: 'Stocks', value: data.assets.stocks.reduce((sum: number, stock: any) => sum + ((stock.shares || 0) * (stock.current_price || 0)), 0) });
   }
-  if (data?.assets?.real_estate) {
+  if (data?.assets?.real_estate?.length) {
       assetAllocationData.push({ name: 'Real Estate', value: data.assets.real_estate.reduce((sum: number, prop: any) => sum + (prop.market_value || 0), 0) });
   }
-   if (data?.investments?.ppf?.balance) {
-      assetAllocationData.push({ name: 'PPF', value: data.investments.ppf.balance });
+   if (data?.investments?.ppf) {
+      assetAllocationData.push({ name: 'PPF', value: data.investments.ppf });
   }
   
 

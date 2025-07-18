@@ -54,9 +54,7 @@ const FinancialDataSchema = z.object({
           name: z.string().describe("Name of the SIP fund."),
           monthly_investment: z.number().describe("Monthly investment amount in Indian Rupees (₹)."),
       })).optional().describe("Systematic Investment Plans."),
-      ppf: z.object({
-          balance: z.number().describe("The current balance in the Public Provident Fund in Indian Rupees (₹).")
-      }).describe("Public Provident Fund (PPF) details. Map EPF to this if PPF is not present.")
+      ppf: z.number().describe("The current balance in the Public Provident Fund in Indian Rupees (₹).")
   }),
   net_worth: z.number().describe("The calculated net worth (Total Assets - Total Liabilities) in Indian Rupees (₹). If provided in the text, use that value. Otherwise, you must calculate it."),
   credit_score: z.number().optional().describe("The user's credit score (e.g., CIBIL score).")
@@ -72,7 +70,6 @@ const prompt = ai.definePrompt({
   name: 'dataExtractionPrompt',
   input: {schema: z.string()},
   output: {schema: FinancialDataSchema},
-  model: 'googleai/gemini-1.5-flash-latest',
   prompt: `You are an expert financial data analyst. Your task is to analyze the following raw text, which contains a user's financial information. The text could be in any format (JSON, CSV, unstructured sentences, bullet points, etc.).
 
 Your goal is to extract all relevant financial details and structure them into a valid JSON object according to the provided schema.
@@ -82,7 +79,7 @@ Your goal is to extract all relevant financial details and structure them into a
 - **Net Worth:** If net worth is explicitly provided in the text, use that value. Otherwise, you MUST calculate it by summing all assets and subtracting all liabilities. Total assets include bank balances, mutual funds, stocks (shares * price), real estate, and PPF balance.
 - **Stocks:** For each stock, you must have 'ticker', 'shares', and 'current_price'. Calculate the total value by multiplying shares by the current price.
 - **Digital Gold:** Treat "Digital Gold" as a type of real estate asset.
-- **PPF/EPF:** The schema uses a 'ppf' field. If you see "EPF" or "Provident Fund", map it to the 'ppf' object.
+- **PPF/EPF:** The schema uses a 'ppf' field which is a direct number. If you see "EPF" or "Provident Fund", map its balance to the 'ppf' number field.
 - **SIPs:** Extract Systematic Investment Plan details into the 'sips' array under 'investments'.
 - **Defaults:** Fill in every field of the schema as accurately as possible. If a piece of information is missing (e.g., credit score), you can omit it if the schema allows. For other missing fields, provide a sensible default (e.g., 0 for a balance, an empty array [] for lists, "Valued User" for a name, 30 for age).
 - **User ID:** Generate a random user_id, for example 'user_12345'.
