@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { RecentTransactions } from '@/components/recent-transactions';
 import { NetWorthChart } from '@/components/net-worth-chart';
 import { AssetAllocationChart } from '@/components/asset-allocation-chart';
-import { getFinancialData } from '@/lib/mock-data';
+import { getFinancialData, FinancialData } from '@/lib/mock-data';
 import { DollarSign, TrendingUp, TrendingDown } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -24,7 +24,7 @@ function formatCurrency(amount: number) {
 }
 
 // Helper function to safely calculate total assets
-const calculateTotalAssets = (data: any) => {
+const calculateTotalAssets = (data: FinancialData | null) => {
     if (!data?.assets) return 0;
     const bankBalance = data.assets.bank_accounts?.reduce((sum: number, acc: any) => sum + (acc.balance || 0), 0) || 0;
     const mutualFunds = data.assets.mutual_funds?.reduce((sum: number, mf: any) => sum + (mf.current_value || 0), 0) || 0;
@@ -35,7 +35,7 @@ const calculateTotalAssets = (data: any) => {
 };
 
 // Helper function to safely calculate total liabilities
-const calculateTotalLiabilities = (data: any) => {
+const calculateTotalLiabilities = (data: FinancialData | null) => {
     if (!data?.liabilities) return 0;
     const loans = data.liabilities.loans?.reduce((sum: number, loan: any) => sum + (loan.outstanding_amount || 0), 0) || 0;
     const creditCards = data.liabilities.credit_cards?.reduce((sum: number, card: any) => sum + (card.outstanding_balance || 0), 0) || 0;
@@ -43,11 +43,11 @@ const calculateTotalLiabilities = (data: any) => {
 };
 
 export default function DashboardPage() {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<FinancialData | null>(null);
 
   useEffect(() => {
     // This effect runs on the client after the component mounts.
-    // It safely retrieves data from localStorage.
+    // It safely retrieves data.
     const financialData = getFinancialData();
     setData(financialData);
   }, []);

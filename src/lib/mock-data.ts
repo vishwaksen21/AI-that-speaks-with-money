@@ -1,13 +1,17 @@
 
+import type { FinancialData as FinancialDataType } from '@/ai/flows/data-extraction';
+
+export type FinancialData = FinancialDataType;
+
 export const LOCAL_STORAGE_KEY = 'userFinancialData';
 
-export const defaultFinancialData = {
-  user_id: 'user_default_123',
+export const defaultFinancialData: FinancialData = {
+  user_id: "user_default_123",
   profile: {
-    name: 'Valued User',
+    name: "Valued User",
     age: 30,
-    employment_status: 'Salaried',
-    monthly_income: 50000,
+    employment_status: "Salaried",
+    monthly_income: 0,
   },
   assets: {
     bank_accounts: [],
@@ -24,10 +28,10 @@ export const defaultFinancialData = {
     ppf: 0,
   },
   net_worth: 0,
-  credit_score: 750,
+  credit_score: 0,
 };
 
-export function getFinancialData() {
+export function getFinancialData(): FinancialData | null {
   if (typeof window === 'undefined') {
     return defaultFinancialData;
   }

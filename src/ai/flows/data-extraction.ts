@@ -53,7 +53,7 @@ const FinancialDataSchema = z.object({
       sips: z.array(z.object({
           name: z.string().describe("Name of the SIP fund."),
           monthly_investment: z.number().describe("Monthly investment amount in Indian Rupees (₹)."),
-      })).optional().describe("Systematic Investment Plans."),
+      })).describe("Systematic Investment Plans. This should not be optional."),
       ppf: z.number().describe("The current balance in the Public Provident Fund in Indian Rupees (₹).")
   }),
   net_worth: z.number().describe("The calculated net worth (Total Assets - Total Liabilities) in Indian Rupees (₹). If provided in the text, use that value. Otherwise, you must calculate it."),
@@ -75,13 +75,13 @@ const prompt = ai.definePrompt({
 Your goal is to extract all relevant financial details and structure them into a valid JSON object according to the provided schema.
 
 **CRITICAL INSTRUCTIONS:**
-- All monetary values must be in Indian Rupees (₹). If a currency symbol is not present, assume INR. Remove commas from numbers.
-- **Net Worth:** If net worth is explicitly provided in the text, use that value. Otherwise, you MUST calculate it by summing all assets and subtracting all liabilities. Total assets include bank balances, mutual funds, stocks (shares * price), real estate, and PPF balance.
-- **Stocks:** For each stock, you must have 'ticker', 'shares', and 'current_price'. Calculate the total value by multiplying shares by the current price.
-- **Digital Gold:** Treat "Digital Gold" as a type of real estate asset.
-- **PPF/EPF:** The schema uses a 'ppf' field which is a direct number. If you see "EPF" or "Provident Fund", map its balance to the 'ppf' number field.
+- All monetary values must be in Indian Rupees (₹). If a currency symbol is not present, assume INR. Remove commas and currency symbols from all numbers before outputting them.
+- **Net Worth:** If net worth is explicitly provided in the text, use that exact value. Otherwise, you MUST calculate it by summing all assets and subtracting all liabilities. Total assets include bank balances, mutual funds, stocks (shares * price), real estate, and PPF balance.
+- **Stocks:** For each stock, you must have 'ticker', 'shares', and 'current_price'. The total value is not needed in the output, just the price per share.
+- **Digital Gold:** Treat "Digital Gold" as a type of real estate asset. Use its total value for market_value.
+- **PPF/EPF:** The schema uses a 'ppf' field which is a direct number. If you see "EPF", "Provident Fund", or "PPF", map its balance to the 'ppf' number field.
 - **SIPs:** Extract Systematic Investment Plan details into the 'sips' array under 'investments'.
-- **Defaults:** Fill in every field of the schema as accurately as possible. If a piece of information is missing (e.g., credit score), you can omit it if the schema allows. For other missing fields, provide a sensible default (e.g., 0 for a balance, an empty array [] for lists, "Valued User" for a name, 30 for age).
+- **Defaults:** You must fill in every field of the schema as accurately as possible. If a piece of information is missing (e.g., credit score), you can omit it if the schema allows. For other missing fields, you MUST provide a sensible default (e.g., 0 for a balance, an empty array [] for lists, "Valued User" for a name, 30 for age). Do not leave any required fields out.
 - **User ID:** Generate a random user_id, for example 'user_12345'.
 - **Output Format:** It is absolutely critical that your output is a single, valid JSON object that strictly adheres to the schema. Do not include any text, explanations, or markdown formatting outside of the JSON object itself.
 
