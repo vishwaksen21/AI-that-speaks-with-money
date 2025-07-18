@@ -1,7 +1,17 @@
+
 'use server';
 
 import { generatePersonalizedFinancialInsights } from '@/ai/flows/insight-generation';
 import { textToSpeech } from '@/ai/flows/tts';
+
+function handleApiError(error: any, serviceName: string) {
+  console.error(`Error calling ${serviceName}:`, error);
+  if (error.message && error.message.includes('429')) {
+    throw new Error('API quota exceeded. Please try again later.');
+  }
+  throw new Error(`Failed to get response from ${serviceName} AI.`);
+}
+
 
 export async function getChatResponse(userQuestion: string, financialData: string) {
   try {
@@ -11,8 +21,7 @@ export async function getChatResponse(userQuestion: string, financialData: strin
     });
     return { insight: response.insights };
   } catch (error) {
-    console.error('Error generating financial insights:', error);
-    throw new Error('Failed to get response from AI.');
+     handleApiError(error, 'Chat');
   }
 }
 
@@ -21,7 +30,6 @@ export async function getTextToSpeech(text: string) {
         const response = await textToSpeech(text);
         return response;
     } catch (error) {
-        console.error('Error generating speech:', error);
-        throw new Error('Failed to get response from TTS AI.');
+        handleApiError(error, 'TTS');
     }
 }

@@ -45,7 +45,12 @@ export async function uploadFinancialData(
   } catch (error: any) {
     console.error('Failed to process or extract financial data:', error);
     
-    // Provide a more helpful error message
+    // Check for a 429 Too Many Requests error
+    if (error.message && error.message.includes('429')) {
+      return { success: false, error: 'You have exceeded the daily API quota. Please try again later or check your billing plan.' };
+    }
+
+    // Provide a more helpful generic error message
     const errorMessage = error.message || 'An unexpected error occurred.';
     if (errorMessage.includes('ZodError')) {
         return { success: false, error: 'The AI returned data in an unexpected format. Please try again or simplify the document.' };

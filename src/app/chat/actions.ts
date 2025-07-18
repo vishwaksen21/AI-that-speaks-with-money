@@ -11,8 +11,11 @@ export async function getChatResponse(userQuestion: string, financialData: strin
       userQuestion: userQuestion,
     });
     return { insight: response.insights };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error generating financial insights:', error);
+    if (error.message && error.message.includes('429')) {
+      throw new Error('API quota exceeded. Please try again later.');
+    }
     throw new Error('Failed to get response from AI.');
   }
 }
