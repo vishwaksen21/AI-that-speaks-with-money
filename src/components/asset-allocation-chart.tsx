@@ -19,14 +19,15 @@ export function AssetAllocationChart() {
 
     useEffect(() => {
         const financialData = getFinancialData();
-        const chartData = financialData.assets.cashAndInvestments.breakdown.map(
-            (item: any) => ({ name: item.type, value: item.amount })
-        );
+        const breakdown = financialData?.assets?.cashAndInvestments?.breakdown;
+        const chartData = breakdown
+            ? breakdown.map((item: any) => ({ name: item.type, value: item.amount }))
+            : [];
         setData(chartData);
     }, []);
 
     if (data.length === 0) {
-        return <div style={{height: 300}} />;
+        return <div style={{height: 300}} className="flex items-center justify-center text-muted-foreground">No asset allocation data available.</div>;
     }
     
   return (
