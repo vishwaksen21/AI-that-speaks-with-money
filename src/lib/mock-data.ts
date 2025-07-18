@@ -46,9 +46,13 @@ export function getFinancialData() {
         if (storedData) {
             return JSON.parse(storedData);
         }
+        // If no data in local storage, set default data
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(defaultFinancialData));
         return defaultFinancialData;
     } catch (error) {
         console.error("Failed to parse financial data from localStorage", error);
+        // If parsing fails, set default data
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(defaultFinancialData));
         return defaultFinancialData;
     }
 }
