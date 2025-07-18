@@ -57,10 +57,11 @@ export default function ImportDataPage() {
         }
 
       } catch (err: any) {
-        setError(err.message || 'Failed to process file.');
+        const friendlyError = 'The AI could not process your file. The content may be unclear or in an unsupported format. Please check the file and try again.';
+        setError(friendlyError);
         toast({
           title: 'Upload Failed',
-          description: err.message || 'Could not process the uploaded file.',
+          description: friendlyError,
           variant: 'destructive',
         });
       } finally {
