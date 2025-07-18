@@ -13,20 +13,14 @@ export const defaultFinancialData: FinancialData = {
     employment_status: "Salaried",
     monthly_income: 0,
   },
-  assets: {
-    bank_accounts: [],
-    mutual_funds: [],
-    stocks: [],
-    real_estate: [],
-  },
-  liabilities: {
-    loans: [],
-    credit_cards: [],
-  },
-  investments: {
-    sips: [],
-    ppf: 0,
-  },
+  bank_accounts: [],
+  mutual_funds: [],
+  stocks: [],
+  real_estate: [],
+  loans: [],
+  credit_cards: [],
+  sips: [],
+  ppf: 0,
   net_worth: 0,
   credit_score: 750,
 };
