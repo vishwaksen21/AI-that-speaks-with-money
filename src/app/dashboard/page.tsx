@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -29,7 +30,7 @@ const calculateTotalAssets = (data: any) => {
     const mutualFunds = data.assets.mutual_funds?.reduce((sum: number, mf: any) => sum + (mf.current_value || 0), 0) || 0;
     const stocks = data.assets.stocks?.reduce((sum: number, stock: any) => sum + ((stock.shares || 0) * (stock.current_price || 0)), 0) || 0;
     const realEstate = data.assets.real_estate?.reduce((sum: number, prop: any) => sum + (prop.market_value || 0), 0) || 0;
-    const ppf = data.investments?.ppf?.balance || data.investments?.EPF?.balance || 0; // Check for ppf or fallback to EPF
+    const ppf = data.investments?.ppf?.balance || data.investments?.EPF?.balance || 0;
     return bankBalance + mutualFunds + stocks + realEstate + ppf;
 };
 
@@ -45,12 +46,13 @@ export default function DashboardPage() {
   const [data, setData] = useState<any>(null);
 
   useEffect(() => {
-    // Directly fetch and set data on the client side.
+    // This effect runs on the client after the component mounts.
+    // It safely retrieves data from localStorage.
     const financialData = getFinancialData();
     setData(financialData);
   }, []);
 
-  // Show a loading skeleton if data is not yet available.
+  // Show a loading skeleton if data has not been loaded from the client yet.
   if (!data) {
     return (
         <AppLayout pageTitle="Dashboard">

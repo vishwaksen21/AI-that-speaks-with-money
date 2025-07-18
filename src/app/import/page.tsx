@@ -51,7 +51,7 @@ export default function ImportDataPage() {
                 title: 'Analysis Complete!',
                 description: 'Your financial data has been extracted and processed.',
             });
-            setTimeout(() => router.push('/dashboard'), 1500);
+            setTimeout(() => router.push('/dashboard'), 1500); // Redirect after success
         } else {
             throw new Error(result.error || 'The AI could not process your file. Please try a different format or check the content.');
         }

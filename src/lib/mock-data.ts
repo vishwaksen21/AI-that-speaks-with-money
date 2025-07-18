@@ -73,7 +73,7 @@ export const defaultFinancialData = {
       balance: 120000,
     },
   },
-  net_worth: 337850, // This is a calculated value based on the assets and liabilities above.
+  net_worth: 337850,
   credit_score: 765,
 };
 
@@ -85,23 +85,17 @@ export function getFinancialData() {
   try {
     const storedData = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (storedData) {
+      // If data exists, parse and return it.
       return JSON.parse(storedData);
     } else {
-      localStorage.setItem(
-        LOCAL_STORAGE_KEY,
-        JSON.stringify(defaultFinancialData)
-      );
+      // If no data, store the default and return it.
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(defaultFinancialData));
       return defaultFinancialData;
     }
   } catch (error) {
-    console.error(
-      'Failed to parse financial data from localStorage, using default:',
-      error
-    );
-    localStorage.setItem(
-      LOCAL_STORAGE_KEY,
-      JSON.stringify(defaultFinancialData)
-    );
+    console.error('Failed to process financial data, using default:', error);
+    // If parsing fails, store the default and return it.
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(defaultFinancialData));
     return defaultFinancialData;
   }
 }
