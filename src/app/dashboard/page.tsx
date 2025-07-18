@@ -19,6 +19,7 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { calculateTotalAssets, calculateTotalLiabilities } from '@/lib/financial-calculations';
 
 
 function formatCurrency(amount: number, currency: string = 'INR') {
@@ -42,22 +43,6 @@ function formatCurrency(amount: number, currency: string = 'INR') {
   }).format(amount);
 }
 
-const calculateTotalAssets = (data: FinancialData): number => {
-    if (!data) return 0;
-    const bankBalance = data.bank_accounts?.reduce((sum, acc) => sum + (acc.balance || 0), 0) || 0;
-    const mutualFunds = data.mutual_funds?.reduce((sum, mf) => sum + (mf.current_value || 0), 0) || 0;
-    const stocks = data.stocks?.reduce((sum, stock) => sum + ((stock.shares || 0) * (stock.current_price || 0)), 0) || 0;
-    const realEstate = data.real_estate?.reduce((sum, prop) => sum + (prop.market_value || 0), 0) || 0;
-    const ppf = data.ppf || 0;
-    return bankBalance + mutualFunds + stocks + realEstate + ppf;
-};
-
-const calculateTotalLiabilities = (data: FinancialData): number => {
-    if (!data) return 0;
-    const loans = data.loans?.reduce((sum, loan) => sum + (loan.outstanding_amount || 0), 0) || 0;
-    const creditCards = data.credit_cards?.reduce((sum, card) => sum + (card.outstanding_balance || 0), 0) || 0;
-    return loans + creditCards;
-};
 
 export default function DashboardPage() {
   const [data, setData] = useState<FinancialData | null>(null);

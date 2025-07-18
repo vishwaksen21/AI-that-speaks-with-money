@@ -60,7 +60,6 @@ const FinancialDataSchema = z.object({
       monthly_investment: z.number().describe("Monthly investment amount in the profile's currency."),
   })).describe("Systematic Investment Plans. This should not be optional."),
   ppf: z.number().describe("The current balance in the Public Provident Fund in the profile's currency."),
-  net_worth: z.number().describe("The calculated net worth (Total Assets - Total Liabilities) in the profile's currency. If provided in the text, use that value. Otherwise, you must calculate it."),
   credit_score: z.number().optional().describe("The user's credit score (e.g., CIBIL score)."),
   transactions: z.array(z.object({
     id: z.string(),
@@ -72,7 +71,11 @@ const FinancialDataSchema = z.object({
 }).describe('A structured representation of a user\'s financial data.');
 
 
-export type FinancialData = z.infer<typeof FinancialDataSchema>;
+const FinancialDataWithNetWorthSchema = FinancialDataSchema.extend({
+  net_worth: z.number().describe("The calculated net worth (Total Assets - Total Liabilities) in the profile's currency."),
+});
+
+export type FinancialData = z.infer<typeof FinancialDataWithNetWorthSchema>;
 
 export async function extractFinancialData(input: DataExtractionInput): Promise<FinancialData> {
   return dataExtractionFlow(input);
@@ -81,7 +84,7 @@ export async function extractFinancialData(input: DataExtractionInput): Promise<
 const prompt = ai.definePrompt({
   name: 'dataExtractionPrompt',
   input: {schema: DataExtractionInputSchema},
-  output: {schema: FinancialDataSchema},
+  output: {schema: FinancialDataSchema}, // AI outputs data WITHOUT net_worth
   prompt: `You are an expert financial data analyst. Your task is to analyze the following financial information, which can be from raw text or an image, and structure it into a valid JSON object matching the provided schema.
 
 CRITICAL INSTRUCTIONS:
@@ -98,7 +101,7 @@ CRITICAL INSTRUCTIONS:
 2.  **Output Format**: Your entire output must be ONLY the JSON object. Do not include any other text, explanations, or markdown formatting like \`\`\`json.
 3.  **Data Source**: Use ONLY the information provided in the input. Do NOT invent or hallucinate any data.
 4.  **Currency**: Identify the currency from the text (e.g., symbols like $, €, ₹, or words like "dollars", "rupees"). Use the appropriate ISO 4217 code (e.g., 'USD', 'EUR', 'INR'). If no currency is mentioned, default to 'INR'. Store this in 'profile_currency'. All monetary values in the JSON must be numbers, without commas or currency symbols.
-5.  **Net Worth Calculation**: If 'net_worth' is explicitly provided, use that value. Otherwise, you MUST calculate it by summing all assets (bank accounts, mutual funds, stocks (shares * price), real estate, PPF) and subtracting all liabilities (loans, credit cards).
+5.  **Net Worth Calculation**: DO NOT calculate 'net_worth'. This will be handled by the application.
 6.  **Specific Mappings**:
     *   Treat "Digital Gold" as a 'real_estate' asset.
     *   Map any provident fund balance (EPF, PF) to the 'ppf' field.
@@ -120,7 +123,7 @@ const dataExtractionFlow = ai.defineFlow(
   {
     name: 'dataExtractionFlow',
     inputSchema: DataExtractionInputSchema,
-    outputSchema: FinancialDataSchema,
+    outputSchema: FinancialDataWithNetWorthSchema, // The flow outputs data WITH net_worth
   },
   async (input) => {
     try {
@@ -133,14 +136,28 @@ const dataExtractionFlow = ai.defineFlow(
             throw new Error("The AI model was unable to extract any structured data from the document. Please ensure the document is clear and contains financial information.");
         }
         
+        // Calculate net worth here instead of asking the AI to do it.
+        const totalAssets = (output.bank_accounts?.reduce((sum, acc) => sum + acc.balance, 0) || 0) +
+                            (output.mutual_funds?.reduce((sum, mf) => sum + mf.current_value, 0) || 0) +
+                            (output.stocks?.reduce((sum, s) => sum + (s.shares * s.current_price), 0) || 0) +
+                            (output.real_estate?.reduce((sum, re) => sum + re.market_value, 0) || 0) +
+                            (output.ppf || 0);
+
+        const totalLiabilities = (output.loans?.reduce((sum, l) => sum + l.outstanding_amount, 0) || 0) +
+                                 (output.credit_cards?.reduce((sum, cc) => sum + cc.outstanding_balance, 0) || 0);
+
+        const net_worth = totalAssets - totalLiabilities;
+        
+        const dataWithNetWorth = { ...output, net_worth };
+
         // Final validation before returning
-        const validatedOutput = FinancialDataSchema.safeParse(output);
+        const validatedOutput = FinancialDataWithNetWorthSchema.safeParse(dataWithNetWorth);
         if (!validatedOutput.success) {
-            console.error("AI output failed Zod validation:", validatedOutput.error.toString());
+            console.error("Final data object failed Zod validation:", validatedOutput.error.toString());
             throw new Error(`The AI produced data in an invalid format. ${validatedOutput.error.toString()}`);
         }
         
-        console.log("Successfully received and validated structured data from AI.");
+        console.log("Successfully processed and calculated net worth.");
         return validatedOutput.data;
 
     } catch (error: any) {
