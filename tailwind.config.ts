@@ -10,8 +10,8 @@ const config = {
   theme: {
     extend: {
       fontFamily: {
-        body: ['var(--font-geist)', 'sans-serif'],
-        headline: ['var(--font-geist)', 'sans-serif'],
+        body: ['var(--font-inter)', 'sans-serif'],
+        headline: ['var(--font-space-grotesk)', 'sans-serif'],
       },
       colors: {
         background: 'hsl(var(--background))',
