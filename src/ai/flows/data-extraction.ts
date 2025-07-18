@@ -66,33 +66,6 @@ export async function extractFinancialData(rawData: string): Promise<FinancialDa
   return dataExtractionFlow(rawData);
 }
 
-const prompt = ai.definePrompt({
-  name: 'dataExtractionPrompt',
-  input: {schema: z.string()},
-  output: {schema: FinancialDataSchema},
-  prompt: `You are an expert financial data analyst. Your task is to analyze the following raw text, which contains a user's financial information. The text could be in any format (JSON, CSV, unstructured sentences, bullet points, etc.).
-
-Your goal is to extract all relevant financial details and structure them into a valid JSON object according to the provided schema.
-
-**CRITICAL INSTRUCTIONS:**
-- All monetary values must be in Indian Rupees (₹). If a currency symbol is not present, assume INR. Remove commas and currency symbols from all numbers before outputting them.
-- **Net Worth:** If net worth is explicitly provided in the text, use that exact value. Otherwise, you MUST calculate it by summing all assets and subtracting all liabilities. Total assets include bank balances, mutual funds, stocks (shares * price), real estate, and PPF balance.
-- **Stocks:** For each stock, you must have 'ticker', 'shares', and 'current_price'. The total value is not needed in the output, just the price per share.
-- **Digital Gold:** Treat "Digital Gold" as a type of real estate asset. Use its total value for market_value.
-- **PPF/EPF:** The schema uses a 'ppf' field which is a direct number. If you see "EPF", "Provident Fund", or "PPF", map its balance to the 'ppf' number field.
-- **SIPs:** Extract Systematic Investment Plan details into the 'sips' array under 'investments'.
-- **Defaults:** You must fill in every field of the schema as accurately as possible. If a piece of information is missing (e.g., credit score), you can omit it if the schema allows. For other missing fields, you MUST provide a sensible default (e.g., 0 for a balance, an empty array [] for lists, "Valued User" for a name, 30 for age). Do not leave any required fields out.
-- **User ID:** Generate a random user_id, for example 'user_12345'.
-- **Output Format:** It is absolutely critical that your output is a single, valid JSON object that strictly adheres to the schema. Do not include any text, explanations, or markdown formatting outside of the JSON object itself.
-
-Raw Data Input:
-\`\`\`
-{{{input}}}
-\`\`\`
-
-Now, provide the structured JSON output.`,
-});
-
 const dataExtractionFlow = ai.defineFlow(
   {
     name: 'dataExtractionFlow',
@@ -100,11 +73,51 @@ const dataExtractionFlow = ai.defineFlow(
     outputSchema: FinancialDataSchema,
   },
   async (input) => {
-    const response = await prompt(input);
-    const output = response.output;
-    if (!output) {
-        throw new Error("The AI model could not extract data. The file might be empty or in an unrecognizable format.");
+    // Generate content using the AI model with a specific prompt.
+    const response = await ai.generate({
+      prompt: `You are an expert financial data analyst. Your task is to analyze the following raw text, which contains a user's financial information, and structure it into a valid JSON object.
+
+CRITICAL INSTRUCTIONS:
+- Your entire output must be ONLY the JSON object. Do not include any other text, explanations, or markdown formatting like \`\`\`json.
+- All monetary values must be in Indian Rupees (₹). Remove commas and currency symbols from numbers.
+- Net Worth: If net worth is explicitly provided, use that value. Otherwise, you MUST calculate it by summing all assets (bank accounts, mutual funds, stocks (shares * price), real estate, PPF) and subtracting all liabilities (loans, credit cards).
+- Stocks: Calculate the total value for each stock holding and use it.
+- Digital Gold: Treat "Digital Gold" as a type of real_estate asset.
+- PPF/EPF: Map any provident fund balance to the 'ppf' number field under 'investments'.
+- Defaults: You must fill in every field of the schema as accurately as possible. For missing fields, provide a sensible default (e.g., 0 for a balance, an empty array [] for lists, "Valued User" for name, 30 for age). Do not leave any required fields out.
+- User ID: Generate a random user_id, for example 'user_12345'.
+
+Here is the financial data to process:
+---
+${input}
+---
+`,
+    });
+
+    // Get the raw text output from the model.
+    const rawOutput = response.text;
+
+    if (!rawOutput) {
+      throw new Error("No output received from the AI model.");
     }
-    return output;
+
+    // Try to parse the raw text as JSON.
+    let structuredOutput;
+    try {
+      structuredOutput = JSON.parse(rawOutput);
+    } catch (err) {
+      console.error("AI output was not valid JSON:", rawOutput);
+      throw new Error("The output from the AI model could not be parsed into JSON.");
+    }
+
+    // Validate the parsed JSON against our Zod schema.
+    const result = FinancialDataSchema.safeParse(structuredOutput);
+    if (!result.success) {
+      console.error("AI output did not match schema:", result.error.flatten());
+      throw new Error("The extracted data does not match the expected financial schema.");
+    }
+
+    // Return the validated, structured data.
+    return result.data;
   }
 );
