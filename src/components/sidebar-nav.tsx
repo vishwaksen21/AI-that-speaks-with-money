@@ -13,7 +13,6 @@ import {
   LayoutDashboard,
   MessageCircle,
   Bot,
-  Download,
   User,
   LogIn,
   Mic,
@@ -26,7 +25,6 @@ const mainNavItems = [
   { href: '/chat', label: 'Chat with AI', icon: MessageCircle },
   { href: '/voice-assistant', label: 'Voice Assistant', icon: Mic },
   { href: '/scenario-simulator', label: 'Scenario Simulator', icon: Bot },
-  { href: '/export', label: 'Export Data', icon: Download },
 ];
 
 const accountNavItems = [
