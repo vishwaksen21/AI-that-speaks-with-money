@@ -9,6 +9,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import {googleAI} from '@genkit-ai/googleai';
 
 // This schema defines the target JSON structure. It should be kept in sync with the application's needs.
 const FinancialDataSchema = z.object({
@@ -67,6 +68,7 @@ const prompt = ai.definePrompt({
   name: 'dataExtractionPrompt',
   input: {schema: z.string()},
   output: {schema: FinancialDataSchema},
+  model: googleAI('gemini-1.5-flash-latest'),
   prompt: `You are an expert financial data analyst. Your task is to analyze the following raw text, which contains a user's financial information. The text could be in any format (JSON, CSV, unstructured sentences, etc.).
 
 Your goal is to extract all relevant financial details and structure them into a valid JSON object according to the provided schema.
