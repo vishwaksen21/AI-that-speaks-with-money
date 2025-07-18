@@ -101,7 +101,7 @@ const dataExtractionFlow = ai.defineFlow(
   },
   async (input) => {
     const response = await prompt(input);
-    const output = response.output();
+    const output = response.output;
     if (!output) {
         throw new Error("The AI model could not extract data. The file might be empty or in an unrecognizable format.");
     }
