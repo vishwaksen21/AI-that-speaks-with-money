@@ -12,7 +12,8 @@ import {
 import { SidebarNav } from '@/components/sidebar-nav';
 import { Logo } from './icons';
 import { Button } from './ui/button';
-import { User, Bell, Search } from 'lucide-react';
+import { User, Search } from 'lucide-react';
+import { NotificationDropdown } from './notification-dropdown';
 
 export function AppLayout({
   children,
@@ -56,9 +57,7 @@ export function AppLayout({
                 <User className="h-5 w-5" />
               </Button>
             </Link>
-             <Button variant="ghost" size="icon">
-              <Bell className="h-5 w-5" />
-            </Button>
+             <NotificationDropdown />
           </div>
         </header>
         <main className="p-4 md:p-6">{children}</main>
