@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { RecentTransactions } from '@/components/recent-transactions';
 import { NetWorthChart } from '@/components/net-worth-chart';
 import { AssetAllocationChart } from '@/components/asset-allocation-chart';
-import { getFinancialData, LOCAL_STORAGE_KEY, defaultFinancialData } from '@/lib/mock-data';
+import { getFinancialData } from '@/lib/mock-data';
 import { DollarSign, TrendingUp, TrendingDown } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -46,22 +46,9 @@ export default function DashboardPage() {
   const [data, setData] = useState<any>(null);
 
   useEffect(() => {
-    let financialData;
-    try {
-      const storedData = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (storedData) {
-        financialData = JSON.parse(storedData);
-        // This is a failsafe to handle incorrectly structured data from previous versions
-        if (financialData && financialData.output) {
-          financialData = financialData.output;
-        }
-      } else {
-        financialData = defaultFinancialData;
-      }
-    } catch (error) {
-      console.error('Failed to parse financial data, using default:', error);
-      financialData = defaultFinancialData;
-    }
+    // Directly fetch and set data on the client side.
+    // This ensures we always get the latest from localStorage.
+    const financialData = getFinancialData();
     setData(financialData);
   }, []);
 

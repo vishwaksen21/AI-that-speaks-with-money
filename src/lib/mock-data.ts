@@ -68,7 +68,7 @@ export const defaultFinancialData = {
       balance: 120000,
     },
   },
-  net_worth: 1235000,
+  net_worth: 243000,
   credit_score: 765,
 };
 
@@ -79,15 +79,16 @@ export function getFinancialData() {
   try {
     const storedData = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (storedData) {
-      // Always parse data from localStorage to ensure it's an object
+      // THIS IS THE CRITICAL FIX:
+      // Always parse the data from localStorage and return the PARSED OBJECT.
       return JSON.parse(storedData);
     }
-    // If no data in local storage, set default data
+    // If no data in local storage, set default data and return it
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(defaultFinancialData));
     return defaultFinancialData;
   } catch (error) {
-    console.error('Failed to parse financial data from localStorage', error);
-    // If parsing fails, set default data
+    console.error('Failed to parse financial data from localStorage, using default:', error);
+    // If parsing fails, set default data and return it
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(defaultFinancialData));
     return defaultFinancialData;
   }
