@@ -57,7 +57,7 @@ export default function ImportDataPage() {
         }
 
       } catch (err: any) {
-        const friendlyError = 'The AI could not process your file. The content may be unclear or in an unsupported format. Please check the file and try again.';
+        const friendlyError = err.message || 'An unexpected error occurred. Please try again.';
         setError(friendlyError);
         toast({
           title: 'Upload Failed',
@@ -129,8 +129,8 @@ export default function ImportDataPage() {
                 </div>
             )}
             {error && (
-                 <div className="flex items-center gap-3 p-4 rounded-md border text-destructive-foreground bg-destructive/10 border-destructive/20">
-                    <AlertTriangle className="h-5 w-s5" />
+                 <div className="flex items-center gap-3 p-4 rounded-md border text-destructive bg-destructive/10 border-destructive/20 dark:text-destructive-foreground dark:bg-destructive/20 dark:border-destructive/40">
+                    <AlertTriangle className="h-5 w-5 text-destructive dark:text-destructive-foreground" />
                     <p className="font-medium text-sm">{error}</p>
                 </div>
             )}
