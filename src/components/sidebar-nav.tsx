@@ -6,40 +6,71 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarGroup,
+  SidebarGroupLabel,
 } from '@/components/ui/sidebar';
 import {
   LayoutDashboard,
   MessageCircle,
   Bot,
   Download,
+  User,
+  LogIn
 } from 'lucide-react';
 
-const navItems = [
+const mainNavItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/chat', label: 'Chat with AI', icon: MessageCircle },
   { href: '/scenario-simulator', label: 'Scenario Simulator', icon: Bot },
   { href: '/export', label: 'Export Data', icon: Download },
 ];
 
+const accountNavItems = [
+    { href: '#', label: 'Profile', icon: User },
+    { href: '#', label: 'Sign In', icon: LogIn },
+];
+
+
 export function SidebarNav() {
   const pathname = usePathname();
 
   return (
     <SidebarMenu>
-      {navItems.map((item) => (
-        <SidebarMenuItem key={item.href}>
-          <SidebarMenuButton
-            asChild
-            isActive={pathname === item.href}
-            tooltip={item.label}
-          >
-            <Link href={item.href}>
-              <item.icon />
-              <span>{item.label}</span>
-            </Link>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      ))}
+        {mainNavItems.map((item) => (
+            <SidebarMenuItem key={item.href}>
+            <SidebarMenuButton
+                asChild
+                isActive={pathname === item.href}
+                tooltip={item.label}
+                className="justify-start"
+            >
+                <Link href={item.href}>
+                <item.icon />
+                <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
+                </Link>
+            </SidebarMenuButton>
+            </SidebarMenuItem>
+        ))}
+         <SidebarGroup className="p-0 pt-4">
+            <SidebarGroupLabel className="px-2 group-data-[collapsible=icon]:px-0">
+                <span className="group-data-[collapsible=icon]:hidden">Account Pages</span>
+            </SidebarGroupLabel>
+            {accountNavItems.map((item) => (
+                <SidebarMenuItem key={item.label}>
+                <SidebarMenuButton
+                    asChild
+                    isActive={pathname === item.href}
+                    tooltip={item.label}
+                    className="justify-start"
+                >
+                    <Link href={item.href}>
+                    <item.icon />
+                    <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
+                    </Link>
+                </SidebarMenuButton>
+                </SidebarMenuItem>
+            ))}
+        </SidebarGroup>
     </SidebarMenu>
   );
 }

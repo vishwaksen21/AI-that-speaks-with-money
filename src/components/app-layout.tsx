@@ -8,9 +8,11 @@ import {
   SidebarInset,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { SidebarNav } from '@/components/sidebar-nav';
 import { Logo } from './icons';
+import { Button } from './ui/button';
+import { Search, User, Bell } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
 export function AppLayout({
   children,
@@ -21,42 +23,45 @@ export function AppLayout({
 }) {
   return (
     <SidebarProvider>
-      <Sidebar>
+      <Sidebar variant="sidebar" collapsible="icon">
         <SidebarHeader>
-          <div className="flex items-center gap-2">
-            <Logo className="w-8 h-8 text-sidebar-primary" />
-            <span className="text-lg font-semibold font-headline text-sidebar-foreground">
-              Fi Money
+          <div className="flex items-center gap-2 p-2">
+            <Logo className="w-8 h-8 text-primary" />
+            <span className="text-lg font-semibold font-headline text-foreground group-data-[collapsible=icon]:hidden">
+              Soft UI
             </span>
           </div>
         </SidebarHeader>
         <SidebarContent>
           <SidebarNav />
         </SidebarContent>
-        <SidebarFooter>
-          <div className="flex items-center gap-2">
-            <Avatar className="h-8 w-8">
-              <AvatarImage src="https://placehold.co/40x40" alt="@user" />
-              <AvatarFallback>U</AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col">
-              <span className="text-sm font-medium text-sidebar-foreground">
-                User
-              </span>
-              <span className="text-xs text-sidebar-foreground/70">
-                user@example.com
-              </span>
-            </div>
-          </div>
+        <SidebarFooter className="p-2">
+          {/* Need help card can go here if needed */}
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
-        <header className="flex items-center justify-between p-4 border-b bg-background md:justify-end">
-          <SidebarTrigger className="md:hidden" />
-          <h1 className="text-xl font-semibold font-headline md:hidden">
-            {pageTitle}
-          </h1>
-          <div>{/* Placeholder for future actions */}</div>
+        <header className="flex items-center justify-between p-4 border-b bg-background">
+          <div className="flex items-center gap-4">
+            <SidebarTrigger className="md:hidden" />
+            <div>
+              <p className="text-sm text-muted-foreground">Pages / {pageTitle}</p>
+              <h1 className="text-lg font-bold font-headline">
+                {pageTitle}
+              </h1>
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+             <div className="relative hidden md:block">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input placeholder="Type here..." className="pl-9" />
+            </div>
+            <Button variant="ghost" size="icon">
+              <User className="h-5 w-5" />
+            </Button>
+             <Button variant="ghost" size="icon">
+              <Bell className="h-5 w-5" />
+            </Button>
+          </div>
         </header>
         <main className="p-4 md:p-6">{children}</main>
       </SidebarInset>
