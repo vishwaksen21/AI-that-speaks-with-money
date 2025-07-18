@@ -18,13 +18,19 @@ interface AssetAllocationChartProps {
 
 const RADIAN = Math.PI / 180;
 const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index, name }: any) => {
-  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  // Don't render label if the slice is too small, to prevent clutter
+  if (percent < 0.08) {
+    return null;
+  }
+  
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.6;
   const x = cx + radius * Math.cos(-midAngle * RADIAN);
   const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
   return (
-    <text x={x} y={y} fill="white" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central" className="text-xs">
-      {`${(percent * 100).toFixed(0)}%`}
+    <text x={x} y={y} fill="white" textAnchor="middle" dominantBaseline="central" className="text-[10px] font-medium">
+      <tspan x={x} dy="-0.5em">{name}</tspan>
+      <tspan x={x} dy="1.1em">{`${(percent * 100).toFixed(0)}%`}</tspan>
     </text>
   );
 };
@@ -46,12 +52,12 @@ export function AssetAllocationChart({ data }: AssetAllocationChartProps) {
           cy="50%"
           labelLine={false}
           label={renderCustomizedLabel}
-          outerRadius={100}
+          outerRadius={110}
           innerRadius={60}
           fill="#8884d8"
           dataKey="value"
           nameKey="name"
-          paddingAngle={5}
+          paddingAngle={3}
         >
           {chartData.map((entry, index) => (
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} className="stroke-background hover:opacity-80" strokeWidth={2} />
