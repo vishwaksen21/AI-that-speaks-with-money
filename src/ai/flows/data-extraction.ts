@@ -123,57 +123,31 @@ const dataExtractionFlow = ai.defineFlow(
     outputSchema: FinancialDataSchema,
   },
   async (input) => {
-    let attempts = 0;
-    const maxAttempts = 3;
-    const delay = 1000;
+    try {
+        console.log("Calling AI model for data extraction...");
+        const response = await prompt(input);
+        const output = response.output;
 
-    while (attempts < maxAttempts) {
-        try {
-            console.log(`Attempt ${attempts + 1} of ${maxAttempts}...`);
-            const response = await prompt(input);
-            const output = response.output;
-
-            if (!output) {
-                throw new Error("AI model did not return a valid output object.");
-            }
-            
-            console.log("Received structured data from AI:", JSON.stringify(output, null, 2));
-            return output;
-
-        } catch (error: any) {
-            attempts++;
-            const isLastAttempt = attempts >= maxAttempts;
-            const errorMessage = error?.message || "Unknown error occurred";
-
-            console.error(`Attempt ${attempts} failed:`, errorMessage);
-
-            // Specific diagnostic suggestions
-            if (/format|unsupported|invalid/i.test(errorMessage)) {
-                console.warn("Hint: The file might be in an unrecognized or unsupported format. Try converting it to PDF or plain text.");
-            } else if (/temporarily unavailable|timeout|503|network/i.test(errorMessage)) {
-                console.warn("Hint: The AI service may be temporarily unavailable. Please check your internet connection or retry later.");
-            }
-
-            if (isLastAttempt) {
-                console.error("Max retry attempts reached. Aborting document processing.");
-
-                throw new Error(
-                    "The AI model failed to process the document after multiple attempts. " +
-                    "Possible reasons:\n" +
-                    "• The file might be in an unrecognized or corrupted format (try converting it to PDF or .txt).\n" +
-                    "• The AI service might be temporarily unavailable (retry after some time).\n" +
-                    "Please verify your file and try again."
-                );
-            }
-
-            // Retry with exponential backoff
-            const retryDelay = delay * Math.pow(2, attempts - 1);
-            console.log(`Waiting ${retryDelay}ms before retrying...`);
-            await new Promise(res => setTimeout(res, retryDelay));
+        if (!output) {
+            console.error("AI model did not return a valid output object.");
+            throw new Error("The AI model was unable to extract any structured data from the document. Please ensure the document is clear and contains financial information.");
         }
+        
+        // Final validation before returning
+        const validatedOutput = FinancialDataSchema.safeParse(output);
+        if (!validatedOutput.success) {
+            console.error("AI output failed Zod validation:", validatedOutput.error.toString());
+            throw new Error(`The AI produced data in an invalid format. ${validatedOutput.error.toString()}`);
+        }
+        
+        console.log("Successfully received and validated structured data from AI.");
+        return validatedOutput.data;
+
+    } catch (error: any) {
+        const errorMessage = error?.message || "An unknown error occurred during AI processing.";
+        console.error("Error in dataExtractionFlow:", errorMessage);
+        // Re-throw the error to be handled by the calling action
+        throw new Error(errorMessage);
     }
-    throw new Error("The AI model returned no output after all retry attempts.");
   }
 );
-
-    

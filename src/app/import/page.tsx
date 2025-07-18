@@ -44,23 +44,12 @@ export default function ImportDataPage() {
           throw new Error('Could not read file content.');
         }
 
-        let result;
-        // Check if the uploaded file is an image
-        if (selectedFile.type.startsWith('image/')) {
-            // The file content is already a data URI (string) from reader.readAsDataURL
-            result = await uploadFinancialData({ 
-                fileContent: fileContent as string, 
-                type: selectedFile.type,
-                isImage: true
-            });
-        } else {
-            // For other files, content is ArrayBuffer from reader.readAsArrayBuffer
-             result = await uploadFinancialData({
-                fileContent: Array.from(new Uint8Array(fileContent as ArrayBuffer)),
-                type: selectedFile.type,
-                isImage: false
-            });
-        }
+        // All file content is now sent as a string (either raw text or a data URI)
+        const result = await uploadFinancialData({
+            fileContent: fileContent as string,
+            type: selectedFile.type,
+            name: selectedFile.name,
+        });
 
         if (result.success && result.data) {
             localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(result.data));
@@ -96,11 +85,11 @@ export default function ImportDataPage() {
         });
     };
 
-    // Use readAsDataURL for images to get the base64 string directly
-    if (selectedFile.type.startsWith('image/')) {
+    // Use readAsText for plain text formats
+    if (['text/plain', 'text/csv', 'application/json'].includes(selectedFile.type)) {
+        reader.readAsText(selectedFile);
+    } else { // Use readAsDataURL for images, xlsx, etc., to get the base64 string
         reader.readAsDataURL(selectedFile);
-    } else { // Use readAsArrayBuffer for other file types
-        reader.readAsArrayBuffer(selectedFile);
     }
   };
 
