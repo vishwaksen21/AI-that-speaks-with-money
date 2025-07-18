@@ -7,10 +7,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { RecentTransactions } from '@/components/recent-transactions';
 import { NetWorthChart } from '@/components/net-worth-chart';
 import { AssetAllocationChart } from '@/components/asset-allocation-chart';
-import { getFinancialData } from '@/lib/mock-data';
+import { getFinancialData, defaultFinancialData, LOCAL_STORAGE_KEY } from '@/lib/mock-data';
 import type { FinancialData } from '@/ai/flows/data-extraction';
-import { DollarSign, TrendingUp, TrendingDown } from 'lucide-react';
+import { DollarSign, TrendingUp, TrendingDown, PlusCircle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { useToast } from '@/hooks/use-toast';
+
 
 function formatCurrency(amount: number) {
   if (typeof amount !== 'number' || isNaN(amount)) {
@@ -45,6 +52,7 @@ const calculateTotalLiabilities = (data: FinancialData): number => {
 
 export default function DashboardPage() {
   const [data, setData] = useState<FinancialData | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     // This effect runs once on the client after the component mounts.
@@ -52,6 +60,58 @@ export default function DashboardPage() {
     const financialData = getFinancialData();
     setData(financialData);
   }, []);
+
+  const handleAddTransaction = (newTransaction: {
+    description: string;
+    amount: number;
+    type: 'income' | 'expense';
+  }) => {
+    setData(currentData => {
+        if (!currentData) return null;
+
+        // Create a deep copy to avoid direct state mutation
+        const newData = JSON.parse(JSON.stringify(currentData));
+
+        const transactionAmount = newTransaction.type === 'income' 
+            ? newTransaction.amount 
+            : -newTransaction.amount;
+        
+        // Add to a new 'transactions' array if it doesn't exist
+        if (!newData.transactions) {
+            newData.transactions = [];
+        }
+        newData.transactions.unshift({
+            id: `txn_${Date.now()}`,
+            description: newTransaction.description,
+            amount: transactionAmount,
+            date: new Date().toISOString().split('T')[0], // YYYY-MM-DD
+            category: newTransaction.type === 'income' ? 'Income' : 'Expense',
+        });
+
+        // Update the first bank account's balance
+        if (newData.bank_accounts && newData.bank_accounts.length > 0) {
+            newData.bank_accounts[0].balance += transactionAmount;
+        } else {
+             // If no bank account, create one
+            newData.bank_accounts = [{ bank: 'Primary Account', balance: transactionAmount }];
+        }
+
+        // Recalculate net worth
+        const newTotalAssets = calculateTotalAssets(newData);
+        const newTotalLiabilities = calculateTotalLiabilities(newData);
+        newData.net_worth = newTotalAssets - newTotalLiabilities;
+
+        // Save to localStorage
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newData));
+
+        toast({
+            title: 'Transaction Added!',
+            description: `${newTransaction.description} for ${formatCurrency(Math.abs(transactionAmount))} has been recorded.`
+        });
+        
+        return newData;
+    });
+  }
 
   // Show a loading skeleton if data has not been loaded from the client yet.
   if (!data) {
@@ -79,7 +139,7 @@ export default function DashboardPage() {
   // Once data is loaded, perform calculations
   const totalAssets = calculateTotalAssets(data);
   const totalLiabilities = calculateTotalLiabilities(data);
-  const netWorth = data.net_worth !== undefined && data.net_worth !== 0 ? data.net_worth : (totalAssets - totalLiabilities);
+  const netWorth = data.net_worth;
 
   const assetAllocationData = [];
   if (data.bank_accounts?.length) {
@@ -97,7 +157,6 @@ export default function DashboardPage() {
    if (data.ppf) {
       assetAllocationData.push({ name: 'PPF', value: data.ppf });
   }
-  
 
   return (
     <AppLayout pageTitle="Dashboard">
@@ -160,15 +219,105 @@ export default function DashboardPage() {
 
         {/* Recent Transactions */}
          <Card>
-            <CardHeader>
-              <CardTitle className="font-headline">Recent Transactions</CardTitle>
-              <CardDescription>Your most recent financial activities.</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="font-headline">Recent Transactions</CardTitle>
+                <CardDescription>Your most recent financial activities.</CardDescription>
+              </div>
+               <AddTransactionDialog onAddTransaction={handleAddTransaction} />
             </CardHeader>
             <CardContent>
-              <RecentTransactions />
+              <RecentTransactions transactions={data.transactions || []} />
             </CardContent>
           </Card>
       </div>
     </AppLayout>
   );
 }
+
+
+function AddTransactionDialog({ onAddTransaction }: { onAddTransaction: (t: any) => void }) {
+    const [isOpen, setIsOpen] = useState(false);
+    const [description, setDescription] = useState('');
+    const [amount, setAmount] = useState('');
+    const [type, setType] = useState<'income' | 'expense'>('expense');
+
+    const handleSubmit = () => {
+        const numericAmount = parseFloat(amount);
+        if (description && !isNaN(numericAmount) && numericAmount > 0) {
+            onAddTransaction({ description, amount: numericAmount, type });
+            // Reset form and close dialog
+            setDescription('');
+            setAmount('');
+            setType('expense');
+            setIsOpen(false);
+        }
+    }
+
+    return (
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>
+                <Button>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Add Transaction
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                    <DialogTitle>Add a New Transaction</DialogTitle>
+                    <DialogDescription>
+                        Enter the details of your transaction below. It will be saved and reflected in your dashboard.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="description" className="text-right">
+                            Description
+                        </Label>
+                        <Input
+                            id="description"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            className="col-span-3"
+                            placeholder="e.g., Dinner with friends"
+                        />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="amount" className="text-right">
+                            Amount (₹)
+                        </Label>
+                        <Input
+                            id="amount"
+                            type="number"
+                            value={amount}
+                            onChange={(e) => setAmount(e.target.value)}
+                            className="col-span-3"
+                            placeholder="e.g., 1500"
+                        />
+                    </div>
+                    <div className="grid grid-cols-4 items-center gap-4">
+                         <Label className="text-right">Type</Label>
+                         <RadioGroup
+                            value={type}
+                            onValueChange={(value) => setType(value as any)}
+                            className="col-span-3 flex gap-4"
+                        >
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="expense" id="r-expense" />
+                                <Label htmlFor="r-expense">Expense</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="income" id="r-income" />
+                                <Label htmlFor="r-income">Income</Label>
+                            </div>
+                        </RadioGroup>
+                    </div>
+                </div>
+                <DialogFooter>
+                    <Button onClick={handleSubmit} disabled={!description || !amount}>Save transaction</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
+

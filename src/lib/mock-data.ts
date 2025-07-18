@@ -23,6 +23,7 @@ export const defaultFinancialData: FinancialData = {
   ppf: 0,
   net_worth: 0,
   credit_score: 750,
+  transactions: [],
 };
 
 export function getFinancialData(): FinancialData {

@@ -51,7 +51,14 @@ const FinancialDataSchema = z.object({
   })).describe("Systematic Investment Plans. This should not be optional."),
   ppf: z.number().describe("The current balance in the Public Provident Fund in Indian Rupees (₹)."),
   net_worth: z.number().describe("The calculated net worth (Total Assets - Total Liabilities) in Indian Rupees (₹). If provided in the text, use that value. Otherwise, you must calculate it."),
-  credit_score: z.number().optional().describe("The user's credit score (e.g., CIBIL score).")
+  credit_score: z.number().optional().describe("The user's credit score (e.g., CIBIL score)."),
+  transactions: z.array(z.object({
+    id: z.string(),
+    description: z.string(),
+    amount: z.number(),
+    date: z.string(),
+    category: z.string(),
+  })).optional().describe("List of recent transactions. The AI should not populate this; it is for application use."),
 }).describe('A structured representation of a user\'s financial data.');
 
 
@@ -61,7 +68,7 @@ export async function extractFinancialData(rawData: string): Promise<FinancialDa
   return dataExtractionFlow(rawData);
 }
 
-const dataExtractionPrompt = ai.definePrompt({
+const prompt = ai.definePrompt({
   name: 'dataExtractionPrompt',
   input: {schema: z.string()},
   output: {schema: FinancialDataSchema},
@@ -76,6 +83,7 @@ CRITICAL INSTRUCTIONS:
 - PPF/EPF: Map any provident fund balance to the 'ppf' number field.
 - Defaults: You must fill in every field of the schema as accurately as possible. For missing fields, provide a sensible default (e.g., 0 for a number, an empty array [] for lists, "Valued User" for name, 30 for age). Do not leave any required fields out.
 - User ID: Generate a random user_id, for example 'user_12345'.
+- Transactions: The 'transactions' field is for application use only. Do NOT populate it. Return an empty array for it.
 
 Here is the financial data to process:
 ---
@@ -84,15 +92,16 @@ Here is the financial data to process:
 `,
 });
 
+
 const dataExtractionFlow = ai.defineFlow(
   {
     name: 'dataExtractionFlow',
-    inputSchema: z.string(),
-    outputSchema: FinancialDataSchema,
+    inputSchema: z.string(), // Expects raw text or file content
+    outputSchema: FinancialDataSchema, // Your defined schema for structured output
   },
   async (input) => {
     console.log('Starting data extraction flow with input...');
-    const response = await dataExtractionPrompt(input);
+    const response = await prompt(input);
     const output = response.output;
 
     if (!output) {

@@ -9,43 +9,17 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { CreditCard, ShoppingCart } from 'lucide-react';
 
-const transactions = [
-  {
-    id: 'txn_1',
-    description: 'Starbucks Coffee',
-    amount: -350,
-    date: '2024-07-22',
-    category: 'Food & Drink',
-  },
-  {
-    id: 'txn_2',
-    description: 'Salary Deposit',
-    amount: 80000,
-    date: '2024-07-21',
-    category: 'Income',
-  },
-  {
-    id: 'txn_3',
-    description: 'Amazon Purchase',
-    amount: -2500,
-    date: '2024-07-20',
-    category: 'Shopping',
-  },
-  {
-    id: 'txn_4',
-    description: 'Netflix Subscription',
-    amount: -799,
-    date: '2024-07-19',
-    category: 'Entertainment',
-  },
-  {
-    id: 'txn_5',
-    description: 'Mutual Fund Investment',
-    amount: -5000,
-    date: '2024-07-18',
-    category: 'Investment',
-  },
-];
+interface Transaction {
+  id: string;
+  description: string;
+  amount: number;
+  date: string;
+  category: string;
+}
+
+interface RecentTransactionsProps {
+  transactions: Transaction[];
+}
 
 function formatCurrency(amount: number) {
   return new Intl.NumberFormat('en-IN', {
@@ -56,7 +30,15 @@ function formatCurrency(amount: number) {
   }).format(amount);
 }
 
-export function RecentTransactions() {
+export function RecentTransactions({ transactions }: RecentTransactionsProps) {
+  if (!transactions || transactions.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-24 text-muted-foreground">
+        No transactions recorded yet.
+      </div>
+    );
+  }
+  
   return (
     <Table>
       <TableHeader>
@@ -68,13 +50,13 @@ export function RecentTransactions() {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {transactions.map((transaction) => (
+        {transactions.slice(0, 5).map((transaction) => ( // Show latest 5
           <TableRow key={transaction.id}>
             <TableCell>
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-secondary rounded-full">
                   {transaction.amount > 0 ? (
-                    <CreditCard className="h-4 w-4 text-primary" />
+                    <CreditCard className="h-4 w-4 text-green-500" />
                   ) : (
                     <ShoppingCart className="h-4 w-4 text-destructive" />
                   )}
@@ -84,9 +66,11 @@ export function RecentTransactions() {
             </TableCell>
             <TableCell className="text-muted-foreground">{transaction.date}</TableCell>
             <TableCell>
-              <Badge variant="outline">{transaction.category}</Badge>
+              <Badge variant={transaction.amount < 0 ? "destructive" : "default"} className={transaction.amount > 0 ? 'bg-green-100 text-green-800' : ''}>
+                {transaction.category}
+              </Badge>
             </TableCell>
-            <TableCell className={`text-right font-semibold ${transaction.amount > 0 ? 'text-primary' : ''}`}>
+            <TableCell className={`text-right font-semibold ${transaction.amount > 0 ? 'text-green-600' : ''}`}>
               {formatCurrency(transaction.amount)}
             </TableCell>
           </TableRow>
