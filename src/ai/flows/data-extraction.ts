@@ -85,8 +85,7 @@ CRITICAL INSTRUCTIONS:
 1.  **Analyze the Input**: Prioritize the image if provided; otherwise, use the raw text.
     {{#if photoDataUri}}
     Image of Financial Document: {{media url=photoDataUri}}
-    {{/if}}
-    {{#if rawData}}
+    {{else if rawData}}
     Raw Text Data:
     ---
     {{{rawData}}}
