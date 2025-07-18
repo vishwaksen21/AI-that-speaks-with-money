@@ -23,16 +23,32 @@ function formatCurrency(amount: number) {
   }).format(amount);
 }
 
+// Helper function to calculate total assets
+const calculateTotalAssets = (data: any) => {
+    if (!data?.assets) return 0;
+    const bankBalance = data.assets.bank_accounts?.reduce((sum: number, acc: any) => sum + (acc.balance || 0), 0) || 0;
+    const mutualFunds = data.assets.mutual_funds?.reduce((sum: number, mf: any) => sum + (mf.current_value || 0), 0) || 0;
+    const stocks = data.assets.stocks?.reduce((sum: number, stock: any) => sum + ((stock.shares || 0) * (stock.current_price || 0)), 0) || 0;
+    const realEstate = data.assets.real_estate?.reduce((sum: number, prop: any) => sum + (prop.market_value || 0), 0) || 0;
+    const epf = data.investments?.EPF?.balance || 0;
+    return bankBalance + mutualFunds + stocks + realEstate + epf;
+};
+
+// Helper function to calculate total liabilities
+const calculateTotalLiabilities = (data: any) => {
+    if (!data?.liabilities) return 0;
+    const loans = data.liabilities.loans?.reduce((sum: number, loan: any) => sum + (loan.outstanding_amount || 0), 0) || 0;
+    const creditCards = data.liabilities.credit_cards?.reduce((sum: number, card: any) => sum + (card.outstanding_balance || 0), 0) || 0;
+    return loans + creditCards;
+};
+
 export default function DashboardPage() {
   const [data, setData] = useState<any>(null);
 
   useEffect(() => {
-    // This effect runs only on the client, after the component has mounted.
-    // It safely retrieves data from localStorage or falls back to defaults.
     setData(getFinancialData());
   }, []);
 
-  // Show a loading skeleton if data hasn't been loaded from the client yet.
   if (!data) {
     return (
         <AppLayout pageTitle="Dashboard">
@@ -55,7 +71,27 @@ export default function DashboardPage() {
     )
   }
 
-  const assetAllocationData = data?.assets?.cashAndInvestments?.breakdown?.map((item: any) => ({ name: item.type, value: item.amount })) || [];
+  const totalAssets = calculateTotalAssets(data);
+  const totalLiabilities = calculateTotalLiabilities(data);
+  const netWorth = data?.net_worth || (totalAssets - totalLiabilities);
+
+  const assetAllocationData = [];
+  if (data?.assets?.bank_accounts) {
+    assetAllocationData.push({ name: 'Bank Accounts', value: data.assets.bank_accounts.reduce((sum: number, acc: any) => sum + acc.balance, 0) });
+  }
+  if (data?.assets?.mutual_funds) {
+    assetAllocationData.push({ name: 'Mutual Funds', value: data.assets.mutual_funds.reduce((sum: number, mf: any) => sum + mf.current_value, 0) });
+  }
+  if (data?.assets?.stocks) {
+    assetAllocationData.push({ name: 'Stocks', value: data.assets.stocks.reduce((sum: number, stock: any) => sum + (stock.shares * stock.current_price), 0) });
+  }
+  if (data?.assets?.real_estate) {
+      assetAllocationData.push({ name: 'Real Estate', value: data.assets.real_estate.reduce((sum: number, prop: any) => sum + prop.market_value, 0) });
+  }
+  if (data?.investments?.EPF) {
+      assetAllocationData.push({ name: 'EPF', value: data.investments.EPF.balance });
+  }
+  
 
   return (
     <AppLayout pageTitle="Dashboard">
@@ -68,7 +104,7 @@ export default function DashboardPage() {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(data.netWorth)}</div>
+              <div className="text-2xl font-bold">{formatCurrency(netWorth)}</div>
               <p className="text-xs text-muted-foreground">+2.5% from last month</p>
             </CardContent>
           </Card>
@@ -78,7 +114,7 @@ export default function DashboardPage() {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(data.assets?.totalAssets)}</div>
+              <div className="text-2xl font-bold">{formatCurrency(totalAssets)}</div>
                <p className="text-xs text-muted-foreground">+5.1% from last month</p>
             </CardContent>
           </Card>
@@ -88,7 +124,7 @@ export default function DashboardPage() {
               <TrendingDown className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(data.liabilities?.totalLiabilities)}</div>
+              <div className="text-2xl font-bold">{formatCurrency(totalLiabilities)}</div>
                <p className="text-xs text-muted-foreground">-1.2% from last month</p>
             </CardContent>
           </Card>
