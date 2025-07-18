@@ -1,8 +1,9 @@
+
 'use client';
 import { useState } from 'react';
 import { AppLayout } from '@/components/app-layout';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Wand2 } from 'lucide-react';
 import { getScenarioResponse } from './actions';
@@ -44,17 +45,17 @@ export default function ScenarioSimulatorPage() {
   return (
     <AppLayout pageTitle="Scenario Simulator">
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold tracking-tight font-headline">
-          Simulate Your Financial Future
-        </h1>
-        <p className="text-muted-foreground">
-          Describe a financial scenario to see its potential impact on your
-          finances. For example: &quot;What is the impact of a ₹50L home
-          loan?&quot; or &quot;Project my wealth at age 40.&quot;
-        </p>
+        <div>
+            <h1 className="text-3xl font-bold tracking-tight font-headline">
+            Simulate Your Financial Future
+            </h1>
+            <p className="text-muted-foreground mt-1">
+                Describe a financial scenario to see its potential impact on your finances.
+            </p>
+        </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <Textarea
-            placeholder="Describe your scenario here..."
+            placeholder='e.g., "What is the impact of a ₹50L home loan?" or "Project my wealth at age 40 if I increase my SIP by ₹5,000."'
             value={scenario}
             onChange={(e) => setScenario(e.target.value)}
             rows={4}
@@ -75,15 +76,23 @@ export default function ScenarioSimulatorPage() {
         {isLoading && (
             <div className="grid md:grid-cols-2 gap-6">
                 <Card>
-                    <CardHeader><CardTitle className="font-headline">Scenario Analysis</CardTitle></CardHeader>
+                    <CardHeader>
+                        <CardTitle className="font-headline">Scenario Analysis</CardTitle>
+                        <CardDescription>Calculating potential outcomes...</CardDescription>
+                    </CardHeader>
                     <CardContent className="space-y-2">
                         <Skeleton className="h-4 w-full" />
                         <Skeleton className="h-4 w-full" />
                         <Skeleton className="h-4 w-5/6" />
+                         <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-4/6" />
                     </CardContent>
                 </Card>
                 <Card>
-                    <CardHeader><CardTitle className="font-headline">Recommendations</CardTitle></CardHeader>
+                    <CardHeader>
+                        <CardTitle className="font-headline">Recommendations</CardTitle>
+                         <CardDescription>Generating actionable advice...</CardDescription>
+                    </CardHeader>
                     <CardContent className="space-y-2">
                         <Skeleton className="h-4 w-full" />
                         <Skeleton className="h-4 w-full" />
@@ -99,7 +108,7 @@ export default function ScenarioSimulatorPage() {
               <CardHeader>
                 <CardTitle className="font-headline">Scenario Analysis</CardTitle>
               </CardHeader>
-              <CardContent className="prose prose-invert prose-sm max-w-none">
+              <CardContent className="prose prose-sm max-w-none dark:prose-invert">
                 <ReactMarkdown>{result.analysis}</ReactMarkdown>
               </CardContent>
             </Card>
@@ -107,7 +116,7 @@ export default function ScenarioSimulatorPage() {
               <CardHeader>
                 <CardTitle className="font-headline">Recommendations</CardTitle>
               </CardHeader>
-              <CardContent className="prose prose-invert prose-sm max-w-none">
+              <CardContent className="prose prose-sm max-w-none dark:prose-invert">
                 <ReactMarkdown>{result.recommendations}</ReactMarkdown>
               </CardContent>
             </Card>

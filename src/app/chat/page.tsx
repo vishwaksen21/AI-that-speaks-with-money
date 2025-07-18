@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
@@ -10,6 +11,7 @@ import { Send, User, Bot, Loader2 } from 'lucide-react';
 import { getChatResponse } from './actions';
 import { Skeleton } from '@/components/ui/skeleton';
 import ReactMarkdown from 'react-markdown';
+import { Logo } from '@/components/icons';
 
 interface Message {
   id: string;
@@ -79,20 +81,20 @@ export default function ChatPage() {
               >
                 {message.role === 'assistant' && (
                   <Avatar className="w-8 h-8 border">
-                    <AvatarFallback>
-                      <Bot className="w-5 h-5 text-primary" />
+                    <AvatarFallback className="bg-primary text-primary-foreground">
+                       <Logo className="w-5 h-5 text-sidebar-primary" />
                     </AvatarFallback>
                   </Avatar>
                 )}
                 <div
-                  className={`max-w-3xl p-4 rounded-lg prose prose-invert prose-sm ${
+                  className={`max-w-3xl p-4 rounded-lg prose prose-sm max-w-none dark:prose-invert ${
                     message.role === 'user'
                       ? 'bg-primary text-primary-foreground'
-                      : 'bg-card'
+                      : 'bg-card border'
                   }`}
                 >
                     {message.role === 'user' ? (
-                        <p>{message.content}</p>
+                        <p className="m-0">{message.content}</p>
                     ) : (
                         <ReactMarkdown>{message.content}</ReactMarkdown>
                     )}
@@ -109,11 +111,11 @@ export default function ChatPage() {
             {isLoading && (
               <div className="flex items-start gap-4">
                 <Avatar className="w-8 h-8 border">
-                  <AvatarFallback>
-                    <Bot className="w-5 h-5 text-primary" />
+                  <AvatarFallback className="bg-primary text-primary-foreground">
+                     <Logo className="w-5 h-5 text-sidebar-primary" />
                   </AvatarFallback>
                 </Avatar>
-                <div className="max-w-xl p-3 rounded-lg bg-card space-y-2">
+                <div className="max-w-xl p-3 rounded-lg bg-card border space-y-2">
                    <Skeleton className="h-4 w-48" />
                    <Skeleton className="h-4 w-64" />
                    <Skeleton className="h-4 w-40" />

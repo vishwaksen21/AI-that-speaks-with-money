@@ -1,3 +1,4 @@
+
 import { AppLayout } from '@/components/app-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { RecentTransactions } from '@/components/recent-transactions';
@@ -23,7 +24,7 @@ export default function DashboardPage() {
         <div className="grid gap-4 md:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Net Worth</CardTitle>
+              <CardTitle className="text-sm font-medium font-headline">Total Net Worth</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -33,7 +34,7 @@ export default function DashboardPage() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Assets</CardTitle>
+              <CardTitle className="text-sm font-medium font-headline">Total Assets</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -43,7 +44,7 @@ export default function DashboardPage() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Liabilities</CardTitle>
+              <CardTitle className="text-sm font-medium font-headline">Total Liabilities</CardTitle>
               <TrendingDown className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -57,7 +58,7 @@ export default function DashboardPage() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
           <Card className="lg:col-span-4">
             <CardHeader>
-              <CardTitle>Net Worth Overview</CardTitle>
+              <CardTitle className="font-headline">Net Worth Overview</CardTitle>
                <CardDescription>Your net worth trend over the last 6 months.</CardDescription>
             </CardHeader>
             <CardContent className="pl-2">
@@ -66,7 +67,7 @@ export default function DashboardPage() {
           </Card>
           <Card className="lg:col-span-3">
             <CardHeader>
-              <CardTitle>Asset Allocation</CardTitle>
+              <CardTitle className="font-headline">Asset Allocation</CardTitle>
               <CardDescription>Your current investment distribution.</CardDescription>
             </CardHeader>
             <CardContent>
@@ -78,7 +79,7 @@ export default function DashboardPage() {
         {/* Recent Transactions */}
          <Card>
             <CardHeader>
-              <CardTitle>Recent Transactions</CardTitle>
+              <CardTitle className="font-headline">Recent Transactions</CardTitle>
               <CardDescription>Your most recent financial activities.</CardDescription>
             </CardHeader>
             <CardContent>
