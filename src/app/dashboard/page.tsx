@@ -46,7 +46,23 @@ export default function DashboardPage() {
   const [data, setData] = useState<any>(null);
 
   useEffect(() => {
-    setData(getFinancialData());
+    let financialData;
+    try {
+      const storedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (storedData) {
+        financialData = JSON.parse(storedData);
+        // This is a failsafe to handle incorrectly structured data from previous versions
+        if (financialData && financialData.output) {
+          financialData = financialData.output;
+        }
+      } else {
+        financialData = defaultFinancialData;
+      }
+    } catch (error) {
+      console.error('Failed to parse financial data, using default:', error);
+      financialData = defaultFinancialData;
+    }
+    setData(financialData);
   }, []);
 
   if (!data) {

@@ -67,6 +67,7 @@ const prompt = ai.definePrompt({
   name: 'dataExtractionPrompt',
   input: {schema: z.string()},
   output: {schema: FinancialDataSchema},
+  model: 'googleai/gemini-1.5-flash-latest',
   prompt: `You are an expert financial data analyst. Your task is to analyze the following raw text, which contains a user's financial information. The text could be in any format (JSON, CSV, unstructured sentences, etc.).
 
 Your goal is to extract all relevant financial details and structure them into a valid JSON object according to the provided schema.
@@ -75,7 +76,7 @@ Your goal is to extract all relevant financial details and structure them into a
 - Carefully identify all assets (bank accounts, stocks, mutual funds, real estate, EPF) and liabilities (loans, credit cards).
 - If the user's name is not explicitly provided, use a placeholder like "Valued User".
 - If age is not provided, use a reasonable default like 30.
-- If net worth is not explicitly mentioned, you MUST calculate it by summing all assets and subtracting all liabilities. Total assets include bank balances, mutual funds, stocks (shares * price), real estate, and EPF balance. Total liabilities include all loans and credit card balances.
+- If net worth is not explicitly mentioned, you MUST calculate it by summing all assets and subtracting all liabilities. Total assets include bank balances, mutual funds, stocks (shares * price), real estate, and EPF balance.
 - Fill in every field of the schema as accurately as possible based on the input text. If a particular piece of information (e.g., credit score) is missing, you can omit it if the schema allows, otherwise provide a sensible default (e.g., 0 for a balance, an empty array [] for lists).
 - Generate a user_id, for example 'user_12345'.
 - It is critical that your output is a single, valid JSON object that strictly adheres to the schema. Do not include any text or explanations outside of the JSON object.
