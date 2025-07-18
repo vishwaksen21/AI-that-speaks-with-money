@@ -29,7 +29,7 @@ export function AppLayout({
           <Link href="/dashboard" className="flex items-center gap-2 p-2 focus:outline-none focus:ring-2 focus:ring-sidebar-ring rounded-md">
               <Logo className="w-8 h-8 text-sidebar-primary" />
               <span className="text-lg font-semibold font-headline text-sidebar-foreground group-data-[collapsible=icon]:hidden">
-                Fi Money
+                FinanceAI Navigator
               </span>
           </Link>
         </SidebarHeader>
