@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { AppLayout } from '@/components/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Loader2, Wand2, ArrowRight, LineChart, PiggyBank, Receipt } from 'lucide-react';
+import { Loader2, Wand2, LineChart, PiggyBank, Receipt } from 'lucide-react';
 import { getInvestmentAdvice, getSavingsAdvice, getExpenseAdvice } from './actions';
 import { Skeleton } from '@/components/ui/skeleton';
 import ReactMarkdown from 'react-markdown';
