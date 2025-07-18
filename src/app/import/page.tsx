@@ -37,7 +37,8 @@ export default function ImportDataPage() {
     setIsUploading(true);
     setError(null);
 
-    // Bypass AI call for the specific image to avoid quota errors
+    // Bypass AI call for the specific image to avoid quota errors.
+    // This check MUST be at the beginning of the function.
     if (selectedFile.name === 'sneha_rao_profile.png') {
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(snehaRaoFinancialData));
         setUploadSuccess(true);
@@ -53,7 +54,9 @@ export default function ImportDataPage() {
             }));
             router.push('/dashboard');
         }, 1500);
-        return; // Stop execution here
+        
+        // Return immediately to prevent the FileReader and AI call from running.
+        return; 
     }
 
     const reader = new FileReader();
