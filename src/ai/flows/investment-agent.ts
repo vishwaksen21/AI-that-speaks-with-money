@@ -55,10 +55,20 @@ const investmentAgentFlow = ai.defineFlow(
     outputSchema: AgentOutputSchema,
   },
   async input => {
-    const {output} = await investmentAgentPrompt(input);
+    const llmResponse = await investmentAgentPrompt(input);
+    const output = llmResponse.output();
+
     if (!output) {
       throw new Error("The AI model was unable to generate investment advice for this profile.");
     }
-    return output;
+    
+    // The output from the LLM is a string of JSON, so we need to parse it.
+    try {
+        const parsedOutput = JSON.parse(output as any);
+        return AgentOutputSchema.parse(parsedOutput);
+    } catch (e) {
+        console.error("Failed to parse JSON from AI response:", output);
+        throw new Error("The AI returned data in an invalid format. Please try again.");
+    }
   }
 );
