@@ -92,7 +92,7 @@ export default function LandingPage() {
                         </ul>
                     </div>
                      <div className="relative h-64 md:h-80 rounded-lg overflow-hidden">
-                        <Image src="/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fstatic.aiprompt.io%2F5c7cf1c5-e51c-4b17-a006-2182061217e1.png&w=3840&q=75" alt="Security & Privacy First shield" layout="fill" objectFit="cover" />
+                        <Image src="https://storage.googleapis.com/static.aiprompt.io/5c7cf1c5-e51c-4b17-a006-2182061217e1.png" alt="Security & Privacy First shield" layout="fill" objectFit="cover" />
                     </div>
                 </div>
             </section>
@@ -172,3 +172,4 @@ export default function LandingPage() {
         </div>
     </AppLayout>
   );
+}
