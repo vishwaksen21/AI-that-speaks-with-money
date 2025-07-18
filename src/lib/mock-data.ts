@@ -73,22 +73,25 @@ export const defaultFinancialData = {
 };
 
 export function getFinancialData() {
+  // This function now runs exclusively on the client, so `window` is safe to use.
   if (typeof window === 'undefined') {
     return defaultFinancialData;
   }
-  try {
-    const storedData = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (storedData) {
-      // THIS IS THE CRITICAL FIX:
-      // Always parse the data from localStorage and return the PARSED OBJECT.
-      return JSON.parse(storedData);
-    }
-    // If no data in local storage, set default data and return it
+  
+  const storedData = localStorage.getItem(LOCAL_STORAGE_KEY);
+  
+  if (!storedData) {
+    // If no data exists, store and return the default.
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(defaultFinancialData));
     return defaultFinancialData;
+  }
+  
+  try {
+    // Try to parse the stored data.
+    return JSON.parse(storedData);
   } catch (error) {
     console.error('Failed to parse financial data from localStorage, using default:', error);
-    // If parsing fails, set default data and return it
+    // If parsing fails (e.g., corrupted data), store and return the default.
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(defaultFinancialData));
     return defaultFinancialData;
   }

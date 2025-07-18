@@ -23,7 +23,7 @@ function formatCurrency(amount: number) {
   }).format(amount);
 }
 
-// Helper function to calculate total assets
+// Helper function to calculate total assets, now part of the component
 const calculateTotalAssets = (data: any) => {
     if (!data?.assets) return 0;
     const bankBalance = data.assets.bank_accounts?.reduce((sum: number, acc: any) => sum + (acc.balance || 0), 0) || 0;
@@ -34,7 +34,7 @@ const calculateTotalAssets = (data: any) => {
     return bankBalance + mutualFunds + stocks + realEstate + epf;
 };
 
-// Helper function to calculate total liabilities
+// Helper function to calculate total liabilities, now part of the component
 const calculateTotalLiabilities = (data: any) => {
     if (!data?.liabilities) return 0;
     const loans = data.liabilities.loans?.reduce((sum: number, loan: any) => sum + (loan.outstanding_amount || 0), 0) || 0;
@@ -52,6 +52,7 @@ export default function DashboardPage() {
     setData(financialData);
   }, []);
 
+  // Show a loading skeleton if data is not yet available.
   if (!data) {
     return (
         <AppLayout pageTitle="Dashboard">
@@ -74,6 +75,7 @@ export default function DashboardPage() {
     )
   }
 
+  // Once data is loaded, perform calculations
   const totalAssets = calculateTotalAssets(data);
   const totalLiabilities = calculateTotalLiabilities(data);
   const netWorth = data?.net_worth || (totalAssets - totalLiabilities);
