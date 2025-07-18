@@ -2,78 +2,29 @@
 export const LOCAL_STORAGE_KEY = 'userFinancialData';
 
 export const defaultFinancialData = {
-  user_id: 'user_56789',
+  user_id: 'user_default_123',
   profile: {
-    name: 'Sneha Rao',
-    age: 27,
-    employment_status: 'Freelancer',
-    monthly_income: 60000,
+    name: 'Valued User',
+    age: 30,
+    employment_status: 'Salaried',
+    monthly_income: 50000,
   },
   assets: {
-    bank_accounts: [
-      {
-        bank: 'Axis Bank',
-        balance: 45000,
-      },
-      {
-        bank: 'Kotak Bank',
-        balance: 55000,
-      },
-    ],
-    mutual_funds: [
-      {
-        name: 'Nippon India Small Cap Fund (Equity)',
-        current_value: 82000,
-      },
-      {
-        name: 'HDFC Hybrid Equity Fund (Hybrid)',
-        current_value: 64000,
-      },
-    ],
-    stocks: [
-      {
-        ticker: 'Reliance Industries',
-        shares: 5,
-        current_price: 2950,
-      },
-      {
-        ticker: 'HDFC Bank',
-        shares: 15,
-        current_price: 1720,
-      },
-    ],
-    real_estate: [
-      {
-        property_type: 'Digital Gold',
-        market_value: 94550,
-      },
-    ],
+    bank_accounts: [],
+    mutual_funds: [],
+    stocks: [],
+    real_estate: [],
   },
   liabilities: {
-    loans: [
-      {
-        type: 'Personal Loan',
-        outstanding_amount: 150000,
-      },
-    ],
-    credit_cards: [
-      {
-        issuer: 'ICICI Bank',
-        outstanding_balance: 8500,
-      },
-    ],
+    loans: [],
+    credit_cards: [],
   },
   investments: {
-    sips: [
-      {
-        name: 'UTI Nifty Index Fund',
-        monthly_investment: 4000,
-      },
-    ],
-    ppf: 120000,
+    sips: [],
+    ppf: 0,
   },
-  net_worth: 337850,
-  credit_score: 765,
+  net_worth: 0,
+  credit_score: 750,
 };
 
 export function getFinancialData() {
@@ -85,11 +36,13 @@ export function getFinancialData() {
     if (storedData) {
       return JSON.parse(storedData);
     } else {
+      // If no data is in storage, set the default data and return it.
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(defaultFinancialData));
       return defaultFinancialData;
     }
   } catch (error) {
     console.error('Failed to parse financial data from localStorage:', error);
+    // If parsing fails, reset to default and return it.
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(defaultFinancialData));
     return defaultFinancialData;
   }

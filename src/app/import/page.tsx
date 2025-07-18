@@ -44,14 +44,15 @@ export default function ImportDataPage() {
 
         if (result.success && result.data) {
             // Save the AI-structured data to localStorage
-            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(result.data, null, 2));
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(result.data));
 
             setUploadSuccess(true);
             toast({
                 title: 'Analysis Complete!',
                 description: 'Your financial data has been extracted and processed.',
             });
-            setTimeout(() => router.push('/dashboard'), 1500); // Redirect after success
+            // Redirect after a short delay to ensure localStorage has updated
+            setTimeout(() => router.push('/dashboard'), 1500); 
         } else {
             throw new Error(result.error || 'The AI could not process your file. Please try a different format or check the content.');
         }

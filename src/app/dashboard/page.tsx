@@ -78,7 +78,7 @@ export default function DashboardPage() {
   // Once data is loaded, perform calculations
   const totalAssets = calculateTotalAssets(data);
   const totalLiabilities = calculateTotalLiabilities(data);
-  const netWorth = data?.net_worth || (totalAssets - totalLiabilities);
+  const netWorth = data.net_worth !== undefined ? data.net_worth : (totalAssets - totalLiabilities);
 
   const assetAllocationData = [];
   if (data?.assets?.bank_accounts?.length) {
