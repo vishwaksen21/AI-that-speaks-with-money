@@ -106,18 +106,36 @@ const dataExtractionFlow = ai.defineFlow(
     outputSchema: FinancialDataSchema, // Your defined schema for structured output
   },
   async (input) => {
-    console.log('Starting data extraction flow with input...');
-    const response = await prompt(input);
-    const output = response.output;
+    let attempts = 0;
+    const maxAttempts = 3;
+    let delay = 1000; // start with 1 second
 
-    if (!output) {
-      console.error("AI model did not return a valid output object.");
-      throw new Error("The AI model returned no output. The file might be empty or in an unrecognizable format.");
+    while (attempts < maxAttempts) {
+        try {
+            console.log(`Attempt ${attempts + 1} of ${maxAttempts}...`);
+            const response = await prompt(input);
+            const output = response.output;
+
+            if (!output) {
+                throw new Error("AI model did not return a valid output object.");
+            }
+            
+            console.log("Received structured data from AI:", JSON.stringify(output, null, 2));
+            return output; // Success, exit the loop
+
+        } catch (error: any) {
+            attempts++;
+            console.error(`Attempt ${attempts} failed:`, error.message);
+            if (attempts >= maxAttempts) {
+                 console.error("Max retry attempts reached. Failing.");
+                 throw new Error("The AI model failed to process the document after multiple attempts. The file might be in an unrecognized format or the AI service is temporarily unavailable.");
+            }
+            console.log(`Waiting ${delay}ms before retrying...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+            delay *= 2; // Exponential backoff
+        }
     }
-    
-    console.log("Received structured data from AI:", JSON.stringify(output, null, 2));
-    
-    // The output is already validated by definePrompt, so we can return it directly.
-    return output;
+     // This should not be reached, but as a fallback:
+    throw new Error("The AI model returned no output after all retry attempts.");
   }
 );
