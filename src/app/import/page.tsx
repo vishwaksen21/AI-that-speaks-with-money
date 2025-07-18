@@ -130,9 +130,9 @@ export default function ImportDataPage() {
                 </div>
             )}
             {error && (
-                 <div className="flex items-center gap-3 p-4 rounded-md border text-destructive bg-destructive/10 border-destructive/20 dark:text-destructive-foreground dark:bg-destructive/20 dark:border-destructive/40">
-                    <AlertTriangle className="h-5 w-5 text-destructive dark:text-destructive-foreground" />
-                    <p className="font-medium text-sm">{error}</p>
+                 <div className="flex items-start gap-3 p-4 rounded-md border text-destructive bg-destructive/10 border-destructive/20 dark:text-destructive-foreground dark:bg-destructive/20 dark:border-destructive/40">
+                    <AlertTriangle className="h-5 w-5 text-destructive dark:text-destructive-foreground mt-1" />
+                    <p className="font-medium text-sm flex-1">{error}</p>
                 </div>
             )}
           </CardContent>
