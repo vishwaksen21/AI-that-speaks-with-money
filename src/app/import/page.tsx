@@ -38,18 +38,28 @@ export default function ImportDataPage() {
     const reader = new FileReader();
     reader.onload = async (e) => {
       try {
-        const fileContent = e.target?.result as ArrayBuffer;
+        const fileContent = e.target?.result;
         if (!fileContent) {
           throw new Error('Could not read file content.');
         }
 
-        const result = await uploadFinancialData(
-          // Convert ArrayBuffer to a plain object for the server action
-          {
-            buffer: Array.from(new Uint8Array(fileContent)),
-            type: selectedFile.type,
-          }
-        );
+        let result;
+        // Check if the uploaded file is an image
+        if (selectedFile.type.startsWith('image/')) {
+            // The file content is already a data URI (string) from reader.readAsDataURL
+            result = await uploadFinancialData({ 
+                fileContent: fileContent as string, 
+                type: selectedFile.type,
+                isImage: true
+            });
+        } else {
+            // For other files, content is ArrayBuffer from reader.readAsArrayBuffer
+             result = await uploadFinancialData({
+                fileContent: Array.from(new Uint8Array(fileContent as ArrayBuffer)),
+                type: selectedFile.type,
+                isImage: false
+            });
+        }
 
         if (result.success && result.data) {
             localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(result.data));
@@ -84,7 +94,13 @@ export default function ImportDataPage() {
             variant: 'destructive'
         });
     };
-    reader.readAsArrayBuffer(selectedFile);
+
+    // Use readAsDataURL for images to get the base64 string directly
+    if (selectedFile.type.startsWith('image/')) {
+        reader.readAsDataURL(selectedFile);
+    } else { // Use readAsArrayBuffer for other file types
+        reader.readAsArrayBuffer(selectedFile);
+    }
   };
 
   return (
@@ -93,7 +109,7 @@ export default function ImportDataPage() {
         <Card>
           <CardHeader>
             <CardTitle className="font-headline">Import Your Financial Data with AI</CardTitle>
-            <CardDescription>Upload a file (txt, csv, json, xlsx) with your financial info. Our AI will analyze and structure it for you.</CardDescription>
+            <CardDescription>Upload a file (txt, csv, json, xlsx, or an image) with your financial info. Our AI will analyze and structure it for you.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-2">
@@ -101,7 +117,7 @@ export default function ImportDataPage() {
                 Data File
               </label>
               <div className="flex items-center gap-4">
-                <Input id="file-upload" type="file" onChange={handleFileChange} className="flex-1" disabled={isUploading} accept=".txt,.csv,.json,.xlsx" />
+                <Input id="file-upload" type="file" onChange={handleFileChange} className="flex-1" disabled={isUploading} accept=".txt,.csv,.json,.xlsx,image/*" />
               </div>
             </div>
 
