@@ -13,24 +13,24 @@ import { Skeleton } from '@/components/ui/skeleton';
 import ReactMarkdown from 'react-markdown';
 import { Logo } from '@/components/icons';
 import { getFinancialData } from '@/lib/mock-data';
-
-interface Message {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-}
+import { useChat } from 'ai/react';
 
 export default function ChatPage() {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
   const [financialDataString, setFinancialDataString] = useState('');
-
+  const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages } = useChat({
+      body: {
+          financialData: financialDataString
+      },
+      api: '/api/chat'
+  });
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  
   useEffect(() => {
-    // Load financial data and chat history on mount
+    // Load financial data on mount
     const data = getFinancialData();
-    setFinancialDataString(JSON.stringify(data, null, 2));
+    const dataForAI = { ...data };
+    delete (dataForAI as any).transactions; // Exclude transactions from the context
+    setFinancialDataString(JSON.stringify(dataForAI, null, 2));
 
     try {
       const savedMessages = localStorage.getItem('chatHistory');
@@ -40,7 +40,7 @@ export default function ChatPage() {
     } catch (error) {
       console.error('Failed to load messages from local storage', error);
     }
-  }, []);
+  }, [setMessages]);
 
   useEffect(() => {
     if (messages.length > 0) {
@@ -51,7 +51,7 @@ export default function ChatPage() {
       }
     }
   }, [messages]);
-
+  
   useEffect(() => {
     if (scrollAreaRef.current) {
       scrollAreaRef.current.scrollTo({
@@ -61,38 +61,15 @@ export default function ChatPage() {
     }
   }, [messages]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!input.trim() || isLoading) return;
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: input,
-    };
-    setMessages((prev) => [...prev, userMessage]);
-    setInput('');
-    setIsLoading(true);
-
-    try {
-      const { insight } = await getChatResponse(input, financialDataString);
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: insight,
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
-    } catch (error) {
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: 'Sorry, I encountered an error. Please try again.',
-      };
-      setMessages((prev) => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
+    if (!financialDataString) {
+        // Maybe show a toast or an alert
+        console.error("Financial data not loaded yet.");
+        return;
     }
-  };
+    handleSubmit(e);
+  }
 
   return (
     <AppLayout pageTitle="Chat with AI">
@@ -135,7 +112,7 @@ export default function ChatPage() {
                 )}
               </div>
             ))}
-            {isLoading && (
+            {isLoading && messages[messages.length-1]?.role === 'user' && (
               <div className="flex items-start gap-4">
                 <Avatar className="w-8 h-8 border">
                   <AvatarFallback className="bg-primary text-primary-foreground">
@@ -152,15 +129,15 @@ export default function ChatPage() {
           </div>
         </ScrollArea>
         <div className="p-4 border-t bg-background">
-          <form onSubmit={handleSubmit} className="flex items-center gap-2">
+          <form onSubmit={handleFormSubmit} className="flex items-center gap-2">
             <Input
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={handleInputChange}
               placeholder="Ask a financial question..."
               autoComplete="off"
-              disabled={isLoading}
+              disabled={isLoading || !financialDataString}
             />
-            <Button type="submit" size="icon" disabled={isLoading}>
+            <Button type="submit" size="icon" disabled={isLoading || !input.trim()}>
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (

@@ -1,6 +1,6 @@
 
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { AppLayout } from '@/components/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -10,44 +10,45 @@ import { getScenarioResponse } from './actions';
 import { Skeleton } from '@/components/ui/skeleton';
 import ReactMarkdown from 'react-markdown';
 import { getFinancialData } from '@/lib/mock-data';
-
-interface ScenarioResult {
-  analysis: string;
-  recommendations: string;
-}
+import { useCompletion } from 'ai/react';
 
 export default function ScenarioSimulatorPage() {
-  const [scenario, setScenario] = useState('');
-  const [result, setResult] = useState<ScenarioResult | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [financialDataString, setFinancialDataString] = useState('');
+  const {
+    completion,
+    input,
+    handleInputChange,
+    handleSubmit,
+    isLoading,
+    stop,
+  } = useCompletion({
+    body: { financialData: financialDataString },
+    api: '/api/scenario'
+  });
 
   useEffect(() => {
       const data = getFinancialData();
-      setFinancialDataString(JSON.stringify(data, null, 2));
-  }, [])
+      const dataForAI = { ...data };
+      delete (dataForAI as any).transactions;
+      setFinancialDataString(JSON.stringify(dataForAI, null, 2));
+  }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!scenario.trim()) return;
-
-    setIsLoading(true);
-    setError(null);
-    setResult(null);
-
-    try {
-      const response = await getScenarioResponse(scenario, financialDataString);
-      setResult({
-        analysis: response.scenarioAnalysis,
-        recommendations: response.recommendations,
-      });
-    } catch (err) {
-      setError('Failed to simulate scenario. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+    if (!financialDataString) return;
+    handleSubmit(e);
   };
+  
+  const { analysis, recommendations } = useMemo(() => {
+    if (!completion) {
+      return { analysis: '', recommendations: '' };
+    }
+    const parts = completion.split('### Recommendations');
+    const analysisPart = parts[0].replace('### Scenario Analysis', '').trim();
+    const recommendationsPart = parts[1] || '';
+    return { analysis: analysisPart, recommendations: recommendationsPart };
+  }, [completion]);
+
 
   return (
     <AppLayout pageTitle="Scenario Simulator">
@@ -60,27 +61,32 @@ export default function ScenarioSimulatorPage() {
                 Describe a financial scenario to see its potential impact on your finances.
             </p>
         </div>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleFormSubmit} className="space-y-4">
           <Textarea
             placeholder='e.g., "What is the impact of a ₹50L home loan?" or "Project my wealth at age 40 if I increase my SIP by ₹5,000."'
-            value={scenario}
-            onChange={(e) => setScenario(e.target.value)}
+            value={input}
+            onChange={handleInputChange}
             rows={4}
             disabled={isLoading}
           />
-          <Button type="submit" disabled={isLoading}>
-            {isLoading ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Wand2 className="mr-2 h-4 w-4" />
+           <div className="flex items-center gap-2">
+            <Button type="submit" disabled={isLoading || !input.trim()}>
+              {isLoading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Wand2 className="mr-2 h-4 w-4" />
+              )}
+              {isLoading ? 'Generating...' : 'Simulate Scenario'}
+            </Button>
+            {isLoading && (
+              <Button variant="outline" onClick={stop}>
+                Stop
+              </Button>
             )}
-            Simulate Scenario
-          </Button>
+          </div>
         </form>
 
-        {error && <p className="text-destructive">{error}</p>}
-        
-        {isLoading && (
+        {(isLoading && !completion) && (
             <div className="grid md:grid-cols-2 gap-6">
                 <Card>
                     <CardHeader>
@@ -109,14 +115,14 @@ export default function ScenarioSimulatorPage() {
             </div>
         )}
 
-        {result && (
+        {completion && (
           <div className="grid md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
                 <CardTitle className="font-headline">Scenario Analysis</CardTitle>
               </CardHeader>
               <CardContent className="prose prose-sm max-w-none dark:prose-invert">
-                <ReactMarkdown>{result.analysis}</ReactMarkdown>
+                <ReactMarkdown>{analysis}</ReactMarkdown>
               </CardContent>
             </Card>
             <Card>
@@ -124,7 +130,7 @@ export default function ScenarioSimulatorPage() {
                 <CardTitle className="font-headline">Recommendations</CardTitle>
               </CardHeader>
               <CardContent className="prose prose-sm max-w-none dark:prose-invert">
-                <ReactMarkdown>{result.recommendations}</ReactMarkdown>
+                <ReactMarkdown>{recommendations}</ReactMarkdown>
               </CardContent>
             </Card>
           </div>

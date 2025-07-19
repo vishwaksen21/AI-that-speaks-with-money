@@ -5,11 +5,11 @@
  *
  * - simulateFinancialScenario - A function that simulates financial scenarios.
  * - SimulateFinancialScenarioInput - The input type for the simulateFinancialScenario function.
- * - SimulateFinancialScenarioOutput - The return type for the simulateFinancialScenario function.
  */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import {generate} from 'genkit/generate';
 
 const SimulateFinancialScenarioInputSchema = z.object({
   financialData: z.string().describe('The user\'s consolidated financial data in JSON format, including assets, liabilities, net worth, credit scores, and EPF.'),
@@ -18,14 +18,7 @@ const SimulateFinancialScenarioInputSchema = z.object({
 
 export type SimulateFinancialScenarioInput = z.infer<typeof SimulateFinancialScenarioInputSchema>;
 
-const SimulateFinancialScenarioOutputSchema = z.object({
-  scenarioAnalysis: z.string().describe('A detailed, well-structured analysis of the simulated financial scenario or financial question, formatted in Markdown. It should include potential outcomes, key factors, and numerical projections where possible.'),
-  recommendations: z.string().describe('A list of clear, actionable, and personalized recommendations formatted in Markdown, based on the analysis to help the user make informed decisions.'),
-});
-
-export type SimulateFinancialScenarioOutput = z.infer<typeof SimulateFinancialScenarioOutputSchema>;
-
-export async function simulateFinancialScenario(input: SimulateFinancialScenarioInput): Promise<SimulateFinancialScenarioOutput> {
+export async function simulateFinancialScenario(input: SimulateFinancialScenarioInput) {
   return simulateFinancialScenarioFlow(input);
 }
 
@@ -34,25 +27,25 @@ const simulateFinancialScenarioPrompt = ai.definePrompt({
   input: {
     schema: SimulateFinancialScenarioInputSchema,
   },
-  output: {
-    schema: SimulateFinancialScenarioOutputSchema,
-  },
   prompt: `You are an expert financial planning AI. Your purpose is to provide users with a clear understanding of the potential impacts of their financial decisions, or to answer their financial questions based on their data.
 
 Analyze the user's financial data and their described scenario or question in detail.
 
-**If the user asks for a specific scenario simulation:**
+Your response MUST be a single, well-structured markdown document.
+It must contain two main sections:
+
+### Scenario Analysis
 - **Immediate Impact:** What changes in the short term (e.g., net worth, cash flow)?
 - **Long-Term Projections:** How does this affect long-term goals (e.g., retirement, wealth accumulation)?
 - **Risks & Opportunities:** What are the potential downsides and upsides?
 - **Key Assumptions:** State the assumptions you made for the simulation (e.g., interest rates, inflation).
 
+### Recommendations
+- Provide personalized and actionable recommendations in Markdown format. These should be concrete steps the user can take.
+
 **If the user asks a general question (e.g., "what stocks to buy?"):**
 - Provide a helpful, well-reasoned analysis and recommendations based on their financial data, even if it's not a direct simulation.
 - Your advice should be generic and educational in nature.
-
-**Recommendations:**
-Provide personalized and actionable recommendations in Markdown format. These should be concrete steps the user can take.
 
 **Disclaimer:**
 Always include a disclaimer at the end of your response: "Disclaimer: I am an AI assistant. This information is for educational purposes only and is not financial advice. Please consult with a qualified human financial advisor before making any decisions."
@@ -72,13 +65,26 @@ const simulateFinancialScenarioFlow = ai.defineFlow(
   {
     name: 'simulateFinancialScenarioFlow',
     inputSchema: SimulateFinancialScenarioInputSchema,
-    outputSchema: SimulateFinancialScenarioOutputSchema,
+    outputSchema: z.string(), // We will stream the string response
   },
   async input => {
-    const {output} = await simulateFinancialScenarioPrompt(input);
-    if (!output) {
-      throw new Error("The AI model was unable to generate a response for this scenario.");
+     const {stream, response} = generate({
+      prompt: simulateFinancialScenarioPrompt.prompt,
+      model: simulateFinancialScenarioPrompt.model,
+      input,
+      stream: true,
+    });
+    
+    const chunks: string[] = [];
+
+    for await (const chunk of stream) {
+      if (chunk.content) {
+        chunks.push(chunk.content.map(c => c.text).join(''));
+      }
     }
-    return output;
+    
+    await response;
+    
+    return chunks.join('');
   }
 );

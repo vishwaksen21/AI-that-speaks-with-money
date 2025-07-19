@@ -5,12 +5,12 @@
  *
  * - generatePersonalizedFinancialInsights - A function that generates personalized financial insights.
  * - GeneratePersonalizedFinancialInsightsInput - The input type for the generatePersonalizedFinancialInsights function.
- * - GeneratePersonalizedFinancialInsightsOutput - The return type for the generatePersonalizedFinancialInsights function.
  */
 
 import {ai} from '@/ai/genkit';
 import { taxCalculatorTool } from '@/ai/tools/tax-calculator';
 import {z} from 'genkit';
+import {generate} from 'genkit/generate';
 
 const GeneratePersonalizedFinancialInsightsInputSchema = z.object({
   financialData: z.string().describe('The user financial data in JSON format.'),
@@ -18,19 +18,13 @@ const GeneratePersonalizedFinancialInsightsInputSchema = z.object({
 });
 export type GeneratePersonalizedFinancialInsightsInput = z.infer<typeof GeneratePersonalizedFinancialInsightsInputSchema>;
 
-const GeneratePersonalizedFinancialInsightsOutputSchema = z.object({
-  insights: z.string().describe('A detailed, well-structured markdown response answering the user\'s question. The response should be broken down into logical sections with clear headings (e.g., "Analysis", "Key Observations", "Recommendations").'),
-});
-export type GeneratePersonalizedFinancialInsightsOutput = z.infer<typeof GeneratePersonalizedFinancialInsightsOutputSchema>;
-
-export async function generatePersonalizedFinancialInsights(input: GeneratePersonalizedFinancialInsightsInput): Promise<GeneratePersonalizedFinancialInsightsOutput> {
+export async function generatePersonalizedFinancialInsights(input: GeneratePersonalizedFinancialInsightsInput) {
   return generatePersonalizedFinancialInsightsFlow(input);
 }
 
 const prompt = ai.definePrompt({
   name: 'generatePersonalizedFinancialInsightsPrompt',
   input: {schema: GeneratePersonalizedFinancialInsightsInputSchema},
-  output: {schema: GeneratePersonalizedFinancialInsightsOutputSchema},
   tools: [taxCalculatorTool],
   prompt: `You are a world-class financial advisor AI. Your goal is to provide clear, actionable, and personalized financial advice.
 
@@ -57,13 +51,33 @@ const generatePersonalizedFinancialInsightsFlow = ai.defineFlow(
   {
     name: 'generatePersonalizedFinancialInsightsFlow',
     inputSchema: GeneratePersonalizedFinancialInsightsInputSchema,
-    outputSchema: GeneratePersonalizedFinancialInsightsOutputSchema,
+    outputSchema: z.string(), // We will stream the string response
   },
-  async input => {
-    const {output} = await prompt(input);
-    if (!output) {
-      throw new Error("The AI model returned no output.");
+  async (input) => {
+    const {stream, response} = generate({
+      prompt: prompt.prompt,
+      model: prompt.model,
+      tools: prompt.tools,
+      input,
+      stream: true,
+    });
+    
+    let result = '';
+    const chunks: string[] = [];
+
+    for await (const chunk of stream) {
+        if(chunk.content){
+            result += chunk.content.map(c => c.text).join('');
+            chunks.push(chunk.content.map(c => c.text).join(''));
+        }
     }
-    return output;
+    
+    const finalResponse = await response;
+    
+    if (finalResponse.candidates[0].finishReason !== 'stop' && finalResponse.candidates[0].finishReason !== 'toolUse') {
+        throw new Error(`The model stopped generating for an unexpected reason: ${finalResponse.candidates[0].finishReason}`);
+    }
+
+    return chunks.join('');
   }
 );
