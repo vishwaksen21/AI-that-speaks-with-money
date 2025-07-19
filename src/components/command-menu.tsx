@@ -41,7 +41,7 @@ export function CommandMenu({ open, setOpen }: CommandMenuProps) {
   };
 
   const navigationCommands = [
-      { href: '/', label: 'Home', icon: Home },
+      { href: '/home', label: 'Home', icon: Home },
       { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
       { href: '/import', label: 'Import Data', icon: Upload },
       { href: '/agents', label: 'AI Agents', icon: Wand2 },
@@ -114,5 +114,3 @@ export function CommandMenu({ open, setOpen }: CommandMenuProps) {
     </CommandDialog>
   );
 }
-
-    
