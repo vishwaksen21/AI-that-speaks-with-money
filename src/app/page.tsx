@@ -37,11 +37,22 @@ export default function LandingPage() {
                     <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
                         Your personal AI-powered guide for smart investing, goal planning, and wealth creation. Make informed decisions with confidence.
                     </p>
-                    <Link href="/dashboard">
-                        <Button size="lg">
-                            Go to Dashboard <ArrowRight className="ml-2 h-5 w-5" />
-                        </Button>
-                    </Link>
+                    <div className="flex justify-center mb-12">
+                         <Link href="/dashboard">
+                            <Button size="lg">
+                                Go to Dashboard <ArrowRight className="ml-2 h-5 w-5" />
+                            </Button>
+                        </Link>
+                    </div>
+                    <div className="relative h-96 w-full max-w-5xl mx-auto rounded-xl border shadow-lg overflow-hidden">
+                        <Image
+                            src="https://placehold.co/1200x800.png"
+                            alt="Financial Dashboard Preview"
+                            fill
+                            style={{ objectFit: 'cover' }}
+                            data-ai-hint="finance technology"
+                        />
+                    </div>
                 </div>
             </section>
 
