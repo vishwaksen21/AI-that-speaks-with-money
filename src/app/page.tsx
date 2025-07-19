@@ -46,7 +46,7 @@ export default function LandingPage() {
                     </div>
                     <div className="relative h-96 w-full max-w-5xl mx-auto rounded-xl border shadow-lg overflow-hidden">
                         <Image
-                            src="https://placehold.co/1200x600/7c3aed/ffffff.png"
+                            src="https://firebasestudio-hosting.web.app/images/clx20d6g000021380m15d9yir.jpg"
                             alt="Financial Dashboard Preview"
                             fill
                             style={{ objectFit: 'cover' }}
@@ -84,7 +84,7 @@ export default function LandingPage() {
                 <div className="grid md:grid-cols-2 gap-12 items-center">
                     <div className="relative h-64 md:h-80 rounded-lg overflow-hidden">
                         <Image 
-                            src="https://placehold.co/600x400/7c3aed/ffffff.png" 
+                            src="https://placehold.co/600x400.png" 
                             alt="AI analyzing financial data" 
                             fill 
                             style={{ objectFit: 'cover' }}
