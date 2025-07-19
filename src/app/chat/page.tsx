@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Send, User, Bot, Loader2 } from 'lucide-react';
+import { Send, User, Bot, Loader2, StopCircle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import ReactMarkdown from 'react-markdown';
 import { Logo } from '@/components/icons';
@@ -16,24 +16,21 @@ import { useFinancialData } from '@/context/financial-data-context';
 
 export default function ChatPage() {
   const { financialData, isLoading: isDataLoading } = useFinancialData();
-  
-  const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages, append } = useChat({
-      onFinish: (message) => {
-        // Save history on completion
-        const updatedMessages = [...messages, message];
-         try {
-            // We remove the user's last message before saving, because append() adds it,
-            // leading to duplicates on reload. The new message from the assistant is what we want to save.
-            const historyToSave = updatedMessages.filter((m, i) => !(m.role === 'user' && i === updatedMessages.length - 2))
-            localStorage.setItem('chatHistory', JSON.stringify(historyToSave));
-        } catch (error) {
-            console.error('Failed to save messages to local storage', error);
-        }
-      }
-  });
-
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   
+  const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages, stop, append } = useChat({
+    api: '/api/chat', // Note: this uses a custom API route for streaming with Vercel AI SDK
+    onFinish: (message) => {
+      // Save history on completion
+      const updatedMessages = [...messages, message];
+      try {
+        localStorage.setItem('chatHistory', JSON.stringify(updatedMessages));
+      } catch (error) {
+          console.error('Failed to save messages to local storage', error);
+      }
+    }
+  });
+
   useEffect(() => {
     if (financialData) {
         try {
@@ -63,9 +60,8 @@ export default function ChatPage() {
         return;
     }
     const dataForAI = { ...financialData };
-    delete (dataForAI as any).transactions; // Exclude transactions from the context
+    delete (dataForAI as any).transactions;
     
-    // Use `append` to send the user message and financial data to the chat API
     append({
       role: 'user',
       content: input,
@@ -148,6 +144,11 @@ export default function ChatPage() {
                 <Send className="w-4 h-4" />
               )}
             </Button>
+             {isLoading && (
+              <Button variant="outline" size="icon" onClick={stop}>
+                <StopCircle className="w-4 h-4" />
+              </Button>
+            )}
           </form>
         </div>
       </div>
