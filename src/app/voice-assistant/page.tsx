@@ -10,7 +10,7 @@ import { getChatResponse, getTextToSpeech } from './actions';
 import { Skeleton } from '@/components/ui/skeleton';
 import ReactMarkdown from 'react-markdown';
 import { Logo } from '@/components/icons';
-import { getFinancialData } from '@/lib/mock-data';
+import { useFinancialData } from '@/context/financial-data-context';
 
 interface Message {
   id: string;
@@ -19,6 +19,7 @@ interface Message {
 }
 
 export default function VoiceAssistantPage() {
+  const { financialData, isLoading: isDataLoading } = useFinancialData();
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -30,10 +31,12 @@ export default function VoiceAssistantPage() {
 
 
   useEffect(() => {
-    // Load financial data on mount
-    const data = getFinancialData();
-    setFinancialDataString(JSON.stringify(data, null, 2));
-
+    if (financialData) {
+      setFinancialDataString(JSON.stringify(financialData, null, 2));
+    }
+  }, [financialData]);
+  
+  useEffect(() => {
     if (scrollAreaRef.current) {
       scrollAreaRef.current.scrollTo({
         top: scrollAreaRef.current.scrollHeight,
@@ -80,7 +83,13 @@ export default function VoiceAssistantPage() {
     setIsLoading(true);
 
     try {
-      const { insight } = await getChatResponse(transcript, financialDataString);
+      const insightResponse = await getChatResponse(transcript, financialDataString);
+      const insight = insightResponse?.insight;
+
+      if (!insight) {
+        throw new Error("Failed to get a valid insight.");
+      }
+      
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
@@ -88,7 +97,9 @@ export default function VoiceAssistantPage() {
       };
       setMessages((prev) => [...prev, assistantMessage]);
 
-      const { media } = await getTextToSpeech(insight);
+      const ttsResponse = await getTextToSpeech(insight);
+      const media = ttsResponse?.media;
+
       if (media && audioRef.current) {
         audioRef.current.src = media;
         audioRef.current.play();
@@ -185,10 +196,10 @@ export default function VoiceAssistantPage() {
             <Button 
                 size="icon" 
                 onClick={toggleRecording} 
-                disabled={isLoading} 
+                disabled={isLoading || isDataLoading} 
                 className={`w-16 h-16 rounded-full transition-all duration-300 ${isRecording ? 'bg-red-500 hover:bg-red-600' : 'bg-primary hover:bg-primary/90'}`}
             >
-              {isLoading ? (
+              {isLoading || isDataLoading ? (
                 <Loader2 className="w-6 h-6 animate-spin" />
               ) : isRecording ? (
                 <StopCircle className="w-6 h-6" />

@@ -6,7 +6,6 @@ import dynamic from 'next/dynamic';
 import { AppLayout } from '@/components/app-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { RecentTransactions } from '@/components/recent-transactions';
-import { getFinancialData, LOCAL_STORAGE_KEY, sampleFinancialData } from '@/lib/mock-data';
 import type { FinancialData } from '@/ai/flows/data-extraction';
 import { DollarSign, TrendingUp, TrendingDown, PlusCircle, User, Briefcase, IndianRupee } from 'lucide-react';
 import { CreditScore as CreditScoreIcon } from '@/components/icons';
@@ -19,6 +18,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { calculateTotalAssets, calculateTotalLiabilities } from '@/lib/financial-calculations';
+import { useFinancialData } from '@/context/financial-data-context';
+import { LOCAL_STORAGE_KEY } from '@/lib/mock-data';
 
 const ChartSkeleton = () => (
     <div className="pl-2 pt-2">
@@ -59,82 +60,46 @@ function formatCurrency(amount: number, currency: string = 'INR') {
 
 
 export default function DashboardPage() {
-  const [data, setData] = useState<FinancialData | null>(null);
-  
-  useEffect(() => {
-    // On initial mount, check if there's any data. If not, populate with sample data.
-    const storedData = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (!storedData) {
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(sampleFinancialData));
-    }
-    
-    const financialData = getFinancialData();
-    setData(financialData);
-
-    const handleStorageChange = (event: StorageEvent) => {
-        if (event.key === LOCAL_STORAGE_KEY) {
-            const updatedFinancialData = getFinancialData();
-            setData(updatedFinancialData);
-        }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-
-    return () => {
-        window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
+  const { financialData: data, setFinancialData, isLoading } = useFinancialData();
 
   const handleAddTransaction = (newTransaction: {
     description: string;
     amount: number;
     type: 'income' | 'expense';
   }) => {
-    setData(currentData => {
-        if (!currentData) return null;
+    if (!data) return;
 
-        const newData = JSON.parse(JSON.stringify(currentData));
+    const newData = JSON.parse(JSON.stringify(data));
 
-        const transactionAmount = newTransaction.type === 'income' 
-            ? newTransaction.amount 
-            : -newTransaction.amount;
-        
-        if (!newData.transactions) {
-            newData.transactions = [];
-        }
-        newData.transactions.unshift({
-            id: `txn_${Date.now()}`,
-            description: newTransaction.description,
-            amount: transactionAmount,
-            date: new Date().toISOString().split('T')[0],
-            category: newTransaction.type === 'income' ? 'Income' : 'Expense',
-        });
-
-        if (newData.bank_accounts && newData.bank_accounts.length > 0) {
-            newData.bank_accounts[0].balance += transactionAmount;
-        } else {
-            newData.bank_accounts = [{ bank: 'Primary Account', balance: transactionAmount }];
-        }
-
-        const newTotalAssets = calculateTotalAssets(newData);
-        const newTotalLiabilities = calculateTotalLiabilities(newData);
-        newData.net_worth = newTotalAssets - newTotalLiabilities;
-
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newData));
-        
-        // This event is needed to notify other browser tabs, but it causes a double-render here.
-        // The correct fix is to separate the state update from the storage update.
-        // For now, we are removing the dispatch to fix the duplication issue.
-        // window.dispatchEvent(new StorageEvent('storage', {
-        //     key: LOCAL_STORAGE_KEY,
-        //     newValue: JSON.stringify(newData),
-        // }));
-
-        return newData;
+    const transactionAmount = newTransaction.type === 'income' 
+        ? newTransaction.amount 
+        : -newTransaction.amount;
+    
+    if (!newData.transactions) {
+        newData.transactions = [];
+    }
+    newData.transactions.unshift({
+        id: `txn_${Date.now()}`,
+        description: newTransaction.description,
+        amount: transactionAmount,
+        date: new Date().toISOString().split('T')[0],
+        category: newTransaction.type === 'income' ? 'Income' : 'Expense',
     });
+
+    if (newData.bank_accounts && newData.bank_accounts.length > 0) {
+        newData.bank_accounts[0].balance += transactionAmount;
+    } else {
+        newData.bank_accounts = [{ bank: 'Primary Account', balance: transactionAmount }];
+    }
+
+    const newTotalAssets = calculateTotalAssets(newData);
+    const newTotalLiabilities = calculateTotalLiabilities(newData);
+    newData.net_worth = newTotalAssets - newTotalLiabilities;
+
+    setFinancialData(newData);
   }
 
-  if (!data) {
+  if (isLoading || !data) {
     return (
         <AppLayout pageTitle="Dashboard">
              <div className="space-y-6">

@@ -8,15 +8,16 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Send, User, Bot, Loader2 } from 'lucide-react';
-import { getChatResponse } from './actions';
 import { Skeleton } from '@/components/ui/skeleton';
 import ReactMarkdown from 'react-markdown';
 import { Logo } from '@/components/icons';
-import { getFinancialData } from '@/lib/mock-data';
 import { useChat } from 'ai/react';
+import { useFinancialData } from '@/context/financial-data-context';
 
 export default function ChatPage() {
+  const { financialData, isLoading: isDataLoading } = useFinancialData();
   const [financialDataString, setFinancialDataString] = useState('');
+  
   const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages } = useChat({
       body: {
           financialData: financialDataString
@@ -26,11 +27,11 @@ export default function ChatPage() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
-    // Load financial data on mount
-    const data = getFinancialData();
-    const dataForAI = { ...data };
-    delete (dataForAI as any).transactions; // Exclude transactions from the context
-    setFinancialDataString(JSON.stringify(dataForAI, null, 2));
+    if (financialData) {
+      const dataForAI = { ...financialData };
+      delete (dataForAI as any).transactions; // Exclude transactions from the context
+      setFinancialDataString(JSON.stringify(dataForAI, null, 2));
+    }
 
     try {
       const savedMessages = localStorage.getItem('chatHistory');
@@ -40,7 +41,7 @@ export default function ChatPage() {
     } catch (error) {
       console.error('Failed to load messages from local storage', error);
     }
-  }, [setMessages]);
+  }, [financialData, setMessages]);
 
   useEffect(() => {
     if (messages.length > 0) {
@@ -63,8 +64,7 @@ export default function ChatPage() {
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!financialDataString) {
-        // Maybe show a toast or an alert
+    if (isDataLoading) {
         console.error("Financial data not loaded yet.");
         return;
     }
@@ -135,9 +135,9 @@ export default function ChatPage() {
               onChange={handleInputChange}
               placeholder="Ask a financial question..."
               autoComplete="off"
-              disabled={isLoading || !financialDataString}
+              disabled={isLoading || isDataLoading}
             />
-            <Button type="submit" size="icon" disabled={isLoading || !input.trim()}>
+            <Button type="submit" size="icon" disabled={isLoading || !input.trim() || isDataLoading}>
               {isLoading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (

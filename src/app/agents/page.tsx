@@ -9,8 +9,8 @@ import { Loader2, Wand2, LineChart, PiggyBank, Receipt, AlertTriangle } from 'lu
 import { getInvestmentAdvice, getSavingsAdvice, getExpenseAdvice } from './actions';
 import { Skeleton } from '@/components/ui/skeleton';
 import ReactMarkdown from 'react-markdown';
-import { getFinancialData } from '@/lib/mock-data';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { useFinancialData } from '@/context/financial-data-context';
 
 type AgentType = 'investment' | 'savings' | 'expense';
 
@@ -31,25 +31,20 @@ const simpleHash = (s: string) => {
 };
 
 export default function AgentsPage() {
+  const { financialData, isLoading: isDataLoading } = useFinancialData();
   const [result, setResult] = useState<AgentResult | null>(null);
   const [loadingAgent, setLoadingAgent] = useState<AgentType | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [financialDataObject, setFinancialDataObject] = useState(null);
-
-  useEffect(() => {
-    const data = getFinancialData();
-    setFinancialDataObject(data as any);
-  }, []);
 
   const handleGenerate = async (agent: AgentType) => {
-    if (!financialDataObject) return;
+    if (!financialData) return;
 
     setLoadingAgent(agent);
     setError(null);
     setResult(null);
 
     try {
-      const dataForAI = { ...financialDataObject };
+      const dataForAI = { ...financialData };
       delete (dataForAI as any).transactions;
       const cleanedDataString = JSON.stringify(dataForAI, null, 2);
       const dataHash = simpleHash(cleanedDataString);
@@ -136,7 +131,7 @@ export default function AgentsPage() {
                     <CardContent>
                         <Button 
                             onClick={() => handleGenerate(agent.type)} 
-                            disabled={loadingAgent !== null || !financialDataObject}
+                            disabled={loadingAgent !== null || isDataLoading}
                             className="w-full"
                         >
                             {loadingAgent === agent.type ? (
@@ -159,7 +154,7 @@ export default function AgentsPage() {
             </Alert>
         )}
 
-        {loadingAgent && !result && (
+        {(loadingAgent || isDataLoading) && !result && (
             <Card>
                 <CardHeader>
                     <Skeleton className="h-6 w-1/2" />

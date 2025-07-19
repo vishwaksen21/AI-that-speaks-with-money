@@ -6,14 +6,15 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Wand2 } from 'lucide-react';
-import { getScenarioResponse } from './actions';
 import { Skeleton } from '@/components/ui/skeleton';
 import ReactMarkdown from 'react-markdown';
-import { getFinancialData } from '@/lib/mock-data';
 import { useCompletion } from 'ai/react';
+import { useFinancialData } from '@/context/financial-data-context';
 
 export default function ScenarioSimulatorPage() {
+  const { financialData, isLoading: isDataLoading } = useFinancialData();
   const [financialDataString, setFinancialDataString] = useState('');
+  
   const {
     completion,
     input,
@@ -27,15 +28,16 @@ export default function ScenarioSimulatorPage() {
   });
 
   useEffect(() => {
-      const data = getFinancialData();
-      const dataForAI = { ...data };
+    if (financialData) {
+      const dataForAI = { ...financialData };
       delete (dataForAI as any).transactions;
       setFinancialDataString(JSON.stringify(dataForAI, null, 2));
-  }, []);
+    }
+  }, [financialData]);
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!financialDataString) return;
+    if (isDataLoading) return;
     handleSubmit(e);
   };
   
@@ -67,10 +69,10 @@ export default function ScenarioSimulatorPage() {
             value={input}
             onChange={handleInputChange}
             rows={4}
-            disabled={isLoading}
+            disabled={isLoading || isDataLoading}
           />
            <div className="flex items-center gap-2">
-            <Button type="submit" disabled={isLoading || !input.trim()}>
+            <Button type="submit" disabled={isLoading || isDataLoading || !input.trim()}>
               {isLoading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (

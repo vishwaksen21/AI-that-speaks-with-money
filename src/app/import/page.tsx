@@ -13,8 +13,10 @@ import { uploadFinancialData } from './actions';
 import { LOCAL_STORAGE_KEY } from '@/lib/mock-data';
 import { snehaRaoFinancialData } from '@/lib/sneha-rao-data';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { useFinancialData } from '@/context/financial-data-context';
 
 export default function ImportDataPage() {
+  const { setFinancialData } = useFinancialData();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
@@ -30,6 +32,18 @@ export default function ImportDataPage() {
       setError(null);
     }
   };
+  
+  const processAndRedirect = (data: any, message: string) => {
+    setFinancialData(data); // Update context
+    setUploadSuccess(true);
+    toast({
+      title: 'Analysis Complete!',
+      description: message,
+    });
+    setTimeout(() => {
+      router.push('/dashboard');
+    }, 1500);
+  };
 
   const handleUpload = async () => {
     if (!selectedFile) return;
@@ -41,26 +55,13 @@ export default function ImportDataPage() {
     // This is the definitive bypass logic.
     // If the filename matches, handle it here and only here.
     if (selectedFile.name === 'sneha_rao_profile.png') {
-      try {
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(snehaRaoFinancialData));
-        setUploadSuccess(true);
-        setIsUploading(false);
-        toast({
-          title: 'Analysis Complete!',
-          description: "Sneha Rao's financial data has been imported.",
-        });
-
-        setTimeout(() => {
-          window.dispatchEvent(new StorageEvent('storage', {
-            key: LOCAL_STORAGE_KEY,
-            newValue: JSON.stringify(snehaRaoFinancialData),
-          }));
-          router.push('/dashboard');
-        }, 1500);
-      } catch (err) {
-        setError('Failed to load sample data.');
-        setIsUploading(false);
-      }
+        try {
+            processAndRedirect(snehaRaoFinancialData, "Sneha Rao's financial data has been imported.");
+        } catch (err) {
+            setError('Failed to load sample data.');
+        } finally {
+            setIsUploading(false);
+        }
     } else {
       // For any other file, proceed with the AI call logic.
       const reader = new FileReader();
@@ -79,19 +80,7 @@ export default function ImportDataPage() {
           });
 
           if (result.success && result.data) {
-            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(result.data));
-            setUploadSuccess(true);
-            toast({
-              title: 'Analysis Complete!',
-              description: 'Your financial data has been extracted and processed.',
-            });
-            setTimeout(() => {
-              window.dispatchEvent(new StorageEvent('storage', {
-                key: LOCAL_STORAGE_KEY,
-                newValue: JSON.stringify(result.data),
-              }));
-              router.push('/dashboard');
-            }, 1500);
+            processAndRedirect(result.data, 'Your financial data has been extracted and processed.');
           } else {
             throw new Error(result.error || 'The AI could not process your file. Please check the content.');
           }
