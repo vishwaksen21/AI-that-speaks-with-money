@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
@@ -5,17 +6,19 @@ import { AppLayout } from '@/components/app-layout';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Mic, User, Bot, Loader2, StopCircle } from 'lucide-react';
-import { getChatResponse, getTextToSpeech } from './actions';
+import { Mic, User, Bot, Loader2, StopCircle, Volume2 } from 'lucide-react';
+import { getChatAndSpeechResponse, getTextToSpeechOnly } from './actions';
 import { Skeleton } from '@/components/ui/skeleton';
 import ReactMarkdown from 'react-markdown';
 import { Logo } from '@/components/icons';
 import { useFinancialData } from '@/context/financial-data-context';
+import { readStreamableValue } from 'ai/rsc';
 
 interface Message {
   id: string;
   role: 'user' | 'assistant';
   content: string;
+  audio?: string | null;
 }
 
 export default function VoiceAssistantPage() {
@@ -68,6 +71,10 @@ export default function VoiceAssistantPage() {
         if (recognitionRef.current) {
             recognitionRef.current.stop();
         }
+        if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current.src = '';
+        }
     };
   }, []);
 
@@ -82,32 +89,36 @@ export default function VoiceAssistantPage() {
     setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
 
+    const assistantMessageId = (Date.now() + 1).toString();
+
     try {
-      const insightResponse = await getChatResponse(transcript, financialDataString);
-      const insight = insightResponse?.insight;
-
-      if (!insight) {
-        throw new Error("Failed to get a valid insight.");
-      }
+      const { text } = await getChatAndSpeechResponse(transcript, financialDataString);
       
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: insight,
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
+      let fullText = '';
+      for await (const delta of readStreamableValue(text)) {
+        if(delta){
+          fullText = delta.text;
+           setMessages((prev) => {
+              const lastMsg = prev[prev.length - 1];
+              if (lastMsg?.role === 'assistant') {
+                  lastMsg.content = delta.text;
+                  lastMsg.audio = delta.audio;
+                  return [...prev];
+              }
+              return [...prev, { id: assistantMessageId, role: 'assistant', content: delta.text, audio: delta.audio }];
+          });
 
-      const ttsResponse = await getTextToSpeech(insight);
-      const media = ttsResponse?.media;
-
-      if (media && audioRef.current) {
-        audioRef.current.src = media;
-        audioRef.current.play();
+          if(delta.audio && audioRef.current){
+              audioRef.current.src = delta.audio;
+              audioRef.current.play();
+          }
+        }
       }
 
     } catch (error) {
+      console.error(error);
       const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
+        id: assistantMessageId,
         role: 'assistant',
         content: 'Sorry, I encountered an error. Please try again.',
       };
@@ -117,6 +128,21 @@ export default function VoiceAssistantPage() {
     }
   }
 
+  const playAudio = async (text: string) => {
+      if (audioRef.current && !audioRef.current.paused) {
+          audioRef.current.pause();
+          return;
+      }
+      try {
+          const res = await getTextToSpeechOnly(text);
+          if (res?.media && audioRef.current) {
+              audioRef.current.src = res.media;
+              audioRef.current.play();
+          }
+      } catch (error) {
+          console.error("Failed to play audio:", error);
+      }
+  }
 
   const toggleRecording = () => {
     if (isRecording) {
@@ -124,6 +150,9 @@ export default function VoiceAssistantPage() {
       setIsRecording(false);
     } else {
       if (recognitionRef.current) {
+         if (audioRef.current) {
+            audioRef.current.pause();
+        }
         recognitionRef.current.start();
         setIsRecording(true);
       } else {
@@ -152,7 +181,7 @@ export default function VoiceAssistantPage() {
                   </Avatar>
                 )}
                 <div
-                  className={`max-w-xl p-4 rounded-lg prose prose-sm ${
+                  className={`max-w-xl p-4 rounded-lg prose prose-sm relative group ${
                     message.role === 'user'
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-card border'
@@ -163,6 +192,11 @@ export default function VoiceAssistantPage() {
                     ) : (
                         <ReactMarkdown>{message.content}</ReactMarkdown>
                     )}
+                     {message.role === 'assistant' && message.content && (
+                         <Button size="icon" variant="ghost" className="absolute -bottom-4 -right-4 h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => playAudio(message.content)}>
+                            <Volume2 className="h-4 w-4" />
+                         </Button>
+                     )}
                 </div>
                 {message.role === 'user' && (
                   <Avatar className="w-8 h-8 border">

@@ -3,6 +3,7 @@
 
 import { generatePersonalizedFinancialInsights } from '@/ai/flows/insight-generation';
 import { textToSpeech } from '@/ai/flows/tts';
+import { convertStreamableValue } from 'ai/rsc';
 
 function handleApiError(error: any, serviceName: string) {
   console.error(`Error calling ${serviceName}:`, error);
@@ -13,19 +14,31 @@ function handleApiError(error: any, serviceName: string) {
 }
 
 
-export async function getChatResponse(userQuestion: string, financialData: string) {
+export async function getChatAndSpeechResponse(userQuestion: string, financialData: string) {
   try {
-    const response = await generatePersonalizedFinancialInsights({
+    const insightStream = await generatePersonalizedFinancialInsights({
       financialData: financialData,
       userQuestion: userQuestion,
     });
-    return { insight: response.insights };
+
+    const { text, ...rest } = convertStreamableValue(insightStream);
+
+    return {
+      ...rest,
+      text: async () => {
+        const result = await text;
+        const ttsResponse = await getTextToSpeech(result);
+        return { text: result, audio: ttsResponse?.media };
+      },
+    };
+
   } catch (error) {
-     handleApiError(error, 'Chat');
+     handleApiError(error, 'Chat/TTS');
+     return { text: async () => ({ text: 'Sorry, I encountered an error.', audio: null }) };
   }
 }
 
-export async function getTextToSpeech(text: string) {
+export async function getTextToSpeechOnly(text: string) {
     try {
         const response = await textToSpeech(text);
         return response;

@@ -16,42 +16,33 @@ import { useFinancialData } from '@/context/financial-data-context';
 
 export default function ChatPage() {
   const { financialData, isLoading: isDataLoading } = useFinancialData();
-  const [financialDataString, setFinancialDataString] = useState('');
   
-  const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages } = useChat({
-      body: {
-          financialData: financialDataString
-      },
-      api: '/api/chat'
+  const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages, append } = useChat({
+      onFinish: (message) => {
+        // Save history on completion
+        const updatedMessages = [...messages, {role: 'user', content: input, id: 'temp-user'}, message];
+         try {
+            localStorage.setItem('chatHistory', JSON.stringify(updatedMessages));
+        } catch (error) {
+            console.error('Failed to save messages to local storage', error);
+        }
+      }
   });
+
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   
   useEffect(() => {
     if (financialData) {
-      const dataForAI = { ...financialData };
-      delete (dataForAI as any).transactions; // Exclude transactions from the context
-      setFinancialDataString(JSON.stringify(dataForAI, null, 2));
-    }
-
-    try {
-      const savedMessages = localStorage.getItem('chatHistory');
-      if (savedMessages) {
-        setMessages(JSON.parse(savedMessages));
-      }
-    } catch (error) {
-      console.error('Failed to load messages from local storage', error);
+        try {
+            const savedMessages = localStorage.getItem('chatHistory');
+            if (savedMessages) {
+                setMessages(JSON.parse(savedMessages));
+            }
+        } catch (error) {
+            console.error('Failed to load messages from local storage', error);
+        }
     }
   }, [financialData, setMessages]);
-
-  useEffect(() => {
-    if (messages.length > 0) {
-      try {
-        localStorage.setItem('chatHistory', JSON.stringify(messages));
-      } catch (error) {
-        console.error('Failed to save messages to local storage', error);
-      }
-    }
-  }, [messages]);
   
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -64,11 +55,20 @@ export default function ChatPage() {
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (isDataLoading) {
+    if (isDataLoading || !financialData) {
         console.error("Financial data not loaded yet.");
         return;
     }
-    handleSubmit(e);
+    const dataForAI = { ...financialData };
+    delete (dataForAI as any).transactions; // Exclude transactions from the context
+    
+    append({
+      role: 'user',
+      content: input,
+      data: {
+        financialData: JSON.stringify(dataForAI, null, 2)
+      }
+    });
   }
 
   return (
