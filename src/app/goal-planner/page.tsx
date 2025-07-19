@@ -10,9 +10,11 @@ import { Loader2, Wand2, Target, StopCircle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useFinancialData } from '@/context/financial-data-context';
 import { useActions, useUIState } from 'ai/rsc';
-import type { AI } from './actions.tsx';
+import type { AI } from './actions';
+import { AI as GoalPlannerAI } from './actions';
 
-export default function GoalPlannerPage() {
+
+function GoalPlannerRSC() {
   const { financialData, isLoading: isDataLoading } = useFinancialData();
   const { getGoalPlan } = useActions<typeof AI>();
   const [messages, setMessages] = useUIState<typeof AI>();
@@ -34,7 +36,7 @@ export default function GoalPlannerPage() {
       ...currentMessages,
       {
         id: Date.now(),
-        display: <div>User message</div>, // This won't be displayed, but is required by the hook
+        display: <div />, // Placeholder, won't be displayed
       },
     ]);
 
@@ -43,6 +45,11 @@ export default function GoalPlannerPage() {
         setMessages(currentMessages => [...currentMessages, responseMessage]);
     } catch (error) {
         console.error("Failed to get goal plan", error);
+        const errorResponseMessage = {
+            id: Date.now(),
+            display: <p className="text-destructive">Sorry, an error occurred. Please try again.</p>
+        };
+        setMessages(currentMessages => [...currentMessages, errorResponseMessage]);
     } finally {
         setIsStreaming(false);
         setInputValue('');
@@ -95,7 +102,7 @@ export default function GoalPlannerPage() {
           </div>
         </form>
 
-        {(isStreaming && !lastMessage) && (
+        {(isStreaming && (!lastMessage || messages.length % 2 !== 0)) && (
             <Card>
                 <CardHeader>
                     <CardTitle className="font-headline">Generating Your Personalized Plan...</CardTitle>
@@ -112,7 +119,7 @@ export default function GoalPlannerPage() {
             </Card>
         )}
 
-        {lastMessage && (
+        {lastMessage && messages.length % 2 === 0 && (
           <Card>
             <CardHeader>
                 <CardTitle className="font-headline">Your Personalized Financial Plan</CardTitle>
@@ -126,4 +133,12 @@ export default function GoalPlannerPage() {
       </div>
     </AppLayout>
   );
+}
+
+export default function GoalPlannerPage() {
+    return (
+        <GoalPlannerAI>
+            <GoalPlannerRSC />
+        </GoalPlannerAI>
+    )
 }

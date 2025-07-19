@@ -7,6 +7,7 @@ import { FinancialDataProvider } from '@/context/financial-data-context';
 import { OnboardingProvider } from '@/context/onboarding-context';
 import 'intro.js/introjs.css';
 import { ThemeProvider } from '@/components/theme-provider';
+import { AI } from '@/app/scenario-simulator/actions';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const spaceGrotesk = Space_Grotesk({

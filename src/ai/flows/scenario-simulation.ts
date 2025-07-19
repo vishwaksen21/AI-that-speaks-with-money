@@ -1,4 +1,4 @@
-// This is an AI-powered agent that allows users to simulate financial scenarios to make informed decisions.
+
 'use server';
 /**
  * @fileOverview Financial scenario simulation AI agent.
@@ -56,5 +56,6 @@ Begin your response now.`;
         prompt: prompt,
     });
     
-    return result.toAIStream();
+    // We return the text stream directly to be consumed by the RSC component.
+    return result.textStream;
 }

@@ -10,10 +10,10 @@ import { Loader2, Wand2, StopCircle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useFinancialData } from '@/context/financial-data-context';
 import { useActions, useUIState } from 'ai/rsc';
-import type { AI } from './actions.tsx';
-import ReactMarkdown from 'react-markdown';
+import type { AI } from './actions';
+import { AI as ScenarioSimulatorAI } from './actions';
 
-export default function ScenarioSimulatorPage() {
+function ScenarioSimulatorRSC() {
   const { financialData, isLoading: isDataLoading } = useFinancialData();
   const { getScenarioResponse } = useActions<typeof AI>();
   const [messages, setMessages] = useUIState<typeof AI>();
@@ -35,7 +35,7 @@ export default function ScenarioSimulatorPage() {
       ...currentMessages,
       {
         id: Date.now(),
-        display: <div>User message</div>, // Placeholder
+        display: <div />, // Placeholder
       },
     ]);
     
@@ -44,6 +44,11 @@ export default function ScenarioSimulatorPage() {
         setMessages(currentMessages => [...currentMessages, responseMessage]);
     } catch(error) {
         console.error("Failed to get scenario response", error);
+        const errorResponseMessage = {
+            id: Date.now(),
+            display: <p className="text-destructive">Sorry, an error occurred. Please try again.</p>
+        };
+        setMessages(currentMessages => [...currentMessages, errorResponseMessage]);
     } finally {
         setIsStreaming(false);
         setInputValue('');
@@ -51,18 +56,6 @@ export default function ScenarioSimulatorPage() {
   };
   
   const lastMessage = messages[messages.length-1];
-
-  const { analysis, recommendations } = useMemo(() => {
-    if (!lastMessage || !lastMessage.display) {
-        return { analysis: null, recommendations: null };
-    }
-    
-    // Since display is a ReactNode, we can't easily split it.
-    // Let's just render the whole thing in the analysis card for now.
-    // A more complex solution would involve passing structured data.
-    return { analysis: lastMessage.display, recommendations: null };
-
-  }, [lastMessage]);
 
   return (
     <AppLayout pageTitle="Scenario Simulator">
@@ -102,7 +95,7 @@ export default function ScenarioSimulatorPage() {
           </div>
         </form>
 
-        {(isStreaming && !lastMessage?.display) && (
+        {(isStreaming && (!lastMessage || messages.length % 2 !== 0)) && (
             <Card>
                 <CardHeader>
                     <CardTitle className="font-headline">Simulation in Progress...</CardTitle>
@@ -118,7 +111,7 @@ export default function ScenarioSimulatorPage() {
             </Card>
         )}
 
-        {lastMessage?.display && (
+        {lastMessage && messages.length % 2 === 0 && (
           <Card>
             <CardHeader>
               <CardTitle className="font-headline">AI-Powered Simulation Result</CardTitle>
@@ -132,4 +125,12 @@ export default function ScenarioSimulatorPage() {
       </div>
     </AppLayout>
   );
+}
+
+export default function ScenarioSimulatorPage() {
+    return (
+        <ScenarioSimulatorAI>
+            <ScenarioSimulatorRSC />
+        </ScenarioSimulatorAI>
+    )
 }

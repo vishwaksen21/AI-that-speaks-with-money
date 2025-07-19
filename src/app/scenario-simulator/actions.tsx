@@ -2,7 +2,7 @@
 'use server';
 
 import { createAI, getMutableAIState, createStreamableUI } from 'ai/rsc';
-import { simulateFinancialScenario } from '@/ai/flows/scenario-simulation';
+import { simulateFinancialScenario as simulateFinancialScenarioFlow } from '@/ai/flows/scenario-simulation';
 import ReactMarkdown from 'react-markdown';
 
 export async function getScenarioResponse(scenarioDescription: string, financialData: string) {
@@ -12,7 +12,7 @@ export async function getScenarioResponse(scenarioDescription: string, financial
 
     (async () => {
         try {
-            const stream = await simulateFinancialScenario({
+            const stream = await simulateFinancialScenarioFlow({
                 financialData,
                 scenarioDescription,
             });
@@ -58,8 +58,6 @@ const initialAIState: {
 const initialUIState: {
   id: number;
   display: React.ReactNode;
-  content?: string;
-  role?: 'user' | 'assistant';
 }[] = [];
 
 export const AI = createAI({
