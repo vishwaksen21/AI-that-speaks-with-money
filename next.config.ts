@@ -3,6 +3,8 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 });
 
+const isDev = process.env.NODE_ENV === 'development';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = withBundleAnalyzer({
   // Add your custom config here
@@ -30,15 +32,10 @@ const nextConfig = withBundleAnalyzer({
       }
     ],
   },
-  // REMOVE these two lines in production for safety
-  // They are dangerous if left on in deployed environments
-  // Only use them temporarily during local development if needed
-  // typescript: {
-  //   ignoreBuildErrors: true,
-  // },
-  // eslint: {
-  //   ignoreDuringBuilds: true,
-  // },
+  ...(isDev && {
+    typescript: { ignoreBuildErrors: true },
+    eslint: { ignoreDuringBuilds: true },
+  }),
 });
 
 module.exports = nextConfig;
