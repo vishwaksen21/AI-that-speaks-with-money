@@ -49,6 +49,8 @@ export default function LandingPage() {
                             src="https://storage.googleapis.com/firebasestudio-hosting.appspot.com/assets/images/financetech.webp"
                             alt="Financial Dashboard Preview"
                             fill
+                            priority
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                             style={{ objectFit: 'cover' }}
                             data-ai-hint="finance technology dashboard"
                         />

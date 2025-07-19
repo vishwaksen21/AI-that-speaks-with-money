@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { User, Mail, LogOut } from 'lucide-react';
+import Image from 'next/image';
 
 export default function ProfilePage() {
   return (
@@ -15,7 +16,7 @@ export default function ProfilePage() {
           <CardHeader>
             <div className="flex items-center gap-4">
               <Avatar className="h-16 w-16 border-2 border-primary">
-                <AvatarImage src="https://placehold.co/100x100.png" alt="User Avatar" />
+                <Image src="https://placehold.co/100x100.png" alt="User Avatar" width={64} height={64} />
                 <AvatarFallback>JD</AvatarFallback>
               </Avatar>
               <div>
