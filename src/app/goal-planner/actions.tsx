@@ -3,9 +3,6 @@
 
 import { createAI, getMutableAIState, createStreamableUI } from 'ai/rsc';
 import ReactMarkdown from 'react-markdown';
-import { streamText } from 'ai';
-import { google } from '@ai-sdk/google';
-import { z } from 'zod';
 import { generateGoalPlan as generateGoalPlanFlow } from '@/ai/flows/goal-planner-agent';
 
 

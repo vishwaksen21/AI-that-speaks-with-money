@@ -145,14 +145,14 @@ export function SidebarNav() {
             <SidebarGroupLabel className="px-2 group-data-[collapsible=icon]:px-0">
                 <span className="group-data-[collapsible=icon]:hidden">Account & Help</span>
             </SidebarGroupLabel>
-            <SidebarMenuItem>
+             <SidebarMenuItem>
                 <SidebarMenuButton
                     asChild
-                    isActive={pathname === '/dashboard'}
+                    isActive={pathname === '/home'}
                     tooltip={'Home'}
                     className="justify-start"
                 >
-                    <Link href={'/dashboard'}>
+                    <Link href={'/home'}>
                         <Home/>
                         <span className="group-data-[collapsible=icon]:hidden">Home</span>
                     </Link>

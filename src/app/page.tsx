@@ -10,6 +10,7 @@ export default function RootPage() {
   const router = useRouter();
 
   useEffect(() => {
+    // Redirect to the primary dashboard page on load.
     router.replace('/dashboard');
   }, [router]);
 
