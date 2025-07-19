@@ -2,7 +2,7 @@
 import { AppLayout } from '@/components/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, Shield, Bot, Users, ArrowRight, Star } from 'lucide-react';
+import { CheckCircle, Shield, Bot, Users, ArrowRight, Star, Info } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -79,6 +79,32 @@ export default function LandingPage() {
                 </div>
             </section>
 
+            {/* About Section */}
+            <section id="about" className="container mx-auto px-4">
+                <div className="grid md:grid-cols-2 gap-12 items-center">
+                    <div className="relative h-64 md:h-80 rounded-lg overflow-hidden">
+                        <Image 
+                            src="https://storage.googleapis.com/static.aiprompt.io/6e3f31a2-c43c-449e-990c-512141544a49.png" 
+                            alt="AI analyzing financial data" 
+                            fill 
+                            style={{ objectFit: 'cover' }}
+                            data-ai-hint="abstract finance data"
+                        />
+                    </div>
+                    <div>
+                        <h2 className="text-3xl md:text-4xl font-bold font-headline">About FinanceAI Navigator</h2>
+                        <p className="text-muted-foreground mt-4 mb-6">
+                            FinanceAI Navigator is a comprehensive suite of AI-powered tools designed to demystify your finances. By consolidating your financial data into a single, intuitive dashboard, it provides personalized insights, simulates future scenarios, and offers expert advice through specialized agents. Whether you're planning investments, managing savings, or optimizing expenses, our platform empowers you to make smarter financial decisions with clarity and confidence.
+                        </p>
+                        <Link href="/import">
+                            <Button variant="outline">
+                                Get Started <ArrowRight className="ml-2 h-5 w-5" />
+                            </Button>
+                        </Link>
+                    </div>
+                </div>
+            </section>
+
              {/* Security Section */}
             <section id="security" className="bg-secondary py-16">
                  <div className="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
@@ -103,7 +129,7 @@ export default function LandingPage() {
                         </ul>
                     </div>
                      <div className="relative h-64 md:h-80 rounded-lg overflow-hidden">
-                        <Image src="https://storage.googleapis.com/static.aiprompt.io/5c7cf1c5-e51c-4b17-a006-2182061217e1.png" alt="Security & Privacy First shield" fill style={{ objectFit: 'cover' }} />
+                        <Image src="https://storage.googleapis.com/static.aiprompt.io/5c7cf1c5-e51c-4b17-a006-2182061217e1.png" alt="Security & Privacy First shield" fill style={{ objectFit: 'cover' }} data-ai-hint="security shield" />
                     </div>
                 </div>
             </section>
