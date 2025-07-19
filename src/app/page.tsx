@@ -98,7 +98,7 @@ export default function LandingPage() {
                         <p className="text-muted-foreground mt-4 mb-6">
                             FinanceAI Navigator is a comprehensive suite of AI-powered tools designed to demystify your finances. By consolidating your financial data into a single, intuitive dashboard, it provides personalized insights, simulates future scenarios, and offers expert advice through specialized agents. Whether you're planning investments, managing savings, or optimizing expenses, our platform empowers you to make smarter financial decisions with clarity and confidence.
                         </p>
-                        <Link href="/import">
+                        <Link href="/dashboard">
                             <Button variant="outline">
                                 Get Started <ArrowRight className="ml-2 h-5 w-5" />
                             </Button>
