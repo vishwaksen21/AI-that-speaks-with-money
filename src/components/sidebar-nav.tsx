@@ -148,11 +148,11 @@ export function SidebarNav() {
             <SidebarMenuItem>
                 <SidebarMenuButton
                     asChild
-                    isActive={pathname === '/home'}
+                    isActive={pathname === '/dashboard'}
                     tooltip={'Home'}
                     className="justify-start"
                 >
-                    <Link href={'/home'}>
+                    <Link href={'/dashboard'}>
                         <Home/>
                         <span className="group-data-[collapsible=icon]:hidden">Home</span>
                     </Link>
