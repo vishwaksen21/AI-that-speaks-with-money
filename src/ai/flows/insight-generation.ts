@@ -1,3 +1,4 @@
+
 // src/ai/flows/insight-generation.ts
 'use server';
 /**

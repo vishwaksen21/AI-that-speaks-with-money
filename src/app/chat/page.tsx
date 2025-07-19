@@ -20,9 +20,12 @@ export default function ChatPage() {
   const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages, append } = useChat({
       onFinish: (message) => {
         // Save history on completion
-        const updatedMessages = [...messages, {role: 'user', content: input, id: 'temp-user'}, message];
+        const updatedMessages = [...messages, message];
          try {
-            localStorage.setItem('chatHistory', JSON.stringify(updatedMessages));
+            // We remove the user's last message before saving, because append() adds it,
+            // leading to duplicates on reload. The new message from the assistant is what we want to save.
+            const historyToSave = updatedMessages.filter((m, i) => !(m.role === 'user' && i === updatedMessages.length - 2))
+            localStorage.setItem('chatHistory', JSON.stringify(historyToSave));
         } catch (error) {
             console.error('Failed to save messages to local storage', error);
         }
@@ -62,6 +65,7 @@ export default function ChatPage() {
     const dataForAI = { ...financialData };
     delete (dataForAI as any).transactions; // Exclude transactions from the context
     
+    // Use `append` to send the user message and financial data to the chat API
     append({
       role: 'user',
       content: input,
