@@ -7,8 +7,8 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
-import {generate} from 'genkit/generate';
+import {z} from 'zod';
+import { generate } from 'genkit/generate';
 
 const AgentInputSchema = z.object({
   financialData: z.string().describe('The user\'s consolidated financial data in JSON format.'),
@@ -54,7 +54,7 @@ const goalPlannerFlow = ai.defineFlow(
     outputSchema: z.string(), // We will stream the string response
   },
   async input => {
-     const {stream, response} = generate({
+     const {stream, response} = await ai.generate({
       prompt: goalPlannerPrompt.prompt,
       model: goalPlannerPrompt.model,
       input,
