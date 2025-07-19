@@ -46,7 +46,7 @@ export default function LandingPage() {
                     </div>
                     <div className="relative h-96 w-full max-w-5xl mx-auto rounded-xl border shadow-lg overflow-hidden">
                         <Image
-                            src="https://storage.googleapis.com/static.aiprompt.io/a22e8424-6510-47b2-8438-e4b2d41579ac.png"
+                            src="https://placehold.co/1200x600.png"
                             alt="Financial Dashboard Preview"
                             fill
                             style={{ objectFit: 'cover' }}
@@ -84,7 +84,7 @@ export default function LandingPage() {
                 <div className="grid md:grid-cols-2 gap-12 items-center">
                     <div className="relative h-64 md:h-80 rounded-lg overflow-hidden">
                         <Image 
-                            src="https://storage.googleapis.com/static.aiprompt.io/6e3f31a2-c43c-449e-990c-512141544a49.png" 
+                            src="https://placehold.co/600x400.png" 
                             alt="AI analyzing financial data" 
                             fill 
                             style={{ objectFit: 'cover' }}
@@ -129,7 +129,7 @@ export default function LandingPage() {
                         </ul>
                     </div>
                      <div className="relative h-64 md:h-80 rounded-lg overflow-hidden">
-                        <Image src="https://storage.googleapis.com/static.aiprompt.io/5c7cf1c5-e51c-4b17-a006-2182061217e1.png" alt="Security & Privacy First shield" fill style={{ objectFit: 'cover' }} data-ai-hint="security shield" />
+                        <Image src="https://placehold.co/600x400.png" alt="Security & Privacy First shield" fill style={{ objectFit: 'cover' }} data-ai-hint="security shield" />
                     </div>
                 </div>
             </section>
@@ -209,4 +209,5 @@ export default function LandingPage() {
         </div>
     </AppLayout>
   );
-}
+
+    
