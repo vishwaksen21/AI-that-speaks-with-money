@@ -35,7 +35,9 @@ export default function VoiceAssistantPage() {
 
   useEffect(() => {
     if (financialData) {
-      setFinancialDataString(JSON.stringify(financialData, null, 2));
+      const dataForAI = { ...financialData };
+      delete (dataForAI as any).transactions;
+      setFinancialDataString(JSON.stringify(dataForAI, null, 2));
     }
   }, [financialData]);
   
@@ -92,10 +94,10 @@ export default function VoiceAssistantPage() {
     const assistantMessageId = (Date.now() + 1).toString();
 
     try {
-      const { text } = await getChatAndSpeechResponse(transcript, financialDataString);
+      const streamable = await getChatAndSpeechResponse(transcript, financialDataString);
       
       let fullText = '';
-      for await (const delta of readStreamableValue(text)) {
+      for await (const delta of readStreamableValue(streamable)) {
         if(delta){
           fullText = delta.text;
            setMessages((prev) => {
@@ -181,14 +183,14 @@ export default function VoiceAssistantPage() {
                   </Avatar>
                 )}
                 <div
-                  className={`max-w-xl p-4 rounded-lg prose prose-sm relative group ${
+                  className={`max-w-xl p-4 rounded-lg prose prose-sm dark:prose-invert relative group ${
                     message.role === 'user'
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-card border'
                   }`}
                 >
                     {message.role === 'user' ? (
-                        <p>{message.content}</p>
+                        <p className="m-0">{message.content}</p>
                     ) : (
                         <ReactMarkdown>{message.content}</ReactMarkdown>
                     )}
@@ -207,7 +209,7 @@ export default function VoiceAssistantPage() {
                 )}
               </div>
             ))}
-            {isLoading && (
+            {isLoading && messages.length > 0 && messages[messages.length - 1].role === 'user' && (
               <div className="flex items-start gap-4">
                 <Avatar className="w-8 h-8 border">
                    <AvatarFallback className="bg-primary text-primary-foreground">

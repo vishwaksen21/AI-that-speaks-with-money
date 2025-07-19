@@ -101,7 +101,7 @@ export function getFinancialData(): FinancialData {
   // This function can only be called on the client-side.
   if (typeof window === 'undefined') {
     // During server-side rendering or build, return the primary sample data.
-    return sampleFinancialData;
+    return defaultFinancialData;
   }
   
   try {
@@ -109,10 +109,9 @@ export function getFinancialData(): FinancialData {
     if (storedData) {
       const parsedData = JSON.parse(storedData) as FinancialData;
       // Use a more reliable check to see if the stored data is valid.
-      // If it's empty or still the default placeholder, return the primary sample data.
+      // If it's empty or still the default placeholder, return the default data.
       if (!parsedData || !parsedData.user_id || parsedData.user_id === "user_default_123") {
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(sampleFinancialData));
-        return sampleFinancialData;
+        return defaultFinancialData;
       }
        // If the user has "imported" Sneha's data, use that.
       if (parsedData.user_id === snehaRaoFinancialData.user_id) {
@@ -121,14 +120,12 @@ export function getFinancialData(): FinancialData {
       // Otherwise, return the parsed data from storage (which might be Alex Johnson's profile).
       return mergeDeep(defaultFinancialData, parsedData);
     } else {
-      // If no data is in storage, initialize it with the primary sample data.
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(sampleFinancialData));
-      return sampleFinancialData;
+      // If no data is in storage, return the default data.
+      return defaultFinancialData;
     }
   } catch (error) {
     console.error('Failed to parse financial data from localStorage:', error);
-    // If parsing fails, fallback to the primary sample data.
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(sampleFinancialData));
-    return sampleFinancialData;
+    // If parsing fails, fallback to the default data.
+    return defaultFinancialData;
   }
 }
