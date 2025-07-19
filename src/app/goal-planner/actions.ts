@@ -36,5 +36,3 @@ Begin your response now.
     
     return result.toAIStream();
 }
-
-    

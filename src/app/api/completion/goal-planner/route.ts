@@ -40,5 +40,3 @@ Begin your response now.
     
     return result.toAIStreamResponse();
 }
-
-    
