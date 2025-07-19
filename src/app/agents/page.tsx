@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { AppLayout } from '@/components/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -29,6 +29,29 @@ const simpleHash = (s: string) => {
   }
   return hash.toString();
 };
+
+const PageSkeleton = () => (
+    <div className="space-y-8">
+        <div className="text-center">
+            <Skeleton className="h-9 w-3/4 mx-auto" />
+            <Skeleton className="h-4 w-1/2 mx-auto mt-3" />
+        </div>
+        <div className="grid md:grid-cols-3 gap-6">
+            <Card>
+                <CardHeader><Skeleton className="h-20 w-full" /></CardHeader>
+                <CardContent><Skeleton className="h-10 w-full" /></CardContent>
+            </Card>
+            <Card>
+                <CardHeader><Skeleton className="h-20 w-full" /></CardHeader>
+                <CardContent><Skeleton className="h-10 w-full" /></CardContent>
+            </Card>
+             <Card>
+                <CardHeader><Skeleton className="h-20 w-full" /></CardHeader>
+                <CardContent><Skeleton className="h-10 w-full" /></CardContent>
+            </Card>
+        </div>
+    </div>
+);
 
 export default function AgentsPage() {
   const { financialData, isLoading: isDataLoading } = useFinancialData();
@@ -106,6 +129,14 @@ export default function AgentsPage() {
     }
   ];
 
+  if (isDataLoading) {
+    return (
+        <AppLayout pageTitle="AI Financial Agents">
+            <PageSkeleton />
+        </AppLayout>
+    );
+  }
+
   return (
     <AppLayout pageTitle="AI Financial Agents">
       <div className="space-y-8">
@@ -154,13 +185,13 @@ export default function AgentsPage() {
             </Alert>
         )}
 
-        {(loadingAgent || isDataLoading) && !result && (
+        {loadingAgent && !result && (
             <Card>
                 <CardHeader>
                     <Skeleton className="h-6 w-1/2" />
-                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-4 w-3/4 mt-2" />
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-4 pt-4">
                     <Skeleton className="h-4 w-full" />
                     <Skeleton className="h-4 w-5/6" />
                     <Skeleton className="h-4 w-full" />
@@ -184,3 +215,5 @@ export default function AgentsPage() {
     </AppLayout>
   );
 }
+
+    

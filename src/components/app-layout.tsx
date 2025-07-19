@@ -1,3 +1,4 @@
+
 import * as React from 'react';
 import Link from 'next/link';
 import {
@@ -14,6 +15,7 @@ import { Logo } from './icons';
 import { Button } from './ui/button';
 import { User, Search } from 'lucide-react';
 import { NotificationDropdown } from './notification-dropdown';
+import { CommandMenu } from './command-menu';
 
 export function AppLayout({
   children,
@@ -22,6 +24,19 @@ export function AppLayout({
   children: React.ReactNode;
   pageTitle: string;
 }) {
+  const [open, setOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setOpen((open) => !open);
+      }
+    };
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, []);
+  
   return (
     <SidebarProvider>
       <Sidebar variant="sidebar" collapsible="icon">
@@ -49,7 +64,7 @@ export function AppLayout({
             </h1>
           </div>
           <div className="flex items-center gap-2">
-             <Button variant="ghost" size="icon">
+             <Button variant="ghost" size="icon" onClick={() => setOpen(true)}>
               <Search className="h-5 w-5" />
             </Button>
             <Link href="/profile">
@@ -61,7 +76,10 @@ export function AppLayout({
           </div>
         </header>
         <main className="p-4 md:p-6">{children}</main>
+        <CommandMenu open={open} setOpen={setOpen} />
       </SidebarInset>
     </SidebarProvider>
   );
 }
+
+    

@@ -1,13 +1,14 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { AppLayout } from '@/components/app-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { RecentTransactions } from '@/components/recent-transactions';
 import type { FinancialData } from '@/ai/flows/data-extraction';
-import { DollarSign, TrendingUp, TrendingDown, PlusCircle, User, Briefcase, IndianRupee } from 'lucide-react';
+import { DollarSign, TrendingUp, TrendingDown, PlusCircle, User, Briefcase, IndianRupee, Upload } from 'lucide-react';
 import { CreditScore as CreditScoreIcon } from '@/components/icons';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
@@ -19,7 +20,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { calculateTotalAssets, calculateTotalLiabilities } from '@/lib/financial-calculations';
 import { useFinancialData } from '@/context/financial-data-context';
-import { LOCAL_STORAGE_KEY } from '@/lib/mock-data';
 
 const ChartSkeleton = () => (
     <div className="pl-2 pt-2">
@@ -58,9 +58,53 @@ function formatCurrency(amount: number, currency: string = 'INR') {
   }).format(amount);
 }
 
+function DashboardSkeleton() {
+    return (
+        <div className="space-y-6">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <Card><CardHeader className="pb-2"><Skeleton className="h-5 w-24" /></CardHeader><CardContent><Skeleton className="h-8 w-32" /><Skeleton className="h-4 w-40 mt-1" /></CardContent></Card>
+                <Card><CardHeader className="pb-2"><Skeleton className="h-5 w-24" /></CardHeader><CardContent><Skeleton className="h-8 w-32" /><Skeleton className="h-4 w-40 mt-1" /></CardContent></Card>
+                <Card><CardHeader className="pb-2"><Skeleton className="h-5 w-24" /></CardHeader><CardContent><Skeleton className="h-8 w-32" /><Skeleton className="h-4 w-40 mt-1" /></CardContent></Card>
+                <Card><CardHeader className="pb-2"><Skeleton className="h-5 w-24" /></CardHeader><CardContent><Skeleton className="h-8 w-32" /><Skeleton className="h-4 w-40 mt-1" /></CardContent></Card>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+                <Card className="lg:col-span-4"><CardHeader><Skeleton className="h-6 w-48" /><Skeleton className="h-4 w-64 mt-2" /></CardHeader><CardContent className="pt-2 pl-2"><Skeleton className="h-[300px] w-full" /></CardContent></Card>
+                <Card className="lg:col-span-3"><CardHeader><Skeleton className="h-6 w-48" /><Skeleton className="h-4 w-56 mt-2" /></CardHeader><CardContent className="pt-2"><Skeleton className="h-[300px] w-full" /></CardContent></Card>
+            </div>
+             <Card>
+                <CardHeader><Skeleton className="h-6 w-48" /><Skeleton className="h-4 w-64 mt-2" /></CardHeader>
+                <CardContent><Skeleton className="h-[200px] w-full" /></CardContent>
+            </Card>
+        </div>
+    );
+}
+
+function EmptyState() {
+    return (
+        <Card className="flex flex-col items-center justify-center text-center p-8 md:p-12 min-h-[400px]">
+            <Upload className="h-16 w-16 text-primary mb-4" />
+            <CardTitle className="font-headline text-2xl mb-2">Welcome to Your Dashboard!</CardTitle>
+            <CardDescription className="max-w-md mb-6">
+                It looks like you haven't imported any financial data yet. Get started by uploading a file. Our AI will analyze it and bring your dashboard to life.
+            </CardDescription>
+            <Link href="/import">
+                <Button>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Import Your Data
+                </Button>
+            </Link>
+        </Card>
+    );
+}
 
 export default function DashboardPage() {
-  const { financialData: data, setFinancialData, isLoading } = useFinancialData();
+  const { financialData, setFinancialData, isLoading } = useFinancialData();
+  const [data, setData] = useState<FinancialData | null>(financialData);
+
+  // Sync local state with context state
+  useState(() => {
+    setData(financialData);
+  });
 
   const handleAddTransaction = (newTransaction: {
     description: string;
@@ -69,16 +113,17 @@ export default function DashboardPage() {
   }) => {
     if (!data) return;
 
-    const newData = JSON.parse(JSON.stringify(data));
+    // Create a new data object for optimistic update
+    const optimisticData = JSON.parse(JSON.stringify(data));
 
     const transactionAmount = newTransaction.type === 'income' 
         ? newTransaction.amount 
         : -newTransaction.amount;
     
-    if (!newData.transactions) {
-        newData.transactions = [];
+    if (!optimisticData.transactions) {
+        optimisticData.transactions = [];
     }
-    newData.transactions.unshift({
+    optimisticData.transactions.unshift({
         id: `txn_${Date.now()}`,
         description: newTransaction.description,
         amount: transactionAmount,
@@ -86,38 +131,36 @@ export default function DashboardPage() {
         category: newTransaction.type === 'income' ? 'Income' : 'Expense',
     });
 
-    if (newData.bank_accounts && newData.bank_accounts.length > 0) {
-        newData.bank_accounts[0].balance += transactionAmount;
+    if (optimisticData.bank_accounts && optimisticData.bank_accounts.length > 0) {
+        optimisticData.bank_accounts[0].balance += transactionAmount;
     } else {
-        newData.bank_accounts = [{ bank: 'Primary Account', balance: transactionAmount }];
+        optimisticData.bank_accounts = [{ bank: 'Primary Account', balance: transactionAmount }];
     }
 
-    const newTotalAssets = calculateTotalAssets(newData);
-    const newTotalLiabilities = calculateTotalLiabilities(newData);
-    newData.net_worth = newTotalAssets - newTotalLiabilities;
-
-    setFinancialData(newData);
+    const newTotalAssets = calculateTotalAssets(optimisticData);
+    const newTotalLiabilities = calculateTotalLiabilities(optimisticData);
+    optimisticData.net_worth = newTotalAssets - newTotalLiabilities;
+    
+    // Optimistically update the local state
+    setData(optimisticData);
+    
+    // Persist the change to the global context and localStorage
+    setFinancialData(optimisticData);
   }
 
-  if (isLoading || !data) {
+  if (isLoading) {
     return (
         <AppLayout pageTitle="Dashboard">
-             <div className="space-y-6">
-                <div className="grid gap-4 md:grid-cols-4">
-                    <Card><CardHeader className="pb-2"><Skeleton className="h-5 w-24" /></CardHeader><CardContent><Skeleton className="h-8 w-32" /><Skeleton className="h-4 w-40 mt-1" /></CardContent></Card>
-                    <Card><CardHeader className="pb-2"><Skeleton className="h-5 w-24" /></CardHeader><CardContent><Skeleton className="h-8 w-32" /><Skeleton className="h-4 w-40 mt-1" /></CardContent></Card>
-                    <Card><CardHeader className="pb-2"><Skeleton className="h-5 w-24" /></CardHeader><CardContent><Skeleton className="h-8 w-32" /><Skeleton className="h-4 w-40 mt-1" /></CardContent></Card>
-                    <Card><CardHeader className="pb-2"><Skeleton className="h-5 w-24" /></CardHeader><CardContent><Skeleton className="h-8 w-32" /><Skeleton className="h-4 w-40 mt-1" /></CardContent></Card>
-                </div>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                    <Card className="lg:col-span-4"><CardHeader><Skeleton className="h-6 w-48" /><Skeleton className="h-4 w-64 mt-2" /></CardHeader><CardContent className="pt-2 pl-2"><Skeleton className="h-[300px] w-full" /></CardContent></Card>
-                    <Card className="lg:col-span-3"><CardHeader><Skeleton className="h-6 w-48" /><Skeleton className="h-4 w-56 mt-2" /></CardHeader><CardContent className="pt-2"><Skeleton className="h-[300px] w-full" /></CardContent></Card>
-                </div>
-                 <Card>
-                    <CardHeader><Skeleton className="h-6 w-48" /><Skeleton className="h-4 w-64 mt-2" /></CardHeader>
-                    <CardContent><Skeleton className="h-[200px] w-full" /></CardContent>
-                </Card>
-             </div>
+             <DashboardSkeleton />
+        </AppLayout>
+    )
+  }
+
+  // Check for an "empty" or default data state
+  if (!data || data.user_id === 'user_default_123' || data.bank_accounts.length === 0) {
+    return (
+        <AppLayout pageTitle="Welcome!">
+            <EmptyState />
         </AppLayout>
     )
   }
@@ -333,6 +376,12 @@ function AddTransactionDialog({ onAddTransaction, currency }: { onAddTransaction
             setAmount('');
             setType('expense');
             setIsOpen(false);
+        } else {
+             toast({
+                title: 'Invalid Input',
+                description: 'Please enter a valid description and amount.',
+                variant: 'destructive'
+            });
         }
     }
 
@@ -348,7 +397,7 @@ function AddTransactionDialog({ onAddTransaction, currency }: { onAddTransaction
                 <DialogHeader>
                     <DialogTitle>Add a New Transaction</DialogTitle>
                     <DialogDescription>
-                        Enter the details of your transaction below. It will be saved and reflected in your dashboard.
+                        Enter the details of your transaction below. This will be reflected optimistically on your dashboard.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
@@ -396,9 +445,11 @@ function AddTransactionDialog({ onAddTransaction, currency }: { onAddTransaction
                     </div>
                 </div>
                 <DialogFooter>
-                    <Button onClick={handleSubmit} disabled={!description || !amount}>Save transaction</Button>
+                    <Button onClick={handleSubmit}>Save transaction</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
     );
 }
+
+    
