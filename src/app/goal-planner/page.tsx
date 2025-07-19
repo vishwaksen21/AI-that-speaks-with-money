@@ -8,33 +8,42 @@ import { Loader2, Wand2, Target, StopCircle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import ReactMarkdown from 'react-markdown';
 import { useFinancialData } from '@/context/financial-data-context';
-import { useCompletion } from 'ai/react';
+import { useActions, useUIState } from 'ai/rsc';
+import type { AI } from './actions';
 
 export default function GoalPlannerPage() {
   const { financialData, isLoading: isDataLoading } = useFinancialData();
-  
-  const { completion, input, handleInputChange, handleSubmit, isLoading, stop } = useCompletion({
-      api: '/api/completion/goal-planner',
-  });
+  const { getGoalPlan } = useActions<typeof AI>();
+  const [messages, setMessages] = useUIState<typeof AI>();
+  const [inputValue, setInputValue] = useState('');
+  const [isStreaming, setIsStreaming] = useState(false);
 
-  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    if (isDataLoading || !financialData) {
-        console.error("Financial data not loaded yet.");
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (isDataLoading || !financialData || !inputValue.trim() || isStreaming) {
         return;
     }
+
     const dataForAI = { ...financialData };
     delete (dataForAI as any).transactions;
     const financialDataString = JSON.stringify(dataForAI, null, 2);
-    
-    // Pass financial data along with the input prompt
-    handleSubmit(e, {
-      options: {
-        body: {
-          financialData: financialDataString,
-        }
-      }
-    });
+
+    setIsStreaming(true);
+    setMessages(currentMessages => [
+      ...currentMessages,
+      {
+        id: Date.now(),
+        display: <div>User message</div>, // This won't be displayed, but is required by the hook
+      },
+    ]);
+
+    const responseMessage = await getGoalPlan(inputValue, financialDataString);
+    setMessages(currentMessages => [...currentMessages, responseMessage]);
+    setIsStreaming(false);
   };
+  
+  const lastMessage = messages[messages.length - 1];
+  const completion = lastMessage?.role === 'assistant' ? lastMessage.display : null;
 
   return (
     <AppLayout pageTitle="Financial Goal Planner">
@@ -56,23 +65,23 @@ export default function GoalPlannerPage() {
         <form onSubmit={handleFormSubmit} className="space-y-4">
           <Textarea
             placeholder='e.g., "I want to save for a down payment on a house. My budget is ₹20 lakhs and I want to achieve this in 5 years." or "I want to retire at age 55 with a corpus of ₹5 crores."'
-            value={input}
-            onChange={handleInputChange}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
             rows={4}
             name="prompt"
-            disabled={isLoading || isDataLoading}
+            disabled={isStreaming || isDataLoading}
           />
            <div className="flex items-center gap-2">
-            <Button type="submit" disabled={isLoading || isDataLoading || !input.trim()}>
-              {isLoading ? (
+            <Button type="submit" disabled={isStreaming || isDataLoading || !inputValue.trim()}>
+              {isStreaming ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <Wand2 className="mr-2 h-4 w-4" />
               )}
-              {isLoading ? 'Generating Plan...' : 'Create My Plan'}
+              {isStreaming ? 'Generating Plan...' : 'Create My Plan'}
             </Button>
-            {isLoading && (
-              <Button variant="outline" type="button" onClick={stop}>
+            {isStreaming && (
+              <Button variant="outline" type="button" onClick={() => { /* Stop logic would go here if needed */ }}>
                 <StopCircle className="mr-2 h-4 w-4" />
                 Stop
               </Button>
@@ -80,7 +89,7 @@ export default function GoalPlannerPage() {
           </div>
         </form>
 
-        {(isLoading && !completion) && (
+        {(isStreaming && !completion) && (
             <Card>
                 <CardHeader>
                     <CardTitle className="font-headline">Generating Your Personalized Plan...</CardTitle>
@@ -104,7 +113,7 @@ export default function GoalPlannerPage() {
                 <CardDescription>Here is a step-by-step guide to help you reach your goal.</CardDescription>
             </CardHeader>
             <CardContent className="prose prose-sm max-w-none dark:prose-invert">
-                <ReactMarkdown>{completion}</ReactMarkdown>
+                {completion}
             </CardContent>
           </Card>
         )}

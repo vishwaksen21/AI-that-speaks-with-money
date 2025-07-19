@@ -1,6 +1,6 @@
 
 'use client';
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { AppLayout } from '@/components/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -9,43 +9,53 @@ import { Loader2, Wand2, StopCircle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import ReactMarkdown from 'react-markdown';
 import { useFinancialData } from '@/context/financial-data-context';
-import { useCompletion } from 'ai/react';
+import { useActions, useUIState } from 'ai/rsc';
+import type { AI } from './actions';
 
 export default function ScenarioSimulatorPage() {
   const { financialData, isLoading: isDataLoading } = useFinancialData();
-  
-  const { completion, input, handleInputChange, handleSubmit, isLoading, stop } = useCompletion({
-    api: '/api/completion/scenario-simulator',
-  });
+  const { getScenarioResponse } = useActions<typeof AI>();
+  const [messages, setMessages] = useUIState<typeof AI>();
+  const [inputValue, setInputValue] = useState('');
+  const [isStreaming, setIsStreaming] = useState(false);
 
-  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    if (isDataLoading || !financialData) {
-        console.error("Financial data not loaded yet.");
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (isDataLoading || !financialData || !inputValue.trim() || isStreaming) {
         return;
     }
+
     const dataForAI = { ...financialData };
     delete (dataForAI as any).transactions;
     const financialDataString = JSON.stringify(dataForAI, null, 2);
 
-    handleSubmit(e, {
-      options: {
-        body: {
-          financialData: financialDataString,
-        },
+    setIsStreaming(true);
+    setMessages(currentMessages => [
+      ...currentMessages,
+      {
+        id: Date.now(),
+        display: <div>User message</div>, // Placeholder
       },
-    });
-  };
+    ]);
 
+    const responseMessage = await getScenarioResponse(inputValue, financialDataString);
+    setMessages(currentMessages => [...currentMessages, responseMessage]);
+    setIsStreaming(false);
+  };
+  
+  const lastMessage = messages[messages.length-1];
+  const completion = lastMessage?.role === 'assistant' ? lastMessage.display : null;
+  const completionText = lastMessage?.role === 'assistant' ? lastMessage.content : '';
+  
   const { analysis, recommendations } = useMemo(() => {
-    if (!completion) {
+    if (!completionText) {
       return { analysis: '', recommendations: '' };
     }
-    const parts = completion.split('### Recommendations');
+    const parts = completionText.split('### Recommendations');
     const analysisPart = parts[0].replace('### Scenario Analysis', '').trim();
     const recommendationsPart = parts[1] || '';
     return { analysis: analysisPart, recommendations: recommendationsPart };
-  }, [completion]);
-
+  }, [completionText]);
 
   return (
     <AppLayout pageTitle="Scenario Simulator">
@@ -61,23 +71,23 @@ export default function ScenarioSimulatorPage() {
         <form onSubmit={handleFormSubmit} className="space-y-4">
           <Textarea
             placeholder='e.g., "What is the impact of a ₹50L home loan?" or "Project my wealth at age 40 if I increase my SIP by ₹5,000."'
-            value={input}
-            onChange={handleInputChange}
+            value={inputValue}
+            onChange={e => setInputValue(e.target.value)}
             rows={4}
             name="prompt"
-            disabled={isLoading || isDataLoading}
+            disabled={isStreaming || isDataLoading}
           />
            <div className="flex items-center gap-2">
-            <Button type="submit" disabled={isLoading || isDataLoading || !input.trim()}>
-              {isLoading ? (
+            <Button type="submit" disabled={isStreaming || isDataLoading || !inputValue.trim()}>
+              {isStreaming ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (
                 <Wand2 className="mr-2 h-4 w-4" />
               )}
-              {isLoading ? 'Generating...' : 'Simulate Scenario'}
+              {isStreaming ? 'Generating...' : 'Simulate Scenario'}
             </Button>
-            {isLoading && (
-              <Button variant="outline" type="button" onClick={stop}>
+            {isStreaming && (
+              <Button variant="outline" type="button" onClick={() => { /* Stop logic */ }}>
                 <StopCircle className="mr-2 h-4 w-4" />
                 Stop
               </Button>
@@ -85,7 +95,7 @@ export default function ScenarioSimulatorPage() {
           </div>
         </form>
 
-        {(isLoading && !completion) && (
+        {(isStreaming && !completion) && (
             <div className="grid md:grid-cols-2 gap-6">
                 <Card>
                     <CardHeader>

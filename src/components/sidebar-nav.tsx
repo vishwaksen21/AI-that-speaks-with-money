@@ -36,7 +36,7 @@ import { useOnboarding } from '@/context/onboarding-context';
 import { FeedbackDialog } from './feedback-dialog';
 
 const mainNavItems = [
-  { href: '/home', label: 'Home', icon: Home },
+  { href: '/home', label: 'Home', icon: Home, id: 'sidebar-home-link' },
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, id: 'sidebar-dashboard-link' },
 ];
 

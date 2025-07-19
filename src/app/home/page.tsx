@@ -2,7 +2,7 @@
 import { AppLayout } from '@/components/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, Shield, Bot, Users, ArrowRight, Star, Info } from 'lucide-react';
+import { CheckCircle, Shield, Bot, Users, ArrowRight, Star } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
