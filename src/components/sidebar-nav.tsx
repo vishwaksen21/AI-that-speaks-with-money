@@ -23,6 +23,8 @@ import {
   Upload,
   UserPlus,
   Wand2,
+  Target,
+  HelpCircle,
 } from 'lucide-react';
 import {
   Collapsible,
@@ -30,17 +32,19 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
+import { useOnboarding } from '@/context/onboarding-context';
 
 const mainNavItems = [
   { href: '/', label: 'Home', icon: Home },
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, id: 'sidebar-dashboard-link' },
 ];
 
 const dataNavItems = [
-    { href: '/import', label: 'Import Data', icon: Upload },
+    { href: '/import', label: 'Import Data', icon: Upload, id: 'sidebar-import-link' },
 ];
 
 const aiToolsNavItems = [
+  { href: '/goal-planner', label: 'Goal Planner', icon: Target },
   { href: '/agents', label: 'AI Agents', icon: Wand2 },
   { href: '/chat', label: 'Chat with AI', icon: MessageCircle },
   { href: '/voice-assistant', label: 'Voice Assistant', icon: Mic },
@@ -56,6 +60,7 @@ const accountNavItems = [
 
 export function SidebarNav() {
   const pathname = usePathname();
+  const { startTour } = useOnboarding();
   const [isAiToolsOpen, setIsAiToolsOpen] = useState(
       aiToolsNavItems.some(item => pathname.startsWith(item.href))
   );
@@ -63,7 +68,7 @@ export function SidebarNav() {
   return (
     <SidebarMenu>
         {mainNavItems.map((item) => (
-            <SidebarMenuItem key={item.href}>
+            <SidebarMenuItem key={item.href} id={item.id}>
             <SidebarMenuButton
                 asChild
                 isActive={pathname === item.href}
@@ -83,7 +88,7 @@ export function SidebarNav() {
                 <span className="group-data-[collapsible=icon]:hidden">Data Management</span>
             </SidebarGroupLabel>
             {dataNavItems.map((item) => (
-                <SidebarMenuItem key={item.label}>
+                <SidebarMenuItem key={item.label} id={item.id}>
                 <SidebarMenuButton
                     asChild
                     isActive={pathname === item.href}
@@ -138,7 +143,7 @@ export function SidebarNav() {
         
          <SidebarGroup className="p-0 pt-4">
             <SidebarGroupLabel className="px-2 group-data-[collapsible=icon]:px-0">
-                <span className="group-data-[collapsible=icon]:hidden">Account Pages</span>
+                <span className="group-data-[collapsible=icon]:hidden">Account & Help</span>
             </SidebarGroupLabel>
             {accountNavItems.map((item) => (
                 <SidebarMenuItem key={item.label}>
@@ -155,6 +160,16 @@ export function SidebarNav() {
                 </SidebarMenuButton>
                 </SidebarMenuItem>
             ))}
+             <SidebarMenuItem>
+                <SidebarMenuButton
+                    onClick={startTour}
+                    tooltip="Help / Tour"
+                    className="justify-start"
+                >
+                    <HelpCircle />
+                    <span className="group-data-[collapsible=icon]:hidden">Help / Tour</span>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
         </SidebarGroup>
     </SidebarMenu>
   );

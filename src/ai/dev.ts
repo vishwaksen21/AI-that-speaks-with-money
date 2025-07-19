@@ -11,3 +11,5 @@ import '@/ai/tools/tax-calculator.ts';
 import '@/ai/flows/investment-agent.ts';
 import '@/ai/flows/savings-agent.ts';
 import '@/ai/flows/expense-agent.ts';
+import '@/ai/flows/health-score-agent.ts';
+import '@/ai/flows/goal-planner-agent.ts';

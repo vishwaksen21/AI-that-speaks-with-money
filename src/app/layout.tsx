@@ -4,6 +4,8 @@ import { Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { FinancialDataProvider } from '@/context/financial-data-context';
+import { OnboardingProvider } from '@/context/onboarding-context';
+import 'intro.js/introjs.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const spaceGrotesk = Space_Grotesk({
@@ -26,9 +28,11 @@ export default function RootLayout({
       <body
         className={`font-body antialiased`}
       >
-        <FinancialDataProvider>
-            {children}
-        </FinancialDataProvider>
+        <OnboardingProvider>
+            <FinancialDataProvider>
+                {children}
+            </FinancialDataProvider>
+        </OnboardingProvider>
         <Toaster />
       </body>
     </html>
