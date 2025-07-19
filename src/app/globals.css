@@ -102,3 +102,55 @@
       padding-bottom: 100%;
   }
 }
+
+/* Custom styles for Intro.js tour */
+@layer base {
+    .introjs-tooltip {
+        @apply bg-popover text-popover-foreground rounded-lg border shadow-lg max-w-sm;
+        font-family: var(--font-inter), sans-serif;
+    }
+    
+    .introjs-tooltiptext {
+        @apply text-sm p-4;
+    }
+
+    .introjs-progressbar {
+        @apply bg-primary;
+    }
+
+    .introjs-button {
+        @apply inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
+        @apply h-9 px-3;
+        text-shadow: none;
+    }
+    
+    .introjs-nextbutton {
+        @apply bg-primary text-primary-foreground hover:bg-primary/90;
+    }
+    
+    .introjs-prevbutton {
+        @apply border border-input bg-background hover:bg-accent hover:text-accent-foreground;
+    }
+
+    .introjs-skipbutton {
+        @apply text-muted-foreground hover:bg-transparent hover:text-foreground;
+    }
+    
+    .introjs-tooltip .introjs-button:focus {
+        @apply ring-2 ring-ring ring-offset-2;
+        box-shadow: none;
+    }
+
+    .introjs-arrow.top, .introjs-arrow.top-middle, .introjs-arrow.top-right {
+        @apply border-t-popover;
+    }
+    .introjs-arrow.right, .introjs-arrow.right-bottom {
+        @apply border-r-popover;
+    }
+     .introjs-arrow.left, .introjs-arrow.left-bottom {
+        @apply border-l-popover;
+    }
+     .introjs-arrow.bottom, .introjs-arrow.bottom-middle, .introjs-arrow.bottom-right {
+        @apply border-b-popover;
+    }
+}
