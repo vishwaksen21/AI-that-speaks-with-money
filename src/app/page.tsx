@@ -46,7 +46,7 @@ export default function LandingPage() {
                     </div>
                     <div className="relative h-96 w-full max-w-5xl mx-auto rounded-xl border shadow-lg overflow-hidden">
                         <Image
-                            src="https://storage.googleapis.com/static.aiprompt.io/713725b8-c397-4277-9610-1498b611e9df.png"
+                            src="https://storage.googleapis.com/static.aiprompt.io/a22e8424-6510-47b2-8438-e4b2d41579ac.png"
                             alt="Financial Dashboard Preview"
                             fill
                             style={{ objectFit: 'cover' }}
