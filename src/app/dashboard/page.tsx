@@ -100,7 +100,8 @@ function EmptyState() {
     );
 }
 
-export default function DashboardPage() {
+// Exported for use in other pages
+export function DashboardPageContent() {
   const { financialData, setFinancialData, isLoading } = useFinancialData();
 
   const handleAddTransaction = (newTransaction: {
@@ -141,19 +142,15 @@ export default function DashboardPage() {
   }
 
   if (isLoading) {
-    return (
-        <AppLayout pageTitle="Dashboard">
-             <DashboardSkeleton />
-        </AppLayout>
-    )
+    return <DashboardSkeleton />;
   }
 
   if (!financialData || financialData.user_id === 'user_default_123' || financialData.bank_accounts.length === 0) {
     return (
-        <AppLayout pageTitle="Welcome!">
+        <>
             <OnboardingTour />
             <EmptyState />
-        </AppLayout>
+        </>
     )
   }
 
@@ -181,7 +178,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <AppLayout pageTitle={`Hello, ${name}!`}>
+      <>
         <OnboardingTour />
       <div className="space-y-6">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -359,7 +356,7 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
       </div>
-    </AppLayout>
+    </>
   );
 }
 
@@ -570,4 +567,12 @@ function FinancialHealthCard({ financialData }: { financialData: FinancialData }
       </CardContent>
     </Card>
   );
+}
+
+export default function DashboardPage() {
+    return (
+      <AppLayout pageTitle="Dashboard">
+        <DashboardPageContent />
+      </AppLayout>
+    )
 }
