@@ -46,7 +46,7 @@ export default function LandingPage() {
                     </div>
                     <div className="relative h-96 w-full max-w-5xl mx-auto rounded-xl border shadow-lg overflow-hidden">
                         <Image
-                            src="https://firebasestudio-hosting.web.app/images/clx20d6g000021380m15d9yir.jpg"
+                            src="https://storage.googleapis.com/firebasestudio-hosting.appspot.com/assets/images/financetech.webp"
                             alt="Financial Dashboard Preview"
                             fill
                             style={{ objectFit: 'cover' }}
