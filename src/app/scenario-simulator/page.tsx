@@ -1,6 +1,6 @@
 
 'use client';
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { AppLayout } from '@/components/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -9,57 +9,33 @@ import { Loader2, Wand2, StopCircle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import ReactMarkdown from 'react-markdown';
 import { useFinancialData } from '@/context/financial-data-context';
-import { getScenarioResponse } from './actions';
-import { readStreamableValue } from 'ai/rsc';
+import { useCompletion } from 'ai/react';
 
 export default function ScenarioSimulatorPage() {
   const { financialData, isLoading: isDataLoading } = useFinancialData();
-  const [completion, setCompletion] = useState('');
-  const [input, setInput] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [abortController, setAbortController] = useState<AbortController | null>(null);
-
-  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (isDataLoading || !financialData || !input.trim()) return;
-    
-    setIsLoading(true);
-    setCompletion('');
-    const controller = new AbortController();
-    setAbortController(controller);
-
-    try {
-        const dataForAI = { ...financialData };
-        delete (dataForAI as any).transactions;
-        const financialDataString = JSON.stringify(dataForAI, null, 2);
-
-        const stream = await getScenarioResponse(input, financialDataString);
-        
-        let result = '';
-        for await (const delta of readStreamableValue(stream)) {
-             if (typeof delta === 'string') {
-                result += delta;
-                setCompletion(result);
-            }
-        }
-    } catch (error: any) {
-         if (error.name !== 'AbortError') {
-            console.error('Error fetching scenario response:', error);
-            setCompletion("Sorry, an error occurred while simulating your scenario. Please try again.");
-        }
-    } finally {
-        setIsLoading(false);
-        setAbortController(null);
-    }
-  };
-
-  const stop = () => {
-    if (abortController) {
-        abortController.abort();
-        setIsLoading(false);
-    }
-  };
   
+  const { completion, input, handleInputChange, handleSubmit, isLoading, stop } = useCompletion({
+    api: '/api/completion/scenario-simulator',
+  });
+
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    if (isDataLoading || !financialData) {
+        console.error("Financial data not loaded yet.");
+        return;
+    }
+    const dataForAI = { ...financialData };
+    delete (dataForAI as any).transactions;
+    const financialDataString = JSON.stringify(dataForAI, null, 2);
+
+    handleSubmit(e, {
+      options: {
+        body: {
+          financialData: financialDataString,
+        },
+      },
+    });
+  };
+
   const { analysis, recommendations } = useMemo(() => {
     if (!completion) {
       return { analysis: '', recommendations: '' };
@@ -86,8 +62,9 @@ export default function ScenarioSimulatorPage() {
           <Textarea
             placeholder='e.g., "What is the impact of a ₹50L home loan?" or "Project my wealth at age 40 if I increase my SIP by ₹5,000."'
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={handleInputChange}
             rows={4}
+            name="prompt"
             disabled={isLoading || isDataLoading}
           />
            <div className="flex items-center gap-2">
@@ -100,7 +77,7 @@ export default function ScenarioSimulatorPage() {
               {isLoading ? 'Generating...' : 'Simulate Scenario'}
             </Button>
             {isLoading && (
-              <Button variant="outline" onClick={stop}>
+              <Button variant="outline" type="button" onClick={stop}>
                 <StopCircle className="mr-2 h-4 w-4" />
                 Stop
               </Button>
@@ -161,3 +138,5 @@ export default function ScenarioSimulatorPage() {
     </AppLayout>
   );
 }
+
+    

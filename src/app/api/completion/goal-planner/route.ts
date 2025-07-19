@@ -1,11 +1,15 @@
 
-'use server';
+// /src/app/api/completion/goal-planner/route.ts
 
 import { streamText } from 'ai';
 import { google } from '@ai-sdk/google';
-
-export async function getGoalResponse(goalDescription: string, financialData: string) {
-    const prompt = `You are an expert financial planning AI that specializes in creating actionable goal-based plans.
+ 
+export const runtime = 'edge';
+ 
+export async function POST(req: Request) {
+  const { prompt, financialData } = await req.json();
+ 
+  const fullPrompt = `You are an expert financial planning AI that specializes in creating actionable goal-based plans.
 
 Your task is to analyze the user's stated goal and their current financial situation to create a clear, step-by-step plan.
 
@@ -24,17 +28,17 @@ User's Financial Data:
 ${financialData}
 \`\`\`
 
-User's Goal: "${goalDescription}"
+User's Goal: "${prompt}"
 
 Begin your response now.
 `;
 
     const result = await streamText({
         model: google('models/gemini-1.5-flash-latest'),
-        prompt: prompt,
+        prompt: fullPrompt,
     });
     
-    return result.toAIStream();
+    return result.toAIStreamResponse();
 }
 
     

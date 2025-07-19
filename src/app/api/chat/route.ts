@@ -1,11 +1,13 @@
 
 import { generatePersonalizedFinancialInsights } from '@/ai/flows/insight-generation';
-import { type CoreMessage } from 'ai';
+import { type CoreMessage, streamText } from 'ai';
+import { google } from '@ai-sdk/google';
+import { taxCalculatorTool } from '@/ai/tools/tax-calculator';
 
 export const runtime = 'edge';
  
 export async function POST(req: Request) {
-  const { messages }: { messages: CoreMessage[] } = await req.json();
+  const { messages, data }: { messages: CoreMessage[], data?: { financialData?: string } } = await req.json();
 
   const lastUserMessage = messages.findLast((m) => m.role === 'user');
 
@@ -14,7 +16,7 @@ export async function POST(req: Request) {
   }
 
   const userQuestion = lastUserMessage.content as string;
-  const financialData = lastUserMessage.data?.financialData as string | undefined;
+  const financialData = data?.financialData;
 
   if (!userQuestion || !financialData) {
      return new Response('Missing user question or financial data', { status: 400 });
@@ -25,5 +27,7 @@ export async function POST(req: Request) {
     financialData,
   });
  
-  return result;
+  return result.toAIStream();
 }
+
+    

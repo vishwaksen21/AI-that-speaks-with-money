@@ -11,40 +11,45 @@ import { Send, User, Bot, Loader2, StopCircle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import ReactMarkdown from 'react-markdown';
 import { Logo } from '@/components/icons';
-import { useChat } from 'ai/react';
+import { useChat, type Message } from 'ai/react';
 import { useFinancialData } from '@/context/financial-data-context';
+
+const CHAT_HISTORY_KEY = 'chatHistory';
 
 export default function ChatPage() {
   const { financialData, isLoading: isDataLoading } = useFinancialData();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  
-  const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages, stop, append } = useChat({
-    api: '/api/chat', // Note: this uses a custom API route for streaming with Vercel AI SDK
+
+  const { messages, input, handleInputChange, handleSubmit, isLoading, stop, setMessages } = useChat({
     onFinish: (message) => {
-      // Save history on completion
+      // Save full history on completion
       const updatedMessages = [...messages, message];
       try {
-        localStorage.setItem('chatHistory', JSON.stringify(updatedMessages));
+        localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(updatedMessages));
       } catch (error) {
-          console.error('Failed to save messages to local storage', error);
+        console.error('Failed to save messages to local storage', error);
       }
+    },
+    body: {
+        financialData: financialData ? JSON.stringify(financialData, null, 2) : ''
     }
   });
 
   useEffect(() => {
-    if (financialData) {
-        try {
-            const savedMessages = localStorage.getItem('chatHistory');
-            if (savedMessages) {
-                setMessages(JSON.parse(savedMessages));
-            }
-        } catch (error) {
-            console.error('Failed to load messages from local storage', error);
-        }
+    // Load chat history from local storage on initial render
+    try {
+      const savedMessages = localStorage.getItem(CHAT_HISTORY_KEY);
+      if (savedMessages) {
+        setMessages(JSON.parse(savedMessages));
+      }
+    } catch (error) {
+      console.error('Failed to load messages from local storage', error);
+      setMessages([]);
     }
-  }, [financialData, setMessages]);
-  
+  }, [setMessages]);
+
   useEffect(() => {
+    // Scroll to bottom when messages change
     if (scrollAreaRef.current) {
       scrollAreaRef.current.scrollTo({
         top: scrollAreaRef.current.scrollHeight,
@@ -52,22 +57,21 @@ export default function ChatPage() {
       });
     }
   }, [messages]);
-
+  
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
     if (isDataLoading || !financialData) {
         console.error("Financial data not loaded yet.");
         return;
     }
     const dataForAI = { ...financialData };
     delete (dataForAI as any).transactions;
-    
-    append({
-      role: 'user',
-      content: input,
-      data: {
-        financialData: JSON.stringify(dataForAI, null, 2)
-      }
+
+    handleSubmit(e, {
+        options: {
+            body: {
+                financialData: JSON.stringify(dataForAI, null, 2)
+            }
+        }
     });
   }
 
@@ -155,3 +159,5 @@ export default function ChatPage() {
     </AppLayout>
   );
 }
+
+    
