@@ -23,6 +23,7 @@ import {
   Upload,
   UserPlus,
   Wand2,
+  Target,
 } from 'lucide-react';
 import { useFinancialData } from '@/context/financial-data-context';
 
@@ -44,6 +45,7 @@ export function CommandMenu({ open, setOpen }: CommandMenuProps) {
       { href: '/home', label: 'Home', icon: Home },
       { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
       { href: '/import', label: 'Import Data', icon: Upload },
+      { href: '/goal-planner', label: 'Goal Planner', icon: Target },
       { href: '/agents', label: 'AI Agents', icon: Wand2 },
       { href: '/chat', label: 'Chat with AI', icon: MessageCircle },
       { href: '/voice-assistant', label: 'Voice Assistant', icon: Mic },
