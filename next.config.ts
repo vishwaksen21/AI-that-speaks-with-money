@@ -1,12 +1,13 @@
 
-import type {NextConfig} from 'next';
-
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
-})
+});
 
-const nextConfig: NextConfig = {
-  /* config options here */
+/** @type {import('next').NextConfig} */
+const nextConfig = withBundleAnalyzer({
+  // Add your custom config here
+  reactStrictMode: true,
+  swcMinify: true,
   images: {
     remotePatterns: [
       {
@@ -29,6 +30,15 @@ const nextConfig: NextConfig = {
       }
     ],
   },
-};
+  // REMOVE these two lines in production for safety
+  // They are dangerous if left on in deployed environments
+  // Only use them temporarily during local development if needed
+  // typescript: {
+  //   ignoreBuildErrors: true,
+  // },
+  // eslint: {
+  //   ignoreDuringBuilds: true,
+  // },
+});
 
-export default withBundleAnalyzer(nextConfig);
+module.exports = nextConfig;
