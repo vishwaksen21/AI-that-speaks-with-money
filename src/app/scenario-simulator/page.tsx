@@ -1,5 +1,6 @@
 
 'use client';
+
 import { useState, useMemo } from 'react';
 import { AppLayout } from '@/components/app-layout';
 import { Button } from '@/components/ui/button';
@@ -7,10 +8,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Wand2, StopCircle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import ReactMarkdown from 'react-markdown';
 import { useFinancialData } from '@/context/financial-data-context';
 import { useActions, useUIState } from 'ai/rsc';
-import type { AI } from './actions';
+import type { AI } from './actions.tsx';
+import ReactMarkdown from 'react-markdown';
 
 export default function ScenarioSimulatorPage() {
   const { financialData, isLoading: isDataLoading } = useFinancialData();
@@ -37,25 +38,32 @@ export default function ScenarioSimulatorPage() {
         display: <div>User message</div>, // Placeholder
       },
     ]);
-
-    const responseMessage = await getScenarioResponse(inputValue, financialDataString);
-    setMessages(currentMessages => [...currentMessages, responseMessage]);
-    setIsStreaming(false);
+    
+    try {
+        const responseMessage = await getScenarioResponse(inputValue, financialDataString);
+        setMessages(currentMessages => [...currentMessages, responseMessage]);
+    } catch(error) {
+        console.error("Failed to get scenario response", error);
+    } finally {
+        setIsStreaming(false);
+        setInputValue('');
+    }
   };
   
   const lastMessage = messages[messages.length-1];
-  const completion = lastMessage?.role === 'assistant' ? lastMessage.display : null;
-  const completionText = lastMessage?.role === 'assistant' ? lastMessage.content : '';
-  
+
   const { analysis, recommendations } = useMemo(() => {
-    if (!completionText) {
-      return { analysis: '', recommendations: '' };
+    if (!lastMessage || lastMessage.role !== 'assistant' || !lastMessage.content) {
+      return { analysis: null, recommendations: null };
     }
-    const parts = completionText.split('### Recommendations');
+    const parts = lastMessage.content.split('### Recommendations');
     const analysisPart = parts[0].replace('### Scenario Analysis', '').trim();
     const recommendationsPart = parts[1] || '';
-    return { analysis: analysisPart, recommendations: recommendationsPart };
-  }, [completionText]);
+    return { 
+        analysis: <ReactMarkdown className="prose prose-sm max-w-none dark:prose-invert">{analysisPart}</ReactMarkdown>, 
+        recommendations: <ReactMarkdown className="prose prose-sm max-w-none dark:prose-invert">{recommendationsPart}</ReactMarkdown>
+    };
+  }, [lastMessage]);
 
   return (
     <AppLayout pageTitle="Scenario Simulator">
@@ -95,7 +103,7 @@ export default function ScenarioSimulatorPage() {
           </div>
         </form>
 
-        {(isStreaming && !completion) && (
+        {(isStreaming && !lastMessage?.display) && (
             <div className="grid md:grid-cols-2 gap-6">
                 <Card>
                     <CardHeader>
@@ -124,22 +132,22 @@ export default function ScenarioSimulatorPage() {
             </div>
         )}
 
-        {completion && (
+        {lastMessage?.display && (
           <div className="grid md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
                 <CardTitle className="font-headline">Scenario Analysis</CardTitle>
               </CardHeader>
-              <CardContent className="prose prose-sm max-w-none dark:prose-invert">
-                <ReactMarkdown>{analysis}</ReactMarkdown>
+              <CardContent>
+                {analysis}
               </CardContent>
             </Card>
             <Card>
               <CardHeader>
                 <CardTitle className="font-headline">Recommendations</CardTitle>
               </CardHeader>
-              <CardContent className="prose prose-sm max-w-none dark:prose-invert">
-                <ReactMarkdown>{recommendations}</ReactMarkdown>
+              <CardContent>
+                {recommendations}
               </CardContent>
             </Card>
           </div>

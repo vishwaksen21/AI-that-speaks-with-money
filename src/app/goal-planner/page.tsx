@@ -1,15 +1,17 @@
 
 'use client';
+
+import { useState } from 'react';
 import { AppLayout } from '@/components/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Wand2, Target, StopCircle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import ReactMarkdown from 'react-markdown';
 import { useFinancialData } from '@/context/financial-data-context';
 import { useActions, useUIState } from 'ai/rsc';
-import type { AI } from './actions';
+import type { AI } from './actions.tsx';
+import ReactMarkdown from 'react-markdown';
 
 export default function GoalPlannerPage() {
   const { financialData, isLoading: isDataLoading } = useFinancialData();
@@ -37,13 +39,18 @@ export default function GoalPlannerPage() {
       },
     ]);
 
-    const responseMessage = await getGoalPlan(inputValue, financialDataString);
-    setMessages(currentMessages => [...currentMessages, responseMessage]);
-    setIsStreaming(false);
+    try {
+        const responseMessage = await getGoalPlan(inputValue, financialDataString);
+        setMessages(currentMessages => [...currentMessages, responseMessage]);
+    } catch (error) {
+        console.error("Failed to get goal plan", error);
+    } finally {
+        setIsStreaming(false);
+        setInputValue('');
+    }
   };
   
   const lastMessage = messages[messages.length - 1];
-  const completion = lastMessage?.role === 'assistant' ? lastMessage.display : null;
 
   return (
     <AppLayout pageTitle="Financial Goal Planner">
@@ -89,7 +96,7 @@ export default function GoalPlannerPage() {
           </div>
         </form>
 
-        {(isStreaming && !completion) && (
+        {(isStreaming && (!lastMessage || lastMessage.role !== 'assistant')) && (
             <Card>
                 <CardHeader>
                     <CardTitle className="font-headline">Generating Your Personalized Plan...</CardTitle>
@@ -106,14 +113,14 @@ export default function GoalPlannerPage() {
             </Card>
         )}
 
-        {completion && (
+        {lastMessage && lastMessage.role === 'assistant' && (
           <Card>
             <CardHeader>
                 <CardTitle className="font-headline">Your Personalized Financial Plan</CardTitle>
                 <CardDescription>Here is a step-by-step guide to help you reach your goal.</CardDescription>
             </CardHeader>
-            <CardContent className="prose prose-sm max-w-none dark:prose-invert">
-                {completion}
+            <CardContent>
+                {lastMessage.display}
             </CardContent>
           </Card>
         )}
