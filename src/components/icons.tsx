@@ -3,26 +3,46 @@ import type { SVGProps } from 'react';
 export function Logo(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 100 100"
-      width={32}
-      height={32}
-      {...props}
+        viewBox="0 0 100 100"
+        xmlns="http://www.w3.org/2000/svg"
+        {...props}
     >
-      <defs>
-        <linearGradient id="logo-bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="hsl(262, 83%, 58%)" />
-          <stop offset="100%" stopColor="hsl(240, 10%, 20%)" />
-        </linearGradient>
-      </defs>
-      <circle cx="50" cy="50" r="48" fill="url(#logo-bg-gradient)" stroke="#FFF" strokeWidth="2" />
-      <g fill="#FFFFFF" transform="translate(25, 25) scale(0.5)">
-        {/* Stylized 'F' */}
-        <path d="M30,10 H70 V25 H45 V90 H30 V10 Z" />
-        {/* Stylized 'A' */}
-        <path d="M60,90 L75,90 L90,40 H75 L70,55 L65,40 H50 L60,90 Z" transform="translate(5, 0)" />
-        <path d="M55,65 H80" stroke="#FFFFFF" strokeWidth="8" strokeLinecap="round" />
-      </g>
+        <defs>
+            <linearGradient id="blue-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#2A45B4" />
+                <stop offset="100%" stopColor="#4A65D4" />
+            </linearGradient>
+            <linearGradient id="green-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#1E8A7A" />
+                <stop offset="100%" stopColor="#34D399" />
+            </linearGradient>
+            <linearGradient id="gold-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#FBBF24" />
+                <stop offset="100%" stopColor="#D97706" />
+            </linearGradient>
+        </defs>
+
+        {/* Top-left rounded shape */}
+        <path d="M22,35 C15,35 15,25 22,25 L38,25 C45,25 45,35 38,35 Z" fill="url(#blue-gradient)" />
+
+        {/* Bottom-right rounded shape */}
+        <path d="M78,65 C85,65 85,75 78,75 L62,75 C55,75 55,65 62,65 Z" fill="url(#green-gradient)" />
+
+        {/* Middle lines */}
+        <path d="M35,42 C50,42 50,58 65,58" stroke="url(#blue-gradient)" strokeWidth="4" fill="none" strokeLinecap="round" />
+        <path d="M42,50 C57,50 57,66 72,66" stroke="url(#green-gradient)" strokeWidth="4" fill="none" strokeLinecap="round" />
+        
+        {/* Top small gold circle */}
+        <circle cx="28" cy="18" r="5" fill="url(#gold-gradient)" />
+
+        {/* Middle big gold circle */}
+        <circle cx="75" cy="55" r="6" fill="url(#gold-gradient)" />
+        
+        {/* Bottom-left small blue circle */}
+        <circle cx="25" cy="58" r="5" fill="#3A55C4" />
+
+        {/* Bottom-right small green circle */}
+        <circle cx="60" cy="85" r="4" fill="#2AAE8D" />
     </svg>
   );
 }
