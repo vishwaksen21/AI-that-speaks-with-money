@@ -250,8 +250,8 @@ export default function DashboardPage() {
 
         <FinancialHealthCard financialData={financialData} />
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-1 space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="md:col-span-1 space-y-6">
                 <Card>
                     <CardHeader><CardTitle className="font-headline text-lg">Profile</CardTitle></CardHeader>
                     <CardContent className="space-y-3 text-sm">
@@ -265,68 +265,82 @@ export default function DashboardPage() {
                     <CardHeader><CardTitle className="font-headline text-lg">Investments</CardTitle></CardHeader>
                     <CardContent>
                          <h4 className="font-semibold mb-2 text-base">Mutual Funds</h4>
-                        <Table>
-                            <TableHeader><TableRow><TableHead>Fund</TableHead><TableHead className="text-right">Value</TableHead></TableRow></TableHeader>
-                            <TableBody>
-                                {financialData.mutual_funds?.map(mf => <TableRow key={mf.name}><TableCell>{mf.name}</TableCell><TableCell className="text-right">{formatCurrency(mf.current_value, currency)}</TableCell></TableRow>)}
-                            </TableBody>
-                        </Table>
+                         <div className="overflow-x-auto">
+                            <Table>
+                                <TableHeader><TableRow><TableHead>Fund</TableHead><TableHead className="text-right">Value</TableHead></TableRow></TableHeader>
+                                <TableBody>
+                                    {financialData.mutual_funds?.map(mf => <TableRow key={mf.name}><TableCell>{mf.name}</TableCell><TableCell className="text-right">{formatCurrency(mf.current_value, currency)}</TableCell></TableRow>)}
+                                </TableBody>
+                            </Table>
+                         </div>
                          <h4 className="font-semibold mt-4 mb-2 text-base">SIPs</h4>
-                         <Table>
-                            <TableHeader><TableRow><TableHead>Fund</TableHead><TableHead className="text-right">Monthly</TableHead></TableRow></TableHeader>
-                            <TableBody>
-                                {financialData.sips?.map(sip => <TableRow key={sip.name}><TableCell>{sip.name}</TableCell><TableCell className="text-right">{formatCurrency(sip.monthly_investment, currency)}</TableCell></TableRow>)}
-                            </TableBody>
-                        </Table>
+                         <div className="overflow-x-auto">
+                            <Table>
+                                <TableHeader><TableRow><TableHead>Fund</TableHead><TableHead className="text-right">Monthly</TableHead></TableRow></TableHeader>
+                                <TableBody>
+                                    {financialData.sips?.map(sip => <TableRow key={sip.name}><TableCell>{sip.name}</TableCell><TableCell className="text-right">{formatCurrency(sip.monthly_investment, currency)}</TableCell></TableRow>)}
+                                </TableBody>
+                            </Table>
+                         </div>
                     </CardContent>
                 </Card>
             </div>
-             <div className="lg:col-span-1 space-y-6">
+             <div className="md:col-span-1 space-y-6">
                 <Card>
                     <CardHeader><CardTitle className="font-headline text-lg">Assets</CardTitle></CardHeader>
                     <CardContent>
                         <h4 className="font-semibold mb-2 text-base">Bank Accounts</h4>
-                        <Table>
-                           <TableHeader><TableRow><TableHead>Bank</TableHead><TableHead className="text-right">Balance</TableHead></TableRow></TableHeader>
-                           <TableBody>
-                                {financialData.bank_accounts?.map(acc => <TableRow key={acc.bank}><TableCell>{acc.bank}</TableCell><TableCell className="text-right">{formatCurrency(acc.balance, currency)}</TableCell></TableRow>)}
-                           </TableBody>
-                        </Table>
+                         <div className="overflow-x-auto">
+                            <Table>
+                               <TableHeader><TableRow><TableHead>Bank</TableHead><TableHead className="text-right">Balance</TableHead></TableRow></TableHeader>
+                               <TableBody>
+                                    {financialData.bank_accounts?.map(acc => <TableRow key={acc.bank}><TableCell>{acc.bank}</TableCell><TableCell className="text-right">{formatCurrency(acc.balance, currency)}</TableCell></TableRow>)}
+                               </TableBody>
+                            </Table>
+                         </div>
                         <h4 className="font-semibold mt-4 mb-2 text-base">Stocks</h4>
-                         <Table>
-                            <TableHeader><TableRow><TableHead>Stock</TableHead><TableHead className="text-right">Value</TableHead></TableRow></TableHeader>
-                            <TableBody>
-                                {financialData.stocks?.map(s => <TableRow key={s.ticker}><TableCell>{s.ticker}</TableCell><TableCell className="text-right">{formatCurrency(s.shares * s.current_price, currency)}</TableCell></TableRow>)}
-                            </TableBody>
-                        </Table>
+                         <div className="overflow-x-auto">
+                             <Table>
+                                <TableHeader><TableRow><TableHead>Stock</TableHead><TableHead className="text-right">Value</TableHead></TableRow></TableHeader>
+                                <TableBody>
+                                    {financialData.stocks?.map(s => <TableRow key={s.ticker}><TableCell>{s.ticker}</TableCell><TableCell className="text-right">{formatCurrency(s.shares * s.current_price, currency)}</TableCell></TableRow>)}
+                                </TableBody>
+                            </Table>
+                         </div>
                          <h4 className="font-semibold mt-4 mb-2 text-base">Other Assets</h4>
-                         <Table>
-                             <TableBody>
-                                {financialData.real_estate?.map(re => <TableRow key={re.property_type}><TableCell>{re.property_type}</TableCell><TableCell className="text-right">{formatCurrency(re.market_value, currency)}</TableCell></TableRow>)}
-                                <TableRow><TableCell>PPF</TableCell><TableCell className="text-right">{formatCurrency(financialData.ppf, currency)}</TableCell></TableRow>
-                             </TableBody>
-                         </Table>
+                         <div className="overflow-x-auto">
+                             <Table>
+                                 <TableBody>
+                                    {financialData.real_estate?.map(re => <TableRow key={re.property_type}><TableCell>{re.property_type}</TableCell><TableCell className="text-right">{formatCurrency(re.market_value, currency)}</TableCell></TableRow>)}
+                                    <TableRow><TableCell>PPF</TableCell><TableCell className="text-right">{formatCurrency(financialData.ppf, currency)}</TableCell></TableRow>
+                                 </TableBody>
+                             </Table>
+                         </div>
                     </CardContent>
                 </Card>
             </div>
-            <div className="lg:col-span-1 space-y-6">
+            <div className="md:col-span-1 space-y-6">
                 <Card>
                     <CardHeader><CardTitle className="font-headline text-lg">Liabilities</CardTitle></CardHeader>
                     <CardContent>
                         <h4 className="font-semibold mb-2 text-base">Loans</h4>
-                        <Table>
-                            <TableHeader><TableRow><TableHead>Type</TableHead><TableHead className="text-right">Outstanding</TableHead></TableRow></TableHeader>
-                            <TableBody>
-                               {financialData.loans?.map(l => <TableRow key={l.type}><TableCell>{l.type}</TableCell><TableCell className="text-right">{formatCurrency(l.outstanding_amount, currency)}</TableCell></TableRow>)}
-                            </TableBody>
-                        </Table>
+                        <div className="overflow-x-auto">
+                            <Table>
+                                <TableHeader><TableRow><TableHead>Type</TableHead><TableHead className="text-right">Outstanding</TableHead></TableRow></TableHeader>
+                                <TableBody>
+                                   {financialData.loans?.map(l => <TableRow key={l.type}><TableCell>{l.type}</TableCell><TableCell className="text-right">{formatCurrency(l.outstanding_amount, currency)}</TableCell></TableRow>)}
+                                </TableBody>
+                            </Table>
+                        </div>
                         <h4 className="font-semibold mt-4 mb-2 text-base">Credit Cards</h4>
-                        <Table>
-                            <TableHeader><TableRow><TableHead>Issuer</TableHead><TableHead className="text-right">Balance</TableHead></TableRow></TableHeader>
-                             <TableBody>
-                                {financialData.credit_cards?.map(cc => <TableRow key={cc.issuer}><TableCell>{cc.issuer}</TableCell><TableCell className="text-right">{formatCurrency(cc.outstanding_balance, currency)}</TableCell></TableRow>)}
-                             </TableBody>
-                        </Table>
+                        <div className="overflow-x-auto">
+                            <Table>
+                                <TableHeader><TableRow><TableHead>Issuer</TableHead><TableHead className="text-right">Balance</TableHead></TableRow></TableHeader>
+                                 <TableBody>
+                                    {financialData.credit_cards?.map(cc => <TableRow key={cc.issuer}><TableCell>{cc.issuer}</TableCell><TableCell className="text-right">{formatCurrency(cc.outstanding_balance, currency)}</TableCell></TableRow>)}
+                                 </TableBody>
+                            </Table>
+                        </div>
                     </CardContent>
                 </Card>
             </div>
@@ -557,4 +571,3 @@ function FinancialHealthCard({ financialData }: { financialData: FinancialData }
     </Card>
   );
 }
-

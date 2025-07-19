@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { User, Mail, LogOut, AlertTriangle, Trash2 } from 'lucide-react';
+import { User, Mail, LogOut, AlertTriangle, Trash2, Sun, Moon, Laptop } from 'lucide-react';
 import Image from 'next/image';
 import { useFinancialData } from '@/context/financial-data-context';
 import {
@@ -25,6 +25,26 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
 import { defaultFinancialData } from '@/lib/mock-data';
+import { useTheme } from 'next-themes';
+import { Separator } from '@/components/ui/separator';
+
+function ThemeToggle() {
+    const { setTheme, theme } = useTheme();
+
+    return (
+        <div className="flex items-center justify-between rounded-lg border p-4">
+            <div>
+                <h4 className="font-semibold">Theme</h4>
+                <p className="text-sm text-muted-foreground">Select your preferred color scheme.</p>
+            </div>
+            <div className="flex items-center gap-2 rounded-md bg-muted p-1">
+                <Button variant={theme === 'light' ? 'default' : 'ghost'} size="icon" className="h-8 w-8" onClick={() => setTheme('light')}><Sun/></Button>
+                <Button variant={theme === 'dark' ? 'default' : 'ghost'} size="icon" className="h-8 w-8" onClick={() => setTheme('dark')}><Moon/></Button>
+                <Button variant={theme === 'system' ? 'default' : 'ghost'} size="icon" className="h-8 w-8" onClick={() => setTheme('system')}><Laptop/></Button>
+            </div>
+        </div>
+    )
+}
 
 export default function ProfilePage() {
   const { financialData, setFinancialData } = useFinancialData();
@@ -43,13 +63,13 @@ export default function ProfilePage() {
   };
 
   return (
-    <AppLayout pageTitle="Profile">
+    <AppLayout pageTitle="Profile & Settings">
       <div className="max-w-3xl mx-auto space-y-6">
         <Card>
           <CardHeader>
             <div className="flex items-center gap-4">
               <Avatar className="h-16 w-16 border-2 border-primary">
-                <Image src="https://placehold.co/100x100.png" alt="User Avatar" width={64} height={64} data-ai-hint="person portrait" />
+                <Image src="https://placehold.co/100x100.png" alt="A placeholder portrait of the user." width={64} height={64} data-ai-hint="person portrait" />
                 <AvatarFallback>
                   {financialData?.profile_name?.split(' ').map(n => n[0]).join('') || 'U'}
                 </AvatarFallback>
@@ -83,6 +103,16 @@ export default function ProfilePage() {
                 </Button>
             </div>
           </CardContent>
+        </Card>
+        
+        <Card>
+            <CardHeader>
+                <CardTitle className="font-headline">Settings</CardTitle>
+                <CardDescription>Customize your application experience.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <ThemeToggle />
+            </CardContent>
         </Card>
 
         <Card className="border-destructive/50">

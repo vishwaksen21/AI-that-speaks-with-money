@@ -6,6 +6,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { FinancialDataProvider } from '@/context/financial-data-context';
 import { OnboardingProvider } from '@/context/onboarding-context';
 import 'intro.js/introjs.css';
+import { ThemeProvider } from '@/components/theme-provider';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const spaceGrotesk = Space_Grotesk({
@@ -28,12 +29,19 @@ export default function RootLayout({
       <body
         className={`font-body antialiased`}
       >
-        <OnboardingProvider>
-            <FinancialDataProvider>
-                {children}
-            </FinancialDataProvider>
-        </OnboardingProvider>
-        <Toaster />
+        <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+        >
+            <OnboardingProvider>
+                <FinancialDataProvider>
+                    {children}
+                </FinancialDataProvider>
+            </OnboardingProvider>
+            <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

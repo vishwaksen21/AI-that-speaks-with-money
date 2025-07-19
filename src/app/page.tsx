@@ -47,7 +47,7 @@ export default function LandingPage() {
                     <div className="relative h-96 w-full max-w-5xl mx-auto rounded-xl border shadow-lg overflow-hidden">
                         <Image
                             src="https://storage.googleapis.com/firebasestudio-hosting.appspot.com/assets/images/financetech.webp"
-                            alt="Financial Dashboard Preview"
+                            alt="A futuristic financial dashboard showing charts and data visualizations."
                             fill
                             priority
                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -87,7 +87,7 @@ export default function LandingPage() {
                     <div className="relative h-64 md:h-80 rounded-lg overflow-hidden">
                         <Image 
                             src="https://placehold.co/600x400.png" 
-                            alt="AI analyzing financial data" 
+                            alt="An abstract visualization of financial data being analyzed by AI."
                             fill 
                             style={{ objectFit: 'cover' }}
                             data-ai-hint="abstract finance data"
@@ -131,7 +131,7 @@ export default function LandingPage() {
                         </ul>
                     </div>
                      <div className="relative h-64 md:h-80 rounded-lg overflow-hidden">
-                        <Image src="https://placehold.co/600x400.png" alt="Security & Privacy First shield" fill style={{ objectFit: 'cover' }} data-ai-hint="security shield" />
+                        <Image src="https://placehold.co/600x400.png" alt="A shield icon representing data security and privacy." fill style={{ objectFit: 'cover' }} data-ai-hint="security shield" />
                     </div>
                 </div>
             </section>
@@ -190,7 +190,7 @@ export default function LandingPage() {
                      <p className="text-muted-foreground mt-2 mb-8 max-w-2xl mx-auto">Don't just take our word for it. Here's what our users have to say about their experience.</p>
                     <Card className="max-w-3xl mx-auto text-left">
                         <CardHeader className="flex-row items-center gap-4">
-                            <Image src="https://placehold.co/100x100.png" alt="User avatar" width={56} height={56} className="rounded-full" data-ai-hint="person portrait" />
+                            <Image src="https://placehold.co/100x100.png" alt="Portrait of a satisfied user." width={56} height={56} className="rounded-full" data-ai-hint="person portrait" />
                             <div>
                                 <CardTitle className="font-headline text-xl">Sarah K.</CardTitle>
                                 <div className="flex text-yellow-500 mt-1">

@@ -33,6 +33,7 @@ import {
 } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
 import { useOnboarding } from '@/context/onboarding-context';
+import { FeedbackDialog } from './feedback-dialog';
 
 const mainNavItems = [
   { href: '/', label: 'Home', icon: Home },
@@ -169,6 +170,9 @@ export function SidebarNav() {
                     <HelpCircle />
                     <span className="group-data-[collapsible=icon]:hidden">Help / Tour</span>
                 </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <FeedbackDialog />
             </SidebarMenuItem>
         </SidebarGroup>
     </SidebarMenu>
