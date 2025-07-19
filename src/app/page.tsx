@@ -46,11 +46,11 @@ export default function LandingPage() {
                     </div>
                     <div className="relative h-96 w-full max-w-5xl mx-auto rounded-xl border shadow-lg overflow-hidden">
                         <Image
-                            src="https://placehold.co/1200x600.png"
+                            src="https://placehold.co/1200x600/7c3aed/ffffff.png"
                             alt="Financial Dashboard Preview"
                             fill
                             style={{ objectFit: 'cover' }}
-                            data-ai-hint="finance technology"
+                            data-ai-hint="finance technology dashboard"
                         />
                     </div>
                 </div>
@@ -84,7 +84,7 @@ export default function LandingPage() {
                 <div className="grid md:grid-cols-2 gap-12 items-center">
                     <div className="relative h-64 md:h-80 rounded-lg overflow-hidden">
                         <Image 
-                            src="https://placehold.co/600x400.png" 
+                            src="https://placehold.co/600x400/7c3aed/ffffff.png" 
                             alt="AI analyzing financial data" 
                             fill 
                             style={{ objectFit: 'cover' }}
@@ -209,5 +209,4 @@ export default function LandingPage() {
         </div>
     </AppLayout>
   );
-
-    
+}
