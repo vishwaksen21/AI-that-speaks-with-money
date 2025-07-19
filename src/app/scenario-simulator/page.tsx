@@ -53,16 +53,15 @@ export default function ScenarioSimulatorPage() {
   const lastMessage = messages[messages.length-1];
 
   const { analysis, recommendations } = useMemo(() => {
-    if (!lastMessage || lastMessage.role !== 'assistant' || !lastMessage.content) {
-      return { analysis: null, recommendations: null };
+    if (!lastMessage || !lastMessage.display) {
+        return { analysis: null, recommendations: null };
     }
-    const parts = lastMessage.content.split('### Recommendations');
-    const analysisPart = parts[0].replace('### Scenario Analysis', '').trim();
-    const recommendationsPart = parts[1] || '';
-    return { 
-        analysis: <ReactMarkdown className="prose prose-sm max-w-none dark:prose-invert">{analysisPart}</ReactMarkdown>, 
-        recommendations: <ReactMarkdown className="prose prose-sm max-w-none dark:prose-invert">{recommendationsPart}</ReactMarkdown>
-    };
+    
+    // Since display is a ReactNode, we can't easily split it.
+    // Let's just render the whole thing in the analysis card for now.
+    // A more complex solution would involve passing structured data.
+    return { analysis: lastMessage.display, recommendations: null };
+
   }, [lastMessage]);
 
   return (
@@ -104,53 +103,31 @@ export default function ScenarioSimulatorPage() {
         </form>
 
         {(isStreaming && !lastMessage?.display) && (
-            <div className="grid md:grid-cols-2 gap-6">
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="font-headline">Scenario Analysis</CardTitle>
-                        <CardDescription>Calculating potential outcomes...</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                        <Skeleton className="h-4 w-full" />
-                        <Skeleton className="h-4 w-full" />
-                        <Skeleton className="h-4 w-5/6" />
-                         <Skeleton className="h-4 w-full" />
-                        <Skeleton className="h-4 w-4/6" />
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="font-headline">Recommendations</CardTitle>
-                         <CardDescription>Generating actionable advice...</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                        <Skeleton className="h-4 w-full" />
-                        <Skeleton className="h-4 w-full" />
-                        <Skeleton className="h-4 w-5/6" />
-                    </CardContent>
-                </Card>
-            </div>
+            <Card>
+                <CardHeader>
+                    <CardTitle className="font-headline">Simulation in Progress...</CardTitle>
+                    <CardDescription>Calculating potential outcomes and generating actionable advice...</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-2 pt-4">
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-5/6" />
+                    <Skeleton className="h-4 w-full mt-4" />
+                    <Skeleton className="h-4 w-4/6" />
+                </CardContent>
+            </Card>
         )}
 
         {lastMessage?.display && (
-          <div className="grid md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="font-headline">Scenario Analysis</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {analysis}
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle className="font-headline">Recommendations</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {recommendations}
-              </CardContent>
-            </Card>
-          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="font-headline">AI-Powered Simulation Result</CardTitle>
+               <CardDescription>Here is the analysis and recommendations based on your scenario.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {lastMessage.display}
+            </CardContent>
+          </Card>
         )}
       </div>
     </AppLayout>

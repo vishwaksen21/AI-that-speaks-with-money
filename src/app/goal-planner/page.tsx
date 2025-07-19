@@ -11,7 +11,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useFinancialData } from '@/context/financial-data-context';
 import { useActions, useUIState } from 'ai/rsc';
 import type { AI } from './actions.tsx';
-import ReactMarkdown from 'react-markdown';
 
 export default function GoalPlannerPage() {
   const { financialData, isLoading: isDataLoading } = useFinancialData();
@@ -96,7 +95,7 @@ export default function GoalPlannerPage() {
           </div>
         </form>
 
-        {(isStreaming && (!lastMessage || lastMessage.role !== 'assistant')) && (
+        {(isStreaming && !lastMessage) && (
             <Card>
                 <CardHeader>
                     <CardTitle className="font-headline">Generating Your Personalized Plan...</CardTitle>
@@ -113,7 +112,7 @@ export default function GoalPlannerPage() {
             </Card>
         )}
 
-        {lastMessage && lastMessage.role === 'assistant' && (
+        {lastMessage && (
           <Card>
             <CardHeader>
                 <CardTitle className="font-headline">Your Personalized Financial Plan</CardTitle>

@@ -1,7 +1,7 @@
 
 'use server';
 
-import { createAI, getMutableAIState, createStreamableUI, readStreamableValue } from 'ai/rsc';
+import { createAI, getMutableAIState, createStreamableUI } from 'ai/rsc';
 import { simulateFinancialScenario } from '@/ai/flows/scenario-simulation';
 import ReactMarkdown from 'react-markdown';
 
