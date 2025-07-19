@@ -10,29 +10,32 @@ export function Logo(props: SVGProps<SVGSVGElement>) {
       {...props}
     >
       <defs>
-        <linearGradient id="bar1" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#F970A1" />
-          <stop offset="100%" stopColor="#ED4D5C" />
+        <linearGradient id="logo-blue-gradient" x1="0.22" y1="0.16" x2="0.77" y2="0.83">
+            <stop offset="0%" stopColor="#4A47C2" />
+            <stop offset="100%" stopColor="#1E1C8A" />
         </linearGradient>
-        <linearGradient id="bar2" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#A861F3" />
-          <stop offset="100%" stopColor="#8346D7" />
+        <linearGradient id="logo-green-gradient" x1="0.22" y1="0.16" x2="0.77" y2="0.83">
+            <stop offset="0%" stopColor="#3DB49E" />
+            <stop offset="100%" stopColor="#1C8A67" />
         </linearGradient>
-        <linearGradient id="bar3" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#6783FF" />
-          <stop offset="100%" stopColor="#3E61F7" />
+         <linearGradient id="logo-gold-gradient" x1="0.22" y1="0.16" x2="0.77" y2="0.83">
+            <stop offset="0%" stopColor="#E6A23C" />
+            <stop offset="100%" stopColor="#C47B1A" />
         </linearGradient>
       </defs>
-      <g fill="currentColor">
-        <path
-          d="M26.6,12.5 C18.8,12.5 12.5,18.8 12.5,26.6 L12.5,61.9 C12.5,69.7 18.8,76 26.6,76 L31.25,76 L31.25,81.25 C31.25,84.6 35,85.6 36.9,83.1 L46.25,70.6 C46.8,70 47.5,69.7 48.25,69.7 L71.9,69.7 C79.7,69.7 86,63.4 86,55.6 L86,26.6 C86,18.8 79.7,12.5 71.9,12.5 L26.6,12.5 Z"
-          fill="none"
-          stroke="hsl(var(--primary))"
-          strokeWidth="5"
-        />
-        <rect x="30" y="45" width="10" height="20" rx="4" fill="url(#bar1)" />
-        <rect x="45" y="35" width="10" height="30" rx="4" fill="url(#bar2)" />
-        <rect x="60" y="25" width="10" height="40" rx="4" fill="url(#bar3)" />
+      <g>
+        <path fill="url(#logo-blue-gradient)" d="M49.61 45.06a3.43 3.43 0 0 1-4.71-1.3l-5.7-8.31a3.43 3.43 0 0 1 1.3-4.71l1-.69a3.43 3.43 0 0 1 4.71 1.3l5.7 8.31a3.43 3.43 0 0 1-1.3 4.71l-1 .69z" />
+        <path fill="url(#logo-blue-gradient)" d="M37.9 31.81a3.43 3.43 0 0 1-4.71-1.3L27.49 22.2a3.43 3.43 0 0 1 1.3-4.71l1-.69a3.43 3.43 0 0 1 4.71 1.3l5.7 8.31a3.43 3.43 0 0 1-1.3 4.71l-1 .69z" />
+        <path fill="url(#logo-green-gradient)" d="M60.1 66.19a3.43 3.43 0 0 1-4.71-1.3L49.69 56.6a3.43 3.43 0 0 1 1.3-4.71l1-.69a3.43 3.43 0 0 1 4.71 1.3l5.7 8.31a3.43 3.43 0 0 1-1.3 4.71l-1 .69z" />
+        <path fill="url(#logo-green-gradient)" d="M71.41 77.8a3.43 3.43 0 0 1-4.71-1.3l-5.7-8.31a3.43 3.43 0 0 1 1.3-4.71l1-.69a3.43 3.43 0 0 1 4.71 1.3l5.7 8.31a3.43 3.43 0 0 1-1.3 4.71l-1 .69z" />
+        <path fill="url(#logo-blue-gradient)" stroke="#FFF" strokeMiterlimit="10" strokeWidth=".5" d="M39.69 57.3a10.87 10.87 0 0 1-7.48-1.54 11.48 11.48 0 0 1-4-11.83 11.48 11.48 0 0 1 11.83-4l.7.12a10.87 10.87 0 0 1 7.48 1.54 11.48 11.48 0 0 1 4 11.83 11.48 11.48 0 0 1-11.83 4l-.7-.12z" />
+        <path fill="url(#logo-green-gradient)" stroke="#FFF" strokeMiterlimit="10" strokeWidth=".5" d="M68.12 55.45a11.48 11.48 0 0 1-4 11.83 11.48 11.48 0 0 1-11.83 4l-.7-.12a10.87 10.87 0 0 1-7.48-1.54 11.48 11.48 0 0 1-4-11.83 11.48 11.48 0 0 1 11.83-4l.7.12a10.87 10.87 0 0 1 7.48 1.54z" />
+        <circle cx="28.98" cy="62.1" r="5.62" fill="url(#logo-blue-gradient)" />
+        <circle cx="70.31" cy="35.9" r="5.62" fill="url(#logo-green-gradient)" />
+        <circle cx="36.88" cy="18.84" r="5.62" fill="url(#logo-gold-gradient)" />
+        <circle cx="63.82" cy="80.16" r="5.62" fill="url(#logo-gold-gradient)" />
+        <circle cx="79.91" cy="58.28" r="3.74" fill="url(#logo-green-gradient)" />
+        <circle cx="18.98" cy="41.52" r="3.74" fill="url(#logo-blue-gradient)" />
       </g>
     </svg>
   );
