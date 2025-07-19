@@ -2,11 +2,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { AppLayout } from '@/components/app-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { RecentTransactions } from '@/components/recent-transactions';
-import { NetWorthChart } from '@/components/net-worth-chart';
-import { AssetAllocationChart } from '@/components/asset-allocation-chart';
 import { getFinancialData, LOCAL_STORAGE_KEY, sampleFinancialData } from '@/lib/mock-data';
 import type { FinancialData } from '@/ai/flows/data-extraction';
 import { DollarSign, TrendingUp, TrendingDown, PlusCircle, User, Briefcase, IndianRupee } from 'lucide-react';
@@ -21,6 +20,21 @@ import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { calculateTotalAssets, calculateTotalLiabilities } from '@/lib/financial-calculations';
 
+const ChartSkeleton = () => (
+    <div className="pl-2 pt-2">
+        <Skeleton className="h-[300px] w-full" />
+    </div>
+);
+
+const NetWorthChart = dynamic(() => import('@/components/net-worth-chart').then(mod => mod.NetWorthChart), {
+  ssr: false,
+  loading: () => <ChartSkeleton />,
+});
+
+const AssetAllocationChart = dynamic(() => import('@/components/asset-allocation-chart').then(mod => mod.AssetAllocationChart), {
+  ssr: false,
+  loading: () => <ChartSkeleton />,
+});
 
 function formatCurrency(amount: number, currency: string = 'INR') {
   if (typeof amount !== 'number' || isNaN(amount)) {
@@ -423,5 +437,3 @@ function AddTransactionDialog({ onAddTransaction, currency }: { onAddTransaction
         </Dialog>
     );
 }
-
-    

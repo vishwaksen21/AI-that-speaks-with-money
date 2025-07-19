@@ -19,6 +19,17 @@ interface AgentResult {
   advice: string;
 }
 
+// Simple hash function to create a key for caching based on data content
+const simpleHash = (s: string) => {
+  let hash = 0;
+  for (let i = 0; i < s.length; i++) {
+    const char = s.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash.toString();
+};
+
 export default function AgentsPage() {
   const [result, setResult] = useState<AgentResult | null>(null);
   const [loadingAgent, setLoadingAgent] = useState<AgentType | null>(null);
@@ -41,7 +52,20 @@ export default function AgentsPage() {
       const dataForAI = { ...financialDataObject };
       delete (dataForAI as any).transactions;
       const cleanedDataString = JSON.stringify(dataForAI, null, 2);
-      
+      const dataHash = simpleHash(cleanedDataString);
+      const cacheKey = `agent-cache-${agent}`;
+
+      // Check cache first
+      const cachedItem = sessionStorage.getItem(cacheKey);
+      if (cachedItem) {
+        const { hash, advice } = JSON.parse(cachedItem);
+        if (hash === dataHash) {
+          setResult({ agent, advice });
+          setLoadingAgent(null);
+          return; // Use cached data
+        }
+      }
+
       let response;
       if (agent === 'investment') {
         response = await getInvestmentAdvice(cleanedDataString);
@@ -53,6 +77,8 @@ export default function AgentsPage() {
       
       if (response && response.advice && !response.advice.toLowerCase().includes('error')) {
         setResult({ agent, advice: response.advice });
+        // Save to cache on successful response
+        sessionStorage.setItem(cacheKey, JSON.stringify({ hash: dataHash, advice: response.advice }));
       } else {
          setError(response?.advice || `Failed to get advice from the ${agent} agent. The AI returned an invalid response.`);
       }
