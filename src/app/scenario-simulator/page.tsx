@@ -84,7 +84,7 @@ function PageContent() {
           <CardTitle className="font-headline text-3xl">Simulate Financial Scenarios</CardTitle>
           <CardDescription className="max-w-xl mx-auto">
             Ask "what if" questions about your finances, and our AI will project the impact. Explore potential futures for your money.
-          </CardDescription>
+          </Description>
         </CardHeader>
         <CardContent>
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-xl mx-auto">
