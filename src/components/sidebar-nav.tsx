@@ -67,6 +67,19 @@ export function SidebarNav() {
 
   return (
     <SidebarMenu>
+        <SidebarMenuItem>
+            <SidebarMenuButton
+                asChild
+                isActive={pathname === '/home'}
+                tooltip={'Home'}
+                className="justify-start"
+            >
+                <Link href={'/home'}>
+                    <Home/>
+                    <span className="group-data-[collapsible=icon]:hidden">Home</span>
+                </Link>
+            </SidebarMenuButton>
+        </SidebarMenuItem>
         {mainNavItems.map((item) => (
             <SidebarMenuItem key={item.href} id={item.id}>
             <SidebarMenuButton
@@ -145,19 +158,6 @@ export function SidebarNav() {
             <SidebarGroupLabel className="px-2 group-data-[collapsible=icon]:px-0">
                 <span className="group-data-[collapsible=icon]:hidden">Account & Help</span>
             </SidebarGroupLabel>
-             <SidebarMenuItem>
-                <SidebarMenuButton
-                    asChild
-                    isActive={pathname === '/home'}
-                    tooltip={'Home'}
-                    className="justify-start"
-                >
-                    <Link href={'/home'}>
-                        <Home/>
-                        <span className="group-data-[collapsible=icon]:hidden">Home</span>
-                    </Link>
-                </SidebarMenuButton>
-            </SidebarMenuItem>
             {accountNavItems.map((item) => (
                 <SidebarMenuItem key={item.label}>
                 <SidebarMenuButton
