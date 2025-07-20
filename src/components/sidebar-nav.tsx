@@ -67,24 +67,11 @@ export function SidebarNav() {
 
   return (
     <SidebarMenu>
-        <SidebarMenuItem>
-            <SidebarMenuButton
-                asChild
-                isActive={pathname === '/home'}
-                tooltip={'Home'}
-                className="justify-start"
-            >
-                <Link href={'/home'}>
-                    <Home/>
-                    <span className="group-data-[collapsible=icon]:hidden">Home</span>
-                </Link>
-            </SidebarMenuButton>
-        </SidebarMenuItem>
         {mainNavItems.map((item) => (
             <SidebarMenuItem key={item.href} id={item.id}>
             <SidebarMenuButton
                 asChild
-                isActive={pathname === item.href}
+                isActive={pathname === item.href || (item.href === '/dashboard' && pathname === '/')}
                 tooltip={item.label}
                 className="justify-start"
             >
