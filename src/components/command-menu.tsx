@@ -86,16 +86,18 @@ export function CommandMenu({ open, setOpen }: CommandMenuProps) {
         
         {financialDataCommands.length > 0 && <CommandSeparator />}
         
-        <CommandGroup heading="Financial Data">
-            {financialDataCommands.map(item => (
-                <CommandItem key={item.name}>
-                    <span>{item.name}:</span>
-                    <span className="ml-auto font-mono">
-                         {item.currency ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: item.currency, minimumFractionDigits: 0 }).format(item.value as number) : item.value}
-                    </span>
-                </CommandItem>
-            ))}
-        </CommandGroup>
+        {financialDataCommands.length > 0 && (
+            <CommandGroup heading="Financial Data">
+                {financialDataCommands.map(item => (
+                    <CommandItem key={item.name}>
+                        <span>{item.name}:</span>
+                        <span className="ml-auto font-mono">
+                            {item.currency && typeof item.value === 'number' ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: item.currency, minimumFractionDigits: 0 }).format(item.value) : item.value}
+                        </span>
+                    </CommandItem>
+                ))}
+            </CommandGroup>
+        )}
         
         <CommandSeparator />
 

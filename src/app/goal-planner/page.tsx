@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Sparkles, Target } from 'lucide-react';
 import { useFinancialData } from '@/context/financial-data-context';
-import { AI } from './actions.tsx';
+import { AI } from './actions';
 import { Skeleton } from '@/components/ui/skeleton';
 
 function PageContent() {

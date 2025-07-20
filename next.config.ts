@@ -32,6 +32,9 @@ const nextConfig = withBundleAnalyzer({
       }
     ],
   },
+  // IMPORTANT: This is the critical change.
+  // We only ignore errors in development for faster iteration.
+  // Production builds will now fail if there are any errors, ensuring stability.
   ...(isDev && {
     typescript: { ignoreBuildErrors: true },
     eslint: { ignoreDuringBuilds: true },
