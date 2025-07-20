@@ -10,7 +10,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Sparkles, Target } from 'lucide-react';
 import { useFinancialData } from '@/context/financial-data-context';
 import { AI } from './actions.tsx';
-import type { AIState } from './actions.tsx';
 
 function PageContent() {
   const [inputValue, setInputValue] = useState('');
