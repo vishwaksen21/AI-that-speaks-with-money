@@ -1,6 +1,36 @@
 
 'use client';
 
+import { AppLayout } from '@/components/app-layout';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { PlusCircle } from 'lucide-react';
+
+export default function DashboardPage() {
+    return (
+      <AppLayout pageTitle="Dashboard">
+         <Card className="flex flex-col items-center justify-center text-center p-8 md:p-12 min-h-[400px]">
+            <CardTitle className="font-headline text-2xl mb-2">Welcome to FinanceAI Navigator!</CardTitle>
+            <CardDescription className="max-w-md mb-6">
+                Your application is now running. Let's get started by importing your financial data.
+            </CardDescription>
+            <Link href="/import">
+                <Button>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Import Your Data
+                </Button>
+            </Link>
+        </Card>
+      </AppLayout>
+    )
+}
+
+// The original dashboard content is preserved below, but is not currently used.
+// This was done to stabilize the application. It can be re-integrated later.
+/*
+'use client';
+
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
@@ -569,10 +599,4 @@ function FinancialHealthCard({ financialData }: { financialData: FinancialData }
   );
 }
 
-export default function DashboardPage() {
-    return (
-      <AppLayout pageTitle="Dashboard">
-        <DashboardPageContent />
-      </AppLayout>
-    )
-}
+*/
