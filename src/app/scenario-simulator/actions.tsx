@@ -18,6 +18,7 @@ export async function getScenarioResponse(scenarioDescription: string, financial
             });
             
             let finalResponse = '';
+            // @ts-ignore
             for await (const delta of stream) {
                 finalResponse += delta;
                 uiStream.update(<ReactMarkdown className="prose prose-sm max-w-none dark:prose-invert">{finalResponse}</ReactMarkdown>);
@@ -48,7 +49,7 @@ export async function getScenarioResponse(scenarioDescription: string, financial
 
 // Define the initial state of the AI. It can be any JSON object.
 const initialAIState: {
-  role: 'user' | 'assistant' | 'system' | 'function';
+  role: 'user' | 'assistant' | 'system' | 'function' | 'tool';
   content: string;
   id?: string;
   name?: string;

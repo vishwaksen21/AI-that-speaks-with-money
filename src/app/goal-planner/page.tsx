@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -9,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Loader2, Target, Wand2, User } from 'lucide-react';
 import { useFinancialData } from '@/context/financial-data-context';
-import { type AI } from './actions';
+import { type AI } from './actions.tsx';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Logo } from '@/components/icons';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -76,7 +77,7 @@ export default function GoalPlannerPage() {
                         {message.display}
                     </div>
                 ))}
-                {isGenerating && messages[messages.length-1]?.display.props.children.props.children?.props?.children !== 'Loading...' && (
+                {isGenerating && messages.length > 0 && typeof messages[messages.length-1]?.display === 'object' && 'props' in messages[messages.length-1].display && (messages[messages.length-1].display as any).props.children.props.children?.props?.children === 'Loading...' && (
                      <div className="flex items-start gap-4">
                         <Avatar className="w-8 h-8 border">
                             <AvatarFallback className="bg-primary text-primary-foreground">
