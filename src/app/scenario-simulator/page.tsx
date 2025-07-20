@@ -57,9 +57,8 @@ export default function ScenarioSimulatorPage() {
     setInputValue('');
     setIsGenerating(false);
   };
-
-  return (
-    <AppLayout pageTitle="AI Scenario Simulator">
+  
+  const PageContent = () => (
       <div className="flex flex-col h-[calc(100vh-120px)] max-w-3xl mx-auto">
         <ScrollArea className="flex-1 p-4 -mx-4">
             <div className="space-y-6">
@@ -77,7 +76,7 @@ export default function ScenarioSimulatorPage() {
                         {message.display}
                     </div>
                 ))}
-                 {isGenerating && messages.length > 0 && typeof messages[messages.length-1]?.display === 'object' && 'props' in messages[messages.length-1].display && (messages[messages.length-1].display as any).props.children.props.children?.props?.children === 'Loading...' && (
+                 {isGenerating && messages.length > 0 && typeof messages[messages.length-1]?.display === 'object' && 'props' in messages[messages.length-1].display && (messages[messages.length-1].display as any).props.children?.props?.children === 'Loading...' && (
                      <div className="flex items-start gap-4">
                         <Avatar className="w-8 h-8 border">
                             <AvatarFallback className="bg-primary text-primary-foreground">
@@ -112,6 +111,13 @@ export default function ScenarioSimulatorPage() {
           </form>
         </div>
       </div>
+  );
+
+  return (
+    <AppLayout pageTitle="AI Scenario Simulator">
+      <AI>
+        <PageContent />
+      </AI>
     </AppLayout>
   );
 }

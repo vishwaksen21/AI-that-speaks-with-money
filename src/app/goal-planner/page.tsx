@@ -57,9 +57,8 @@ export default function GoalPlannerPage() {
     setInputValue('');
     setIsGenerating(false);
   };
-
-  return (
-    <AppLayout pageTitle="AI Goal Planner">
+  
+  const PageContent = () => (
       <div className="flex flex-col h-[calc(100vh-120px)] max-w-3xl mx-auto">
         <ScrollArea className="flex-1 p-4 -mx-4">
             <div className="space-y-6">
@@ -112,6 +111,13 @@ export default function GoalPlannerPage() {
           </form>
         </div>
       </div>
+  );
+
+  return (
+    <AppLayout pageTitle="AI Goal Planner">
+        <AI>
+            <PageContent />
+        </AI>
     </AppLayout>
   );
 }

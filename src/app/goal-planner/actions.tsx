@@ -4,12 +4,13 @@
 import { createAI, getMutableAIState, createStreamableUI } from 'ai/rsc';
 import ReactMarkdown from 'react-markdown';
 import { generateGoalPlan as generateGoalPlanFlow } from '@/ai/flows/goal-planner-agent';
+import { ReactNode } from 'react';
 
 
 export async function getGoalPlan(goalDescription: string, financialData: string) {
     'use server';
     const aiState = getMutableAIState<typeof AI>();
-    const uiStream = createStreamableUI(<div>Loading...</div>);
+    const uiStream = createStreamableUI(<div className="p-4">Generating plan...</div>);
 
     (async () => {
         try {
@@ -19,7 +20,6 @@ export async function getGoalPlan(goalDescription: string, financialData: string
             });
 
             let finalResponse = '';
-            // @ts-ignore
             for await (const delta of resultStream) {
                 finalResponse += delta;
                 uiStream.update(<ReactMarkdown className="prose prose-sm max-w-none dark:prose-invert">{finalResponse}</ReactMarkdown>);
@@ -59,7 +59,7 @@ const initialAIState: {
 // The initial UI state that the client will keep track of.
 const initialUIState: {
   id: number;
-  display: React.ReactNode;
+  display: ReactNode;
 }[] = [];
 
 export const AI = createAI({
