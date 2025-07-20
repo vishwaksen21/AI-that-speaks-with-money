@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -18,7 +17,6 @@ import {
   User,
   LogIn,
   Mic,
-  Home,
   ChevronDown,
   Upload,
   UserPlus,

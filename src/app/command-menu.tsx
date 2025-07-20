@@ -1,4 +1,3 @@
-
 'use client';
 
 import * as React from 'react';
@@ -19,7 +18,6 @@ import {
   User,
   LogIn,
   Mic,
-  Home,
   Upload,
   UserPlus,
   Wand2,
@@ -42,7 +40,6 @@ export function CommandMenu({ open, setOpen }: CommandMenuProps) {
   };
 
   const navigationCommands = [
-      { href: '/home', label: 'Home', icon: Home },
       { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
       { href: '/import', label: 'Import Data', icon: Upload },
       { href: '/goal-planner', label: 'Goal Planner', icon: Target },
@@ -93,7 +90,7 @@ export function CommandMenu({ open, setOpen }: CommandMenuProps) {
                 <CommandItem key={item.name}>
                     <span>{item.name}:</span>
                     <span className="ml-auto font-mono">
-                         {item.currency ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: item.currency, minimumFractionDigits: 0 }).format(item.value) : item.value}
+                         {item.currency ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: item.currency, minimumFractionDigits: 0 }).format(item.value as number) : item.value}
                     </span>
                 </CommandItem>
             ))}
