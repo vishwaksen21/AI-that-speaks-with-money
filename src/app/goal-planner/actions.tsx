@@ -10,7 +10,7 @@ import { ReactNode } from 'react';
 export async function getGoalPlan(goalDescription: string, financialData: string) {
     'use server';
     const aiState = getMutableAIState<typeof AI>();
-    const uiStream = createStreamableUI(<div className="p-4">Generating plan...</div>);
+    const uiStream = createStreamableUI(<div className="p-4 text-center text-muted-foreground">Generating your personalized financial plan...</div>);
 
     (async () => {
         try {
@@ -38,7 +38,14 @@ export async function getGoalPlan(goalDescription: string, financialData: string
         } catch(e) {
             console.error("Error in getGoalPlan action:", e);
             const errorMarkdown = `Sorry, I encountered an error while generating your plan. Please try again. Error: ${(e as Error).message}`;
-            uiStream.done(<ReactMarkdown>{errorMarkdown}</ReactMarkdown>);
+            uiStream.done(<ReactMarkdown className="prose prose-sm max-w-none dark:prose-invert text-destructive">{errorMarkdown}</ReactMarkdown>);
+            aiState.done([
+                ...aiState.get(),
+                {
+                    role: 'assistant',
+                    content: errorMarkdown,
+                },
+            ]);
         }
     })();
     

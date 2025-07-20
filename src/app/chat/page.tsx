@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import { AppLayout } from '@/components/app-layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,25 +13,35 @@ import ReactMarkdown from 'react-markdown';
 import { Logo } from '@/components/icons';
 import { useChat, type Message } from 'ai/react';
 import { useFinancialData } from '@/context/financial-data-context';
+import { useToast } from '@/hooks/use-toast';
 
 const CHAT_HISTORY_KEY = 'chatHistory';
 
 export default function ChatPage() {
   const { financialData, isLoading: isDataLoading } = useFinancialData();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
-  const { messages, input, handleInputChange, handleSubmit, isLoading, stop, setMessages } = useChat({
+  const { messages, input, handleInputChange, handleSubmit, isLoading, stop, setMessages, error } = useChat({
+    api: '/api/chat',
     onFinish: (message) => {
       // Save full history on completion
       const updatedMessages = [...messages, message];
       try {
         localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(updatedMessages));
-      } catch (error) {
-        console.error('Failed to save messages to local storage', error);
+      } catch (e) {
+        console.error('Failed to save messages to local storage', e);
       }
     },
     body: {
         financialData: financialData ? JSON.stringify(financialData, null, 2) : ''
+    },
+    onError: (err) => {
+        toast({
+            title: 'An error occurred',
+            description: err.message,
+            variant: 'destructive',
+        });
     }
   });
 
@@ -42,8 +52,8 @@ export default function ChatPage() {
       if (savedMessages) {
         setMessages(JSON.parse(savedMessages));
       }
-    } catch (error) {
-      console.error('Failed to load messages from local storage', error);
+    } catch (e) {
+      console.error('Failed to load messages from local storage', e);
       setMessages([]);
     }
   }, [setMessages]);

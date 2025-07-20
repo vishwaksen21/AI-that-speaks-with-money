@@ -1,8 +1,8 @@
 
 import { generatePersonalizedFinancialInsights } from '@/ai/flows/insight-generation';
-import { type CoreMessage, streamText } from 'ai';
-import { google } from '@ai-sdk/google';
-import { taxCalculatorTool } from '@/ai/tools/tax-calculator';
+import { type CoreMessage } from 'ai';
+import { createStreamableValue, StreamData, StreamingTextResponse } from 'ai/rsc';
+import { AIStream } from 'ai';
 
 export const runtime = 'edge';
  
@@ -22,10 +22,18 @@ export async function POST(req: Request) {
      return new Response('Missing user question or financial data', { status: 400 });
   }
  
-  const result = await generatePersonalizedFinancialInsights({
-    userQuestion,
-    financialData,
-  });
- 
-  return result.toAIStream();
+  try {
+    const resultStream = await generatePersonalizedFinancialInsights({
+        userQuestion,
+        financialData,
+    });
+    
+    const aiStream = AIStream(resultStream, undefined);
+    
+    return new StreamingTextResponse(aiStream);
+
+  } catch (error) {
+    console.error('Error in chat API:', error);
+    return new Response('An error occurred while processing your request.', { status: 500 });
+  }
 }

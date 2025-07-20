@@ -9,7 +9,7 @@ import { ReactNode } from 'react';
 export async function getScenarioResponse(scenarioDescription: string, financialData: string) {
     'use server';
     const aiState = getMutableAIState<typeof AI>();
-    const uiStream = createStreamableUI(<div className="p-4">Simulating scenario...</div>);
+    const uiStream = createStreamableUI(<div className="p-4 text-center text-muted-foreground">Simulating financial scenario...</div>);
 
     (async () => {
         try {
@@ -37,7 +37,14 @@ export async function getScenarioResponse(scenarioDescription: string, financial
         } catch(e) {
             console.error("Error in getScenarioResponse action:", e);
             const errorMarkdown = `Sorry, I encountered an error. Please try again. Error: ${(e as Error).message}`;
-            uiStream.done(<ReactMarkdown>{errorMarkdown}</ReactMarkdown>);
+            uiStream.done(<ReactMarkdown className="prose prose-sm max-w-none dark:prose-invert text-destructive">{errorMarkdown}</ReactMarkdown>);
+            aiState.done([
+                ...aiState.get(),
+                {
+                    role: 'assistant',
+                    content: errorMarkdown,
+                },
+            ]);
         }
     })();
     

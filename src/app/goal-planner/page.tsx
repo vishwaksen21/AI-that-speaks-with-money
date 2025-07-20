@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Sparkles, Target } from 'lucide-react';
 import { useFinancialData } from '@/context/financial-data-context';
 import { AI } from './actions.tsx';
+import { Skeleton } from '@/components/ui/skeleton';
 
 function PageContent() {
   const [inputValue, setInputValue] = useState('');
@@ -50,6 +51,17 @@ function PageContent() {
     }
   };
 
+  if (isDataLoading) {
+    return (
+        <div className="space-y-6">
+            <Card>
+                <CardHeader className="text-center"><Skeleton className="h-10 w-3/4 mx-auto" /><Skeleton className="h-4 w-1/2 mx-auto mt-2" /></CardHeader>
+                <CardContent><Skeleton className="h-24 w-full max-w-xl mx-auto" /><Skeleton className="h-10 w-full max-w-xl mx-auto mt-4" /></CardContent>
+            </Card>
+        </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
         <Card>
@@ -80,8 +92,8 @@ function PageContent() {
             </CardContent>
         </Card>
         
-        {messages.map(message => (
-            <Card key={message.id}>
+        {messages.map((message, index) => (
+            <Card key={message.id || `msg-${index}`}>
                 <CardContent className="pt-6">
                     {message.display}
                 </CardContent>
